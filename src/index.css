@@ -1,3 +1,19 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+html {
+	scroll-behavior: smooth;
+}
+
+body {
+	@apply bg-white font-sans text-slate-800;
+}
+
+h1.hero-title {
+	@apply text-white font-extrabold drop-shadow;
+}
+
+p.hero-subtitle {
+	@apply text-white font-semibold drop-shadow;
+}
