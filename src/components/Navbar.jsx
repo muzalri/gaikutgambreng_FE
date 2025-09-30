@@ -1,35 +1,56 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const location = useLocation();
+  const isHome = location.pathname === "/";
   return (
-    <header className="fixed top-0 inset-x-0 z-50 bg-white/80 backdrop-blur border-b border-gray-200">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+    <header
+      className={
+        `fixed inset-x-0 top-0 z-50 transition-all ` +
+        (isHome
+          ? "bg-transparent"
+          : "bg-teal-900 border-b border-teal-900 shadow")
+      }
+    >
+      <div className="flex items-center justify-between h-16 px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
         <Link
           to="/"
-          className="flex items-center gap-2 text-xl font-bold text-slate-900"
+          className={
+            `flex items-center gap-4 font-bold pl-2 ` +
+            (isHome ? "text-white drop-shadow" : "text-white")
+          }
+          style={{ minWidth: "220px" }}
         >
-          <img src="/assets/logo1.png" alt="Logo" className="h-6 w-auto" />
-          <span>Al-Ihsan</span>
+          <img
+            src="/assets/logo3.png"
+            alt="Logo"
+            className={isHome ? "h-8 w-auto" : "h-10 w-auto"}
+            style={{ filter: "brightness(0) invert(1)" }}
+          />
         </Link>
-        <nav className="hidden md:flex items-center gap-6 text-sm text-slate-700 relative">
-          <Link to="/" className="hover:text-slate-900">
+        <nav
+          className={
+            `relative items-center hidden gap-6 text-sm md:flex ` +
+            (isHome ? "text-white" : "text-white")
+          }
+        >
+          <Link to="/" className="hover:underline">
             Beranda
           </Link>
-          <div
-            className="relative"
-            onMouseEnter={() => setOpen(true)}
-            onMouseLeave={() => setOpen(false)}
-          >
+          <div className="relative" onMouseEnter={() => setOpen(true)}>
             <button
               type="button"
-              className="hover:text-slate-900 flex items-center gap-1"
+              className="flex items-center gap-1 hover:underline"
             >
               Profil <span>▾</span>
             </button>
             {open && (
-              <div className="absolute top-full left-0 mt-2 w-48 rounded-md border border-slate-200 bg-white shadow-lg py-2">
+              <div
+                className="absolute left-0 w-48 py-2 mt-2 bg-white border rounded-md shadow-lg top-full border-slate-200 text-slate-700"
+                onMouseLeave={() => setOpen(false)}
+              >
                 <Link
                   to="/profil/tentang-kami"
                   className="block px-3 py-2 hover:bg-slate-50"
@@ -45,12 +66,17 @@ export default function Navbar() {
               </div>
             )}
           </div>
-          <Link to="/artikel" className="hover:text-slate-900">
+          <Link to="/artikel" className="hover:underline">
             Artikel
           </Link>
-          <Link to="/pendaftaran" className="hover:text-slate-900">
+          <a
+            href="/pendaftaran"
+            className="hover:underline"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             Pendaftaran
-          </Link>
+          </a>
         </nav>
       </div>
     </header>

@@ -40,7 +40,7 @@ export default function Home() {
   return (
     <div className="text-slate-800">
       {/* Hero */}
-      <section className="pt-16">
+      <section>
         <div className="relative">
           <div
             className="h-[56vh] sm:h-[64vh] md:h-[72vh] lg:h-[78vh] xl:h-[82vh] bg-cover bg-center"
@@ -48,12 +48,12 @@ export default function Home() {
           />
           <div className="absolute inset-0 bg-black/30" />
           <div className="absolute inset-0 flex items-center justify-center px-4">
-            <div className="text-center max-w-5xl">
-              <h1 className="hero-title text-4xl sm:text-5xl md:text-6xl lg:text-7xl">
+            <div className="max-w-5xl text-center">
+              <h1 className="text-4xl hero-title sm:text-5xl md:text-6xl lg:text-7xl">
                 Pesantren <span className="text-amber-500">Al-Ihsan</span>{" "}
                 Bekasi
               </h1>
-              <p className="hero-subtitle mt-4 text-lg sm:text-xl md:text-2xl">
+              <p className="mt-4 text-lg hero-subtitle sm:text-xl md:text-2xl">
                 Adab, Ilmu, dan Amal
               </p>
             </div>
@@ -63,8 +63,8 @@ export default function Home() {
 
       {/* Tentang */}
       <section id="about" className="py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid md:grid-cols-2 gap-8 items-start">
-          <div className="rounded-xl overflow-hidden border border-slate-200">
+        <div className="grid items-start gap-8 px-4 mx-auto max-w-7xl sm:px-6 lg:px-8 md:grid-cols-2">
+          <div className="overflow-hidden border rounded-xl border-slate-200">
             <div
               className="aspect-[16/10] bg-cover bg-center"
               style={{ backgroundImage: "url(/assets/articles/about.jpg)" }}
@@ -75,7 +75,7 @@ export default function Home() {
               Kenapa Memilih Pesantren <br></br>{" "}
               <span className="text-teal-700">Al-Ihsan</span> Bekasi ?
             </h2>
-            <p className="mt-4 text-slate-600 leading-7">
+            <p className="mt-4 leading-7 text-slate-600">
               Pondok Pesantren Al Ihsan berkomitmen mencetak generasi muslim
               yang berilmu dan berakhlak mulia melalui pembelajaran agama yang
               mendalam. Santri dibimbing untuk menguasai bahasa Arab sebagai
@@ -88,7 +88,7 @@ export default function Home() {
             </p>
             <a
               href="/profil/tentang-kami"
-              className="mt-4 inline-block text-sm text-slate-600 hover:text-slate-900"
+              className="inline-block mt-4 text-sm text-slate-600 hover:text-slate-900"
             >
               Lihat Selengkapnya
             </a>
@@ -98,18 +98,18 @@ export default function Home() {
 
       {/* Prestasi */}
       <section className="py-20 bg-slate-50">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
           <h2 className="text-2xl font-bold text-slate-900">
             Prestasi <span className="text-teal-700">Pesantren</span>
           </h2>
-          <div className="mt-8 grid md:grid-cols-3 gap-6">
+          <div className="grid gap-6 mt-8 md:grid-cols-3">
             {[1, 2, 3].map((i) => (
               <article
                 key={i}
-                className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden"
+                className="overflow-hidden bg-white border shadow-sm border-slate-200 rounded-xl"
               >
                 <div
-                  className="h-40 bg-cover bg-center"
+                  className="h-40 bg-center bg-cover"
                   style={{
                     backgroundImage: "url(/assets/achievements/sample.jpg)",
                   }}
@@ -141,18 +141,18 @@ export default function Home() {
 
       {/* Kegiatan */}
       <section className="py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
           <h2 className="text-2xl font-bold text-slate-900">
             Kegiatan <span className="text-teal-700">Pesantren</span>
           </h2>
-          <div className="mt-8 grid md:grid-cols-3 gap-6">
+          <div className="grid gap-6 mt-8 md:grid-cols-3">
             {[1, 2, 3].map((i) => (
               <article
                 key={i}
-                className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden"
+                className="overflow-hidden bg-white border shadow-sm border-slate-200 rounded-xl"
               >
                 <div
-                  className="h-40 bg-cover bg-center"
+                  className="h-40 bg-center bg-cover"
                   style={{
                     backgroundImage: "url(/assets/activities/sample.jpg)",
                   }}
@@ -188,8 +188,8 @@ export default function Home() {
         />
         <div className="absolute inset-0 -z-10 bg-white/80" />
 
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-center text-2xl font-extrabold">
+        <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+          <h2 className="text-2xl font-extrabold text-center">
             Testimoni <span className="text-amber-600">Alumni</span>
           </h2>
 
@@ -197,7 +197,7 @@ export default function Home() {
             {/* Side previews positioned behind main card, consistent size */}
             <div className="hidden md:block absolute left-4 top-1/2 -translate-y-1/2 w-[220px] h-[300px] rounded-2xl overflow-hidden blur-[2px] opacity-70 pointer-events-none z-0">
               <div
-                className="w-full h-full bg-cover bg-center"
+                className="w-full h-full bg-center bg-cover"
                 style={{
                   backgroundImage: `url(${
                     testimonials[(current - 1 + total) % total].photo
@@ -207,7 +207,7 @@ export default function Home() {
             </div>
             <div className="hidden md:block absolute right-4 top-1/2 -translate-y-1/2 w-[220px] h-[300px] rounded-2xl overflow-hidden blur-[2px] opacity-70 pointer-events-none z-0">
               <div
-                className="w-full h-full bg-cover bg-center"
+                className="w-full h-full bg-center bg-cover"
                 style={{
                   backgroundImage: `url(${
                     testimonials[(current + 1) % total].photo
@@ -217,22 +217,22 @@ export default function Home() {
             </div>
 
             {/* Main card fixed size */}
-            <div className="relative z-10 mx-auto max-w-5xl">
+            <div className="relative z-10 max-w-5xl mx-auto">
               <div className="bg-white rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.12)] ring-1 ring-slate-100 grid md:grid-cols-[360px_1fr] overflow-hidden h-[300px]">
                 <div
-                  className="h-full bg-cover bg-center"
+                  className="h-full bg-center bg-cover"
                   style={{
                     backgroundImage: `url(${testimonials[current].photo})`,
                   }}
                 />
                 <div className="p-6 md:p-8">
-                  <p className="text-slate-900 font-semibold text-lg md:text-xl">
+                  <p className="text-lg font-semibold text-slate-900 md:text-xl">
                     {testimonials[current].name} -{" "}
                     <span className="text-amber-600">
                       {testimonials[current].cohort}
                     </span>
                   </p>
-                  <p className="mt-3 text-slate-700 leading-7 text-sm md:text-base">
+                  <p className="mt-3 text-sm leading-7 text-slate-700 md:text-base">
                     {testimonials[current].text}
                   </p>
                 </div>
@@ -243,14 +243,14 @@ export default function Home() {
             <button
               onClick={prev}
               aria-label="Sebelumnya"
-              className="absolute left-0 md:left-6 top-1/2 -translate-y-1/2 inline-flex items-center justify-center w-12 h-12 rounded-full bg-amber-500 text-white shadow hover:bg-amber-600 z-20"
+              className="absolute left-0 z-20 inline-flex items-center justify-center w-12 h-12 text-white -translate-y-1/2 rounded-full shadow md:left-6 top-1/2 bg-amber-500 hover:bg-amber-600"
             >
               ‹
             </button>
             <button
               onClick={next}
               aria-label="Selanjutnya"
-              className="absolute right-0 md:right-6 top-1/2 -translate-y-1/2 inline-flex items-center justify-center w-12 h-12 rounded-full bg-amber-500 text-white shadow hover:bg-amber-600 z-20"
+              className="absolute right-0 z-20 inline-flex items-center justify-center w-12 h-12 text-white -translate-y-1/2 rounded-full shadow md:right-6 top-1/2 bg-amber-500 hover:bg-amber-600"
             >
               ›
             </button>
@@ -260,11 +260,11 @@ export default function Home() {
 
       {/* Hubungi */}
       <section id="contact" className="py-16">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-center text-2xl font-extrabold">
+        <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+          <h2 className="text-2xl font-extrabold text-center">
             Hubungi <span className="text-teal-700">Kami</span>
           </h2>
-          <div className="mt-6 grid md:grid-cols-2 gap-6">
+          <div className="grid gap-6 mt-6 md:grid-cols-2">
             {/* Kartu Tanya */}
             <div className="relative rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
               {/* Background blur */}
@@ -281,15 +281,15 @@ export default function Home() {
                 className="absolute right-2 bottom-0 h-[92%] object-contain z-20 hidden sm:block"
               />
               {/* Teks dan tombol - vertikal tengah kiri */}
-              <div className="absolute left-6 top-1/2 -translate-y-1/2 z-30">
-                <h3 className="text-white text-xl sm:text-2xl font-extrabold drop-shadow">
+              <div className="absolute z-30 -translate-y-1/2 left-6 top-1/2">
+                <h3 className="text-xl font-extrabold text-white sm:text-2xl drop-shadow">
                   Tanyakan Disini
                 </h3>
                 <a
                   href={WHATSAPP_LINK}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-block mt-3 px-5 py-2 rounded-full bg-amber-500 text-white text-sm font-semibold shadow"
+                  className="inline-block px-5 py-2 mt-3 text-sm font-semibold text-white rounded-full shadow bg-amber-500"
                 >
                   Tanya Disini
                 </a>
@@ -306,12 +306,12 @@ export default function Home() {
                 referrerPolicy="no-referrer-when-downgrade"
               />
               {/* Gradient bottom for label readability */}
-              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-white/90 to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 h-20 pointer-events-none bg-gradient-to-t from-white/90 to-transparent" />
               <a
                 href={GMAPS_LINK}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="absolute left-1/2 -translate-x-1/2 bottom-4 inline-block px-4 py-2 rounded-full bg-amber-500 text-white text-xs sm:text-sm font-semibold shadow z-10"
+                className="absolute z-10 inline-block px-4 py-2 text-xs font-semibold text-white -translate-x-1/2 rounded-full shadow left-1/2 bottom-4 bg-amber-500 sm:text-sm"
               >
                 Lokasi Pesantren Al-Ihsan Bekasi
               </a>
