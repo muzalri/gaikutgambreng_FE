@@ -8,12 +8,22 @@ import Teachers from "./pages/Teachers";
 import Articles from "./pages/Articles";
 import Register from "./pages/Register";
 import AdminLogin from "./pages/AdminLogin";
+import AdminDashboard from "./pages/AdminDashboard";
+import Santri from "./pages/Santri";
+import Pendidik from "./pages/Pendidik";
+import Artikel from "./pages/Artikel";
+import PPDB from "./pages/PPDB";
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/admin" element={<AdminLogin />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/admin/santri" element={<Santri />} />
+        <Route path="/admin/pendidik" element={<Pendidik />} />
+        <Route path="/admin/artikel" element={<Artikel />} />
+        <Route path="/admin/ppdb" element={<PPDB />} />
         <Route
           path="*"
           element={

@@ -1,0 +1,170 @@
+import React from "react";
+import AdminSidebar from "../components/AdminSidebar";
+import { useState } from "react";
+
+export default function Pendidik() {
+  const [showModal, setShowModal] = useState(false);
+  return (
+    <div className="min-h-screen bg-[#f5f6fa]">
+      <header className="sticky top-0 z-40 flex items-center justify-between w-full px-10 py-5 text-white shadow bg-gradient-to-r from-teal-800 to-teal-600">
+        <div className="flex items-center gap-3">
+          <img src="/assets/logo3.png" alt="Logo" className="h-8" />
+        </div>
+        <div className="flex items-center gap-3">
+          <span className="font-semibold">Halo, Admin Pusat</span>
+          <img
+            src="/assets/teachers/Drs.-K.H.-Mudrik-Qori-MA-Mudir 1.png"
+            alt="Admin"
+            className="object-cover w-8 h-8 border-2 border-white rounded-full"
+          />
+        </div>
+      </header>
+      <div className="flex">
+        <div className="fixed left-0 top-[72px] h-[calc(100vh-72px)] z-30">
+          <AdminSidebar activeMenu="Pendidik" />
+        </div>
+        <div className="flex-1 ml-64">
+          <main className="flex flex-col min-h-screen">
+            <section className="p-10 bg-[#f5f6fa] min-h-screen">
+              <h2 className="mb-2 text-3xl font-bold text-slate-900">
+                Pendidik
+              </h2>
+              <span className="block mb-6 font-medium text-slate-500">
+                Pendidik
+              </span>
+              {/* Tabel dan filter sesuai desain Tenaga Pendidik.png */}
+              <div className="p-8 bg-white border shadow rounded-2xl border-slate-100">
+                <div className="flex items-center justify-end gap-4 mb-4">
+                  <button
+                    className="px-6 py-2 font-semibold text-white bg-teal-700 rounded-full shadow"
+                    onClick={() => setShowModal(true)}
+                  >
+                    Tambah
+                  </button>
+                  <div className="relative">
+                    <select className="px-6 py-2 pr-10 font-semibold text-teal-700 transition-all border-2 border-teal-700 rounded-full appearance-none focus:outline-none focus:ring-2 focus:ring-teal-400">
+                      <option>Semua</option>
+                    </select>
+                    <span className="absolute text-teal-700 transform -translate-y-1/2 pointer-events-none right-4 top-1/2">
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 20 20"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
+                        <path d="M6 8l4 4 4-4" />
+                      </svg>
+                    </span>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="Cari..."
+                      className="px-6 py-2 pr-10 font-semibold text-teal-700 transition-all border-2 border-teal-700 rounded-full focus:outline-none focus:ring-2 focus:ring-teal-400"
+                    />
+                    <span className="absolute right-4 top-2.5 text-teal-700">
+                      <svg
+                        width="20"
+                        height="20"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle cx="11" cy="11" r="8" />
+                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                      </svg>
+                    </span>
+                  </div>
+                </div>
+                {/* Modal Tambah Tenaga Pendidik */}
+                {showModal && (
+                  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+                    <div className="relative w-full max-w-lg mx-auto bg-white rounded-2xl shadow-lg p-8">
+                      <button
+                        className="absolute top-6 right-6 text-2xl text-slate-400 hover:text-teal-700"
+                        onClick={() => setShowModal(false)}
+                        aria-label="Tutup"
+                      >
+                        &#10005;
+                      </button>
+                      <h3 className="text-2xl font-bold text-center mb-2">Tambah Tenaga Pendidik</h3>
+                      <p className="text-center text-slate-500 mb-6 text-base">Silakan lengkapi data berikut untuk menambah tenaga pendidik Pesantren Al Ihsan Bekasi yang baru.</p>
+                      <form className="flex flex-col gap-4">
+                        <input type="text" placeholder="Masukkan Nama Lengkap..." className="w-full px-5 py-3 rounded-lg bg-slate-100 text-slate-700 font-medium focus:outline-none" />
+                        <input type="text" placeholder="Masukkan No Telepon..." className="w-full px-5 py-3 rounded-lg bg-slate-100 text-slate-700 font-medium focus:outline-none" />
+                        <input type="email" placeholder="Masukkan Alamat Lengkap..." className="w-full px-5 py-3 rounded-lg bg-slate-100 text-slate-700 font-medium focus:outline-none" />
+                        <input type="text" placeholder="Masukkan Peran..." className="w-full px-5 py-3 rounded-lg bg-slate-100 text-slate-700 font-medium focus:outline-none" />
+                        <input type="password" placeholder="Masukkan Kata Sandi..." className="w-full px-5 py-3 rounded-lg bg-slate-100 text-slate-700 font-medium focus:outline-none" />
+                        <button type="submit" className="w-1/2 mx-auto mt-4 py-3 rounded-full bg-teal-700 text-white font-semibold shadow">Konfirmasi</button>
+                      </form>
+                    </div>
+                  </div>
+                )}
+                <div className="overflow-x-auto">
+                  <table className="min-w-full text-left">
+                    <thead>
+                      <tr className="text-base font-bold text-slate-700">
+                        <th className="px-4 py-3">NO</th>
+                        <th className="px-4 py-3">Nama</th>
+                        <th className="px-4 py-3">NIP</th>
+                        <th className="px-4 py-3">Peran</th>
+                        <th className="px-4 py-3">Aksi</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[
+                        { nama: "Heru Kusuma", peran: "Penanggung Jawab" },
+                        {
+                          nama: "Muhibbul Umam Thalib, Lc",
+                          peran: "Mudir Pesantren",
+                        },
+                        { nama: "Danu Sabdo, M.Pd", peran: "Kesatrian" },
+                        { nama: "Hudzaifah, BA.", peran: "Bagian Bahasa" },
+                        { nama: "Lutthi", peran: "Bagian Tahfidz" },
+                        { nama: "Reza", peran: "Koordinator Musyrif" },
+                        { nama: "Fajar", peran: "Musyrif" },
+                        { nama: "Najib", peran: "Musyrif" },
+                        { nama: "Fauzan", peran: "Musyrif" },
+                        { nama: "Raka", peran: "Musyrif" },
+                        { nama: "Risky", peran: "Musyrif" },
+                        { nama: "Putra", peran: "Musyrif" },
+                        { nama: "Rega", peran: "Musyrif" },
+                      ].map((data, i) => (
+                        <tr
+                          key={i}
+                          className={i % 2 === 0 ? "bg-white" : "bg-slate-50"}
+                        >
+                          <td className="px-4 py-3">{i + 1}</td>
+                          <td className="px-4 py-3">{data.nama}</td>
+                          <td className="px-4 py-3">J04032311{i + 1}</td>
+                          <td className="px-4 py-3">{data.peran}</td>
+                          <td className="px-4 py-3">
+                            <button className="px-4 py-1 font-semibold text-white bg-teal-700 rounded-full">
+                              Lihat
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <div className="flex items-center justify-end gap-2 mt-4">
+                  <button className="px-2 py-1 rounded bg-slate-100 text-slate-700">
+                    &lt;
+                  </button>
+                  <span className="px-2">1</span>
+                  <button className="px-2 py-1 rounded bg-slate-100 text-slate-700">
+                    &gt;
+                  </button>
+                </div>
+              </div>
+            </section>
+          </main>
+        </div>
+      </div>
+    </div>
+  );
+}
