@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import AdminSidebar from "../components/AdminSidebar";
+import AdminService from "../services/AdminService";
 import {
   FaUserFriends,
   FaChalkboardTeacher,
@@ -8,8 +10,42 @@ import {
 } from "react-icons/fa";
 
 export default function AdminDashboard() {
-  // Dummy admin name and avatar
-  const adminName = "Admin Pusat";
+  const navigate = useNavigate();
+  const [adminData, setAdminData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Check if admin is logged in
+    if (!AdminService.isLoggedIn()) {
+      navigate("/admin");
+      return;
+    }
+
+    // Get admin data from localStorage
+    const admin = AdminService.getCurrentAdmin();
+    setAdminData(admin);
+    setLoading(false);
+  }, [navigate]);
+
+  const handleLogout = async () => {
+    try {
+      await AdminService.logout();
+      navigate("/admin");
+    } catch (error) {
+      console.error("Logout error:", error);
+      navigate("/admin");
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-lg font-semibold text-teal-700">Loading...</div>
+      </div>
+    );
+  }
+
+  const adminName = adminData?.nama || "Admin";
   const adminAvatar = "/assets/teachers/Drs.-K.H.-Mudrik-Qori-MA-Mudir 1.png";
 
   return (
@@ -19,13 +55,19 @@ export default function AdminDashboard() {
         <div className="flex items-center gap-3">
           <img src="/assets/logo3.png" alt="Logo" className="h-8" />
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           <span className="font-semibold">Halo, {adminName}</span>
           <img
             src={adminAvatar}
             alt="Admin"
             className="object-cover w-8 h-8 border-2 border-white rounded-full"
           />
+          <button
+            onClick={handleLogout}
+            className="px-4 py-2 text-sm font-semibold transition bg-red-500 rounded-lg hover:bg-red-600"
+          >
+            Logout
+          </button>
         </div>
       </header>
       <div className="flex">

@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import ProtectedRoute from "./components/ProtectedRoute";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Teachers from "./pages/Teachers";
@@ -19,11 +20,46 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/admin" element={<AdminLogin />} />
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        <Route path="/admin/santri" element={<Santri />} />
-        <Route path="/admin/pendidik" element={<Pendidik />} />
-        <Route path="/admin/artikel" element={<Artikel />} />
-        <Route path="/admin/ppdb" element={<PPDB />} />
+        <Route
+          path="/admin/dashboard"
+          element={
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/santri"
+          element={
+            <ProtectedRoute>
+              <Santri />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/pendidik"
+          element={
+            <ProtectedRoute>
+              <Pendidik />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/artikel"
+          element={
+            <ProtectedRoute>
+              <Artikel />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/ppdb"
+          element={
+            <ProtectedRoute>
+              <PPDB />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="*"
           element={

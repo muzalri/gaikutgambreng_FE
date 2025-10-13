@@ -1,20 +1,45 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import AdminSidebar from "../components/AdminSidebar";
+import AdminService from "../services/AdminService";
 
 export default function PPDB() {
+  const navigate = useNavigate();
+  const [adminData, setAdminData] = useState(null);
+
+  useEffect(() => {
+    const admin = AdminService.getCurrentAdmin();
+    if (admin) {
+      setAdminData(admin);
+    }
+  }, []);
+
+  const handleLogout = async () => {
+    await AdminService.logout();
+    navigate("/admin");
+  };
+
+  const adminName = adminData?.nama || "Admin";
+
   return (
     <div className="min-h-screen bg-[#f5f6fa]">
       <header className="w-full flex items-center justify-between px-10 py-5 text-white shadow bg-gradient-to-r from-teal-800 to-teal-600 sticky top-0 z-40">
         <div className="flex items-center gap-3">
           <img src="/assets/logo3.png" alt="Logo" className="h-8" />
         </div>
-        <div className="flex items-center gap-3">
-          <span className="font-semibold">Halo, Admin Pusat</span>
+        <div className="flex items-center gap-4">
+          <span className="font-semibold">Halo, {adminName}</span>
           <img
             src="/assets/teachers/Drs.-K.H.-Mudrik-Qori-MA-Mudir 1.png"
             alt="Admin"
             className="object-cover w-8 h-8 border-2 border-white rounded-full"
           />
+          <button
+            onClick={handleLogout}
+            className="px-4 py-2 text-sm font-semibold transition bg-red-500 rounded-lg hover:bg-red-600"
+          >
+            Logout
+          </button>
         </div>
       </header>
       <div className="flex">
