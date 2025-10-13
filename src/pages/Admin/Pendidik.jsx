@@ -1,5 +1,5 @@
 import React from "react";
-import AdminSidebar from "../components/AdminSidebar";
+import AdminSidebar from "../../components/AdminSidebar";
 import { useState } from "react";
 
 export default function Pendidik() {
@@ -26,23 +26,22 @@ export default function Pendidik() {
         <div className="flex-1 ml-64">
           <main className="flex flex-col min-h-screen">
             <section className="p-10 bg-[#f5f6fa] min-h-screen">
-              <h2 className="mb-2 text-3xl font-bold text-slate-900">
-                Pendidik
-              </h2>
-              <span className="block mb-6 font-medium text-slate-500">
-                Pendidik
-              </span>
-              {/* Tabel dan filter sesuai desain Tenaga Pendidik.png */}
-              <div className="p-8 bg-white border shadow rounded-2xl border-slate-100">
-                <div className="flex items-center justify-end gap-4 mb-4">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="text-3xl font-bold text-slate-900">
+                    Pendidik
+                  </h2>
+                  <span className="font-medium text-slate-500">Pendidik</span>
+                </div>
+                <div className="flex items-center gap-4">
                   <button
-                    className="px-6 py-2 font-semibold text-white bg-teal-700 rounded-full shadow"
+                    className="px-6 py-2 font-semibold text-white bg-teal-700 rounded-full shadow-md"
                     onClick={() => setShowModal(true)}
                   >
                     Tambah
                   </button>
                   <div className="relative">
-                    <select className="px-6 py-2 pr-10 font-semibold text-teal-700 transition-all border-2 border-teal-700 rounded-full appearance-none focus:outline-none focus:ring-2 focus:ring-teal-400">
+                    <select className="px-6 py-2 pr-10 font-semibold text-teal-700 bg-white border border-teal-700 rounded-full shadow-sm appearance-none focus:outline-none focus:ring-2 focus:ring-teal-400">
                       <option>Semua</option>
                     </select>
                     <span className="absolute text-teal-700 transform -translate-y-1/2 pointer-events-none right-4 top-1/2">
@@ -62,9 +61,9 @@ export default function Pendidik() {
                     <input
                       type="text"
                       placeholder="Cari..."
-                      className="px-6 py-2 pr-10 font-semibold text-teal-700 transition-all border-2 border-teal-700 rounded-full focus:outline-none focus:ring-2 focus:ring-teal-400"
+                      className="px-6 py-2 pr-10 font-semibold text-teal-700 bg-white border border-teal-700 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
                     />
-                    <span className="absolute right-4 top-2.5 text-teal-700">
+                    <span className="absolute text-teal-700 transform -translate-y-1/2 right-4 top-1/2">
                       <svg
                         width="20"
                         height="20"
@@ -79,26 +78,66 @@ export default function Pendidik() {
                     </span>
                   </div>
                 </div>
+              </div>
+              {/* Table card only contains table and pagination */}
+              <div className="p-8 bg-white border shadow rounded-2xl border-slate-100">
                 {/* Modal Tambah Tenaga Pendidik */}
                 {showModal && (
                   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
-                    <div className="relative w-full max-w-lg mx-auto bg-white rounded-2xl shadow-lg p-8">
+                    <div className="relative w-full max-w-lg p-8 mx-auto bg-white shadow-lg rounded-2xl">
                       <button
-                        className="absolute top-6 right-6 text-2xl text-slate-400 hover:text-teal-700"
+                        className="absolute text-2xl top-6 right-6 text-slate-400 hover:text-teal-700"
                         onClick={() => setShowModal(false)}
                         aria-label="Tutup"
                       >
                         &#10005;
                       </button>
-                      <h3 className="text-2xl font-bold text-center mb-2">Tambah Tenaga Pendidik</h3>
-                      <p className="text-center text-slate-500 mb-6 text-base">Silakan lengkapi data berikut untuk menambah tenaga pendidik Pesantren Al Ihsan Bekasi yang baru.</p>
-                      <form className="flex flex-col gap-4">
-                        <input type="text" placeholder="Masukkan Nama Lengkap..." className="w-full px-5 py-3 rounded-lg bg-slate-100 text-slate-700 font-medium focus:outline-none" />
-                        <input type="text" placeholder="Masukkan No Telepon..." className="w-full px-5 py-3 rounded-lg bg-slate-100 text-slate-700 font-medium focus:outline-none" />
-                        <input type="email" placeholder="Masukkan Alamat Lengkap..." className="w-full px-5 py-3 rounded-lg bg-slate-100 text-slate-700 font-medium focus:outline-none" />
-                        <input type="text" placeholder="Masukkan Peran..." className="w-full px-5 py-3 rounded-lg bg-slate-100 text-slate-700 font-medium focus:outline-none" />
-                        <input type="password" placeholder="Masukkan Kata Sandi..." className="w-full px-5 py-3 rounded-lg bg-slate-100 text-slate-700 font-medium focus:outline-none" />
-                        <button type="submit" className="w-1/2 mx-auto mt-4 py-3 rounded-full bg-teal-700 text-white font-semibold shadow">Konfirmasi</button>
+                      <h3 className="mb-2 text-2xl font-bold text-center">
+                        Tambah Tenaga Pendidik
+                      </h3>
+                      <p className="mb-6 text-base text-center text-slate-500">
+                        Silakan lengkapi data berikut untuk menambah tenaga
+                        pendidik Pesantren Al Ihsan Bekasi yang baru.
+                      </p>
+                      <form className="flex flex-col gap-2">
+                        <span className="font-normal text text-slate-700">
+                          Nama
+                        </span>
+                        <input
+                          type="text"
+                          placeholder="Masukkan Nama Lengkap..."
+                          className="w-full px-5 py-3 font-medium rounded-lg bg-slate-100 text-slate-700 focus:outline-none"
+                        />
+                        <h>No Telepon</h>
+                        <input
+                          type="text"
+                          placeholder="Masukkan No Telepon..."
+                          className="w-full px-5 py-3 font-medium rounded-lg bg-slate-100 text-slate-700 focus:outline-none"
+                        />
+                        <h>Email</h>
+                        <input
+                          type="email"
+                          placeholder="Masukkan Alamat Lengkap..."
+                          className="w-full px-5 py-3 font-medium rounded-lg bg-slate-100 text-slate-700 focus:outline-none"
+                        />
+                        <h>Peran</h>
+                        <input
+                          type="text"
+                          placeholder="Masukkan Peran..."
+                          className="w-full px-5 py-3 font-medium rounded-lg bg-slate-100 text-slate-700 focus:outline-none"
+                        />
+                        <h>Kata Sandi</h>
+                        <input
+                          type="password"
+                          placeholder="Masukkan Kata Sandi..."
+                          className="w-full px-5 py-3 font-medium rounded-lg bg-slate-100 text-slate-700 focus:outline-none"
+                        />
+                        <button
+                          type="submit"
+                          className="w-1/2 py-3 mx-auto mt-4 font-semibold text-white bg-teal-700 rounded-full shadow"
+                        >
+                          Konfirmasi
+                        </button>
                       </form>
                     </div>
                   </div>

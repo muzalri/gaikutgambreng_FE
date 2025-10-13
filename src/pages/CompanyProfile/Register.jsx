@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Footer from "../components/Footer";
+import Footer from "../../components/Footer";
 
 export default function Register() {
   const [open, setOpen] = useState([false, false, false]);
@@ -26,9 +26,11 @@ export default function Register() {
           alt="logo"
           className="object-contain w-auto h-12"
         />
-        <button className="px-6 py-2 text-base font-semibold text-teal-900 transition bg-white rounded-full shadow hover:bg-teal-50">
-          Daftar Sekarang
-        </button>
+        <a href="/loginpengguna">
+          <button className="px-6 py-2 text-base font-semibold text-teal-900 transition bg-white rounded-full shadow hover:bg-teal-50">
+            Daftar Sekarang
+          </button>
+        </a>
       </header>
 
       {/* Hero section full width */}
@@ -166,7 +168,6 @@ export default function Register() {
       </section>
 
       <div className="mt-24" />
-      
     </div>
   );
 }
