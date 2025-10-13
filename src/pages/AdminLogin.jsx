@@ -2,10 +2,23 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AdminService from "../services/AdminService";
 
+// Import Swal dengan try-catch untuk fallback
+let Swal;
+try {
+  Swal = require("sweetalert2").default;
+} catch (error) {
+  // Fallback jika SweetAlert2 belum terinstall
+  console.warn("SweetAlert2 belum terinstall. Menggunakan alert biasa.");
+  Swal = {
+    fire: ({ text, title }) => {
+      return Promise.resolve(alert(`${title}\n${text}`));
+    }
+  };
+}
+
 const AdminLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -17,30 +30,83 @@ const AdminLogin = () => {
   }, [navigate]);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
+    e.preventDefault(); // Mencegah form reload
+    e.stopPropagation(); // Mencegah event bubbling
+    
+    console.log("Form submitted - preventing default");
     setLoading(true);
 
     // Validasi
     if (!email || !password) {
-      setError("Email dan password wajib diisi");
+      console.log("Validation failed: email or password empty");
+      try {
+        await Swal.fire({
+          icon: "warning",
+          title: "Data Tidak Lengkap",
+          text: "Email dan password wajib diisi!",
+          confirmButtonColor: "#0f766e",
+        });
+      } catch (error) {
+        // Fallback jika SweetAlert2 belum terinstall
+        alert("Email dan password wajib diisi!");
+      }
       setLoading(false);
       return;
     }
 
     try {
+      console.log("Attempting login with:", email);
       const response = await AdminService.login(email, password);
+      console.log("Login response:", response);
       
       if (response.success) {
-        // Login berhasil, redirect ke dashboard
-        navigate("/admin/dashboard");
+        // Login berhasil
+        console.log("Login successful");
+        try {
+          await Swal.fire({
+            icon: "success",
+            title: "Login Berhasil!",
+            text: `Selamat datang, ${response.data.nama}`,
+            confirmButtonColor: "#0f766e",
+            timer: 1500,
+            showConfirmButton: false,
+          });
+          navigate("/admin/dashboard");
+        } catch (error) {
+          // Fallback jika SweetAlert2 belum terinstall
+          navigate("/admin/dashboard");
+        }
       } else {
-        setError(response.message || "Login gagal");
+        // Login gagal
+        console.log("Login failed:", response.message);
+        setLoading(false);
+        try {
+          await Swal.fire({
+            icon: "error",
+            title: "Login Gagal",
+            text: response.message || "Email atau password salah!",
+            confirmButtonColor: "#0f766e",
+          });
+        } catch (error) {
+          // Fallback jika SweetAlert2 belum terinstall
+          alert(response.message || "Email atau password salah!");
+        }
       }
     } catch (err) {
-      setError(err.message || "Terjadi kesalahan saat login");
-    } finally {
+      // Error dari server
+      console.error("Login error:", err);
       setLoading(false);
+      try {
+        await Swal.fire({
+          icon: "error",
+          title: "Terjadi Kesalahan",
+          text: err.message || "Tidak dapat terhubung ke server. Pastikan backend sudah berjalan.",
+          confirmButtonColor: "#0f766e",
+        });
+      } catch (error) {
+        // Fallback jika SweetAlert2 belum terinstall
+        alert(err.message || "Tidak dapat terhubung ke server. Pastikan backend sudah berjalan.");
+      }
     }
   };
 
@@ -68,13 +134,6 @@ const AdminLogin = () => {
           <p className="mb-6 text-center text-gray-600">
             Silahkan Masukkan Data Akun Anda!
           </p>
-
-          {/* Error Message */}
-          {error && (
-            <div className="w-full max-w-sm px-4 py-3 mb-4 text-sm text-red-700 bg-red-100 border border-red-400 rounded-lg">
-              {error}
-            </div>
-          )}
 
           <form onSubmit={handleSubmit} className="w-full max-w-sm">
             <div className="flex items-center px-4 mb-4 bg-gray-100 rounded-full">
