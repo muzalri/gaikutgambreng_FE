@@ -8,14 +8,14 @@ export default function PPDB() {
         <div className="flex items-center gap-3">
           <img src="/assets/logo3.png" alt="Logo" className="h-8" />
         </div>
-        <div className="flex items-center gap-3">
+        <a href="/admin/profil" className="flex items-center gap-3">
           <span className="font-semibold">Halo, Admin Pusat</span>
           <img
             src="/assets/teachers/Drs.-K.H.-Mudrik-Qori-MA-Mudir 1.png"
             alt="Admin"
             className="object-cover w-8 h-8 border-2 border-white rounded-full"
           />
-        </div>
+        </a>
       </header>
       <div className="flex">
         <div className="fixed left-0 top-[72px] h-[calc(100vh-72px)] z-30">

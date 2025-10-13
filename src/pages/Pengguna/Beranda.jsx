@@ -7,6 +7,8 @@ import {
   FaCalendarAlt,
   FaRegCalendarCheck,
 } from "react-icons/fa";
+import { Link, useLocation } from "react-router-dom";
+import PenggunaSidebar from "../../components/PenggunaSidebar";
 
 export default function Beranda() {
   // Dummy data for demonstration
@@ -27,6 +29,8 @@ export default function Beranda() {
     "Rafii Khairan",
   ];
 
+  const location = useLocation();
+
   return (
     <div className="min-h-screen bg-[#F7F8FA] flex flex-col">
       {/* Sticky Header Full Width */}
@@ -45,28 +49,7 @@ export default function Beranda() {
       </header>
       <div className="flex flex-1">
         {/* Sidebar */}
-        <aside className="flex flex-col justify-between w-64 h-[calc(100vh-80px)] bg-white shadow-lg pt-8 pb-8 fixed left-0 top-[80px] z-30">
-          <nav className="flex flex-col gap-1">
-            <a
-              href="/pengguna/beranda"
-              className="flex items-center gap-3 py-3 px-5 font-semibold text-[#1B8277] bg-[#E6F4F1]"
-            >
-              <FaHome className="text-xl" /> Beranda
-            </a>
-            <a
-              href="/pengguna/berkas"
-              className="flex items-center gap-3 py-3 px-5 font-semibold text-gray-700 hover:bg-[#E6F4F1]"
-            >
-              <FaFolder className="text-xl" /> Berkas
-            </a>
-          </nav>
-          <a
-            href="/"
-            className="flex items-center gap-3 py-3 px-5 font-semibold text-gray-700 hover:bg-[#E6F4F1] mb-2"
-          >
-            <FaSignOutAlt className="text-xl" /> Keluar
-          </a>
-        </aside>
+        <PenggunaSidebar />
         {/* Main Content */}
         <div className="flex-1 ml-64">
           <main className="px-10 py-8">

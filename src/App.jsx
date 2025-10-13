@@ -16,6 +16,8 @@ import Santri from "./pages/Admin/Santri";
 import Pendidik from "./pages/Admin/Pendidik";
 import Artikel from "./pages/Admin/Artikel";
 import PPDB from "./pages/Admin/PPDB";
+import Profil from "./pages/Admin/Profil";
+import BerkasPengguna from "./pages/Pengguna/Berkas";
 
 export default function App() {
   // ...existing code...
@@ -27,10 +29,12 @@ export default function App() {
         <Route path="/admin/santri" element={<Santri />} />
         <Route path="/admin/pendidik" element={<Pendidik />} />
         <Route path="/admin/artikel" element={<Artikel />} />
+        <Route path="/admin/profil" element={<Profil />} />
         <Route path="/admin/ppdb" element={<PPDB />} />
         <Route path="/loginpengguna" element={<LoginPengguna />} />
         <Route path="/registerpengguna" element={<RegisterPengguna />} />
         <Route path="/pengguna/beranda" element={<BerandaPengguna />} />
+        <Route path="/pengguna/berkas" element={<BerkasPengguna />} />
         <Route
           path="*"
           element={

@@ -20,12 +20,14 @@ export default function AdminDashboard() {
           <img src="/assets/logo3.png" alt="Logo" className="h-8" />
         </div>
         <div className="flex items-center gap-3">
-          <span className="font-semibold">Halo, {adminName}</span>
-          <img
-            src={adminAvatar}
-            alt="Admin"
-            className="object-cover w-8 h-8 border-2 border-white rounded-full"
-          />
+          <a href="/admin/profil" className="flex items-center gap-3">
+            <span className="font-semibold">Halo, {adminName}</span>
+            <img
+              src={adminAvatar}
+              alt="Admin"
+              className="object-cover w-8 h-8 border-2 border-white rounded-full"
+            />
+          </a>
         </div>
       </header>
       <div className="flex">

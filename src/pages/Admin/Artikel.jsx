@@ -17,20 +17,48 @@ export default function Artikel() {
     if (fileInputRef.current) fileInputRef.current.click();
   };
 
+  // New: modal for viewing article details
+  const [viewModal, setViewModal] = React.useState(false);
+  const [selectedArticle, setSelectedArticle] = React.useState(null);
+
+  const openViewModal = (article) => {
+    // article is an object { id, judul, isi, penulis, image }
+    setSelectedArticle(article);
+    // initialize preview with article image (if any)
+    setPreview(article.image || null);
+    setImage(null);
+    setViewModal(true);
+  };
+
+  const closeViewModal = () => {
+    setViewModal(false);
+    setSelectedArticle(null);
+  };
+
+  const handleConfirm = () => {
+    // stub: here you'd call API to save changes
+    closeViewModal();
+  };
+
+  const handleDelete = () => {
+    // stub: here you'd call API to delete the article
+    closeViewModal();
+  };
+
   return (
     <div className="min-h-screen bg-[#f5f6fa]">
       <header className="sticky top-0 z-40 flex items-center justify-between w-full px-10 py-5 text-white shadow bg-gradient-to-r from-teal-800 to-teal-600">
         <div className="flex items-center gap-3">
           <img src="/assets/logo3.png" alt="Logo" className="h-8" />
         </div>
-        <div className="flex items-center gap-3">
+        <a href="/admin/profil" className="flex items-center gap-3">
           <span className="font-semibold">Halo, Admin Pusat</span>
           <img
             src="/assets/teachers/Drs.-K.H.-Mudrik-Qori-MA-Mudir 1.png"
             alt="Admin"
             className="object-cover w-8 h-8 border-2 border-white rounded-full"
           />
-        </div>
+        </a>
       </header>
       <div className="flex">
         <div className="fixed left-0 top-[72px] h-[calc(100vh-72px)] z-30">
@@ -185,20 +213,32 @@ export default function Artikel() {
                       </tr>
                     </thead>
                     <tbody>
-                      {Array.from({ length: 13 }).map((_, i) => (
-                        <tr
-                          key={i}
-                          className={i % 2 === 0 ? "bg-white" : "bg-slate-50"}
-                        >
-                          <td className="px-4 py-3">{i + 1}</td>
-                          <td className="px-4 py-3">Juara 1 Kompetisi MQK</td>
-                          <td className="px-4 py-3">
-                            <button className="px-4 py-1 font-semibold text-white bg-teal-700 rounded-full">
-                              Lihat
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
+                      {Array.from({ length: 13 }).map((_, i) => {
+                        const article = {
+                          id: i + 1,
+                          judul: "Juara 1 Kompetisi MQK",
+                          isi: "Ringkasan atau isi artikel singkat...",
+                          penulis: "Admin Pusat",
+                          image: null,
+                        };
+                        return (
+                          <tr
+                            key={i}
+                            className={i % 2 === 0 ? "bg-white" : "bg-slate-50"}
+                          >
+                            <td className="px-4 py-3">{i + 1}</td>
+                            <td className="px-4 py-3">{article.judul}</td>
+                            <td className="px-4 py-3">
+                              <button
+                                className="px-4 py-1 font-semibold text-white bg-teal-700 rounded-full"
+                                onClick={() => openViewModal(article)}
+                              >
+                                Lihat
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
@@ -216,6 +256,98 @@ export default function Artikel() {
           </main>
         </div>
       </div>
+
+      {/* View Article Modal (matches design image) */}
+      {viewModal && selectedArticle && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black bg-opacity-30">
+          <div className="relative w-full max-w-2xl p-8 mx-auto mt-8 mb-12 bg-white shadow-lg rounded-2xl">
+            <button
+              className="absolute text-2xl top-6 right-6 text-slate-400 hover:text-teal-700"
+              onClick={closeViewModal}
+              aria-label="Tutup"
+            >
+              &#10005;
+            </button>
+            <h3 className="mb-2 text-3xl font-bold text-center">
+              Lihat Artikel
+            </h3>
+            <p className="mb-6 text-base text-center text-slate-500">
+              Silakan lengkapi data berikut menyunting artikel Pesantren Al
+              Ihsan Bekasi.
+            </p>
+
+            <form className="flex flex-col gap-4">
+              <label className="text-sm font-medium text-slate-700">
+                Foto Artikel
+              </label>
+              <div
+                className="w-full h-40 rounded-lg bg-slate-100 flex items-center justify-center cursor-pointer"
+                onClick={handleImageClick}
+              >
+                {preview ? (
+                  <img
+                    src={preview}
+                    alt="preview"
+                    className="object-contain h-full"
+                  />
+                ) : (
+                  <span className="text-4xl font-bold text-slate-400">+</span>
+                )}
+              </div>
+              {/* hidden file input reused from Tambah modal */}
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                onChange={handleImageChange}
+                className="hidden"
+              />
+
+              <label className="text-sm font-medium text-slate-700">
+                Judul
+              </label>
+              <input
+                type="text"
+                defaultValue={selectedArticle.judul}
+                className="w-full px-5 py-3 font-medium rounded-lg bg-slate-100 text-slate-700 focus:outline-none"
+              />
+
+              <label className="text-sm font-medium text-slate-700">Isi</label>
+              <textarea
+                defaultValue={selectedArticle.isi}
+                rows={4}
+                className="w-full px-5 py-3 font-medium rounded-lg resize-none bg-slate-100 text-slate-700 focus:outline-none"
+              />
+
+              <label className="text-sm font-medium text-slate-700">
+                Penulis
+              </label>
+              <input
+                type="text"
+                defaultValue={selectedArticle.penulis}
+                className="w-full px-5 py-3 font-medium rounded-lg bg-slate-100 text-slate-700 focus:outline-none"
+              />
+
+              <div className="flex items-center justify-center gap-6 mt-4">
+                <button
+                  type="button"
+                  onClick={handleConfirm}
+                  className="px-6 py-3 bg-teal-700 text-white rounded-full shadow"
+                >
+                  Konfirmasi
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDelete}
+                  className="px-6 py-3 bg-red-600 text-white rounded-full shadow"
+                >
+                  Hapus
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
