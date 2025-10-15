@@ -3,6 +3,16 @@ import axios from 'axios';
 // Base URL untuk API
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
+// Base URL untuk server (untuk static files)
+export const SERVER_BASE_URL = process.env.REACT_APP_SERVER_URL || 'http://localhost:5000';
+
+// Helper function untuk get full image URL
+export const getImageUrl = (path) => {
+  if (!path) return null;
+  if (path.startsWith('http')) return path;
+  return `${SERVER_BASE_URL}${path}`;
+};
+
 // Create axios instance
 const api = axios.create({
   baseURL: API_BASE_URL,
