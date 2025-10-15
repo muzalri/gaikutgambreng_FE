@@ -6,8 +6,8 @@ import {
   FaChartLine,
   FaSignOutAlt,
 } from "react-icons/fa";
-import { Link, useLocation } from "react-router-dom";
-// Use public path for logo3.png
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import AdminService from "../services/AdminService";
 
 const sidebarMenu = [
   { label: "Beranda", icon: <FaChartLine />, path: "/admin/dashboard" },
@@ -19,6 +19,21 @@ const sidebarMenu = [
 
 export default function AdminSidebar() {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await AdminService.logout();
+      navigate("/admin");
+    } catch (error) {
+      console.error("Logout error:", error);
+      // Force logout even if API call fails
+      localStorage.removeItem("adminToken");
+      localStorage.removeItem("adminData");
+      navigate("/admin");
+    }
+  };
+
   return (
     <aside
       className="w-64 h-full bg-white shadow-lg flex flex-col justify-between px-4 pt-1"
@@ -44,7 +59,10 @@ export default function AdminSidebar() {
         </nav>
       </div>
       <div className="pb-2">
-        <button className="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-700 font-semibold text-base hover:bg-red-50 transition w-full">
+        <button 
+          onClick={handleLogout}
+          className="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-700 font-semibold text-base hover:bg-red-50 hover:text-red-600 transition w-full"
+        >
           <span className="text-xl">
             <FaSignOutAlt />
           </span>

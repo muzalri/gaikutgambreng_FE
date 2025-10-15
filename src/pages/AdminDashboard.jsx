@@ -27,16 +27,6 @@ export default function AdminDashboard() {
     setLoading(false);
   }, [navigate]);
 
-  const handleLogout = async () => {
-    try {
-      await AdminService.logout();
-      navigate("/admin");
-    } catch (error) {
-      console.error("Logout error:", error);
-      navigate("/admin");
-    }
-  };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -55,20 +45,14 @@ export default function AdminDashboard() {
         <div className="flex items-center gap-3">
           <img src="/assets/logo3.png" alt="Logo" className="h-8" />
         </div>
-        <div className="flex items-center gap-4">
+        <a href="/admin/profil" className="flex items-center gap-3 hover:opacity-80 transition cursor-pointer">
           <span className="font-semibold">Halo, {adminName}</span>
           <img
             src={adminAvatar}
             alt="Admin"
             className="object-cover w-8 h-8 border-2 border-white rounded-full"
           />
-          <button
-            onClick={handleLogout}
-            className="px-4 py-2 text-sm font-semibold transition bg-red-500 rounded-lg hover:bg-red-600"
-          >
-            Logout
-          </button>
-        </div>
+        </a>
       </header>
       <div className="flex">
         {/* Sidebar fixed on the left, below header */}

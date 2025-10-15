@@ -14,6 +14,7 @@ import Santri from "./pages/Santri";
 import Pendidik from "./pages/Pendidik";
 import Artikel from "./pages/Artikel";
 import PPDB from "./pages/PPDB";
+import Profil from "./pages/Profil";
 
 export default function App() {
   return (
@@ -57,6 +58,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <PPDB />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/profil"
+          element={
+            <ProtectedRoute>
+              <Profil />
             </ProtectedRoute>
           }
         />
