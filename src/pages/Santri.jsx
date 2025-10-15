@@ -2,17 +2,61 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AdminSidebar from "../components/AdminSidebar";
 import AdminService from "../services/AdminService";
+import SantriService from "../services/SantriService";
 
 export default function Santri() {
   const navigate = useNavigate();
   const [adminData, setAdminData] = useState(null);
+  const [santriList, setSantriList] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchKeyword, setSearchKeyword] = useState("");
 
   useEffect(() => {
     const admin = AdminService.getCurrentAdmin();
     if (admin) {
       setAdminData(admin);
     }
+    
+    // Fetch data santri
+    fetchSantri();
   }, []);
+
+  const fetchSantri = async () => {
+    try {
+      setLoading(true);
+      const response = await SantriService.getAllSantri();
+      if (response.success) {
+        setSantriList(response.data);
+      }
+    } catch (error) {
+      console.error("Error fetching santri:", error);
+      alert("Gagal mengambil data santri");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    
+    if (!searchKeyword.trim()) {
+      fetchSantri();
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await SantriService.searchSantri(searchKeyword);
+      if (response.success) {
+        setSantriList(response.data);
+      }
+    } catch (error) {
+      console.error("Error searching santri:", error);
+      alert("Gagal mencari data santri");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLogout = async () => {
     await AdminService.logout();
@@ -74,13 +118,15 @@ export default function Santri() {
                       </svg>
                     </span>
                   </div>
-                  <div className="relative">
+                  <form onSubmit={handleSearch} className="relative">
                     <input
                       type="text"
-                      placeholder="Cari..."
+                      placeholder="Cari nama, email, alamat..."
+                      value={searchKeyword}
+                      onChange={(e) => setSearchKeyword(e.target.value)}
                       className="px-6 py-2 font-semibold border-2 border-teal-700 rounded-full text-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-400 transition-all pr-10"
                     />
-                    <span className="absolute right-4 top-2.5 text-teal-700">
+                    <button type="submit" className="absolute right-4 top-2.5 text-teal-700">
                       <svg
                         width="20"
                         height="20"
@@ -92,8 +138,8 @@ export default function Santri() {
                         <circle cx="11" cy="11" r="8" />
                         <line x1="21" y1="21" x2="16.65" y2="16.65" />
                       </svg>
-                    </span>
-                  </div>
+                    </button>
+                  </form>
                 </div>
                 {/* Tabel data santri */}
                 <div className="overflow-x-auto">
@@ -102,42 +148,44 @@ export default function Santri() {
                       <tr className="text-slate-700 font-bold text-base">
                         <th className="py-3 px-4">NO</th>
                         <th className="py-3 px-4">Nama</th>
-                        <th className="py-3 px-4">NIS</th>
+                        <th className="py-3 px-4">Email</th>
                         <th className="py-3 px-4">No Telepon</th>
+                        <th className="py-3 px-4">Alamat</th>
                         <th className="py-3 px-4">Aksi</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {[
-                        "Bilal Abdurrahman",
-                        "Dhiyaurrahman Hamizan",
-                        "Raffa Danendra",
-                        "Zaki Algifari",
-                        "Faris Fadhil",
-                        "Rafi Alexander",
-                        "Cahya Ilham",
-                        "Dzaky Ikbaar",
-                        "Frizaski Alfath",
-                        "Daffa Abiyya",
-                        "Hakkam Zakka",
-                        "Raden Muhammad",
-                        "Rafii Khairan",
-                      ].map((nama, i) => (
-                        <tr
-                          key={i}
-                          className={i % 2 === 0 ? "bg-white" : "bg-slate-50"}
-                        >
-                          <td className="py-3 px-4">{i + 1}</td>
-                          <td className="py-3 px-4">{nama}</td>
-                          <td className="py-3 px-4">J04032311{i + 1}</td>
-                          <td className="py-3 px-4">08123456789</td>
-                          <td className="py-3 px-4">
-                            <button className="bg-teal-700 text-white px-4 py-1 rounded-full font-semibold">
-                              Lihat
-                            </button>
+                      {loading ? (
+                        <tr>
+                          <td colSpan="6" className="py-8 text-center text-slate-500">
+                            Loading...
                           </td>
                         </tr>
-                      ))}
+                      ) : santriList.length === 0 ? (
+                        <tr>
+                          <td colSpan="6" className="py-8 text-center text-slate-500">
+                            Tidak ada data santri
+                          </td>
+                        </tr>
+                      ) : (
+                        santriList.map((santri, i) => (
+                          <tr
+                            key={santri.id}
+                            className={i % 2 === 0 ? "bg-white" : "bg-slate-50"}
+                          >
+                            <td className="py-3 px-4">{i + 1}</td>
+                            <td className="py-3 px-4">{santri.nama}</td>
+                            <td className="py-3 px-4">{santri.email}</td>
+                            <td className="py-3 px-4">{santri.no_telp || '-'}</td>
+                            <td className="py-3 px-4">{santri.alamat || '-'}</td>
+                            <td className="py-3 px-4">
+                              <button className="bg-teal-700 text-white px-4 py-1 rounded-full font-semibold hover:bg-teal-800 transition">
+                                Lihat
+                              </button>
+                            </td>
+                          </tr>
+                        ))
+                      )}
                     </tbody>
                   </table>
                 </div>
