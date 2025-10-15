@@ -10,16 +10,20 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import AdminService from "../services/AdminService";
 
 const sidebarMenu = [
-  { label: "Beranda", icon: <FaChartLine />, path: "/admin/dashboard" },
-  { label: "Santri", icon: <FaUserFriends />, path: "/admin/santri" },
-  { label: "Pendidik", icon: <FaChalkboardTeacher />, path: "/admin/pendidik" },
-  { label: "Artikel", icon: <FaFileAlt />, path: "/admin/artikel" },
-  { label: "PPDB", icon: <FaChartLine />, path: "/admin/ppdb" },
+  { label: "Beranda", icon: <FaChartLine />, path: "/admin/dashboard", roles: ["admin", "user"] },
+  { label: "Santri", icon: <FaUserFriends />, path: "/admin/santri", roles: ["admin", "user"] },
+  { label: "Pendidik", icon: <FaChalkboardTeacher />, path: "/admin/pendidik", roles: ["admin"] }, // Only for admin
+  { label: "Artikel", icon: <FaFileAlt />, path: "/admin/artikel", roles: ["admin", "user"] },
+  { label: "PPDB", icon: <FaChartLine />, path: "/admin/ppdb", roles: ["admin", "user"] },
 ];
 
 export default function AdminSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
+  
+  // Get current admin role from localStorage
+  const currentAdmin = AdminService.getCurrentAdmin();
+  const userRole = currentAdmin?.role || "user"; // Default to 'user' if not found
 
   const handleLogout = async () => {
     try {
@@ -33,6 +37,9 @@ export default function AdminSidebar() {
     }
   };
 
+  // Filter menu items based on user role
+  const filteredMenu = sidebarMenu.filter(item => item.roles.includes(userRole));
+
   return (
     <aside
       className="w-64 h-full bg-white shadow-lg flex flex-col justify-between px-4 pt-1"
@@ -41,7 +48,7 @@ export default function AdminSidebar() {
       <div>
         <img src="/assets/logo3.png" alt="Logo" className="h-8 mb-1 mx-auto" />
         <nav className="flex flex-col gap-0.5 mt-1">
-          {sidebarMenu.map((item) => (
+          {filteredMenu.map((item) => (
             <Link
               key={item.label}
               to={item.path}

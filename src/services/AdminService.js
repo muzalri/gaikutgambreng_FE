@@ -66,6 +66,70 @@ const AdminService = {
   isLoggedIn: () => {
     return localStorage.getItem('adminData') !== null;
   },
+
+  // ==================== PENDIDIK METHODS ====================
+
+  // Get all pendidik
+  getAllPendidik: async () => {
+    try {
+      const response = await api.get('/admin/pendidik');
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { success: false, message: 'Terjadi kesalahan koneksi' };
+    }
+  },
+
+  // Get pendidik by ID
+  getPendidikById: async (id) => {
+    try {
+      const response = await api.get(`/admin/pendidik/${id}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { success: false, message: 'Terjadi kesalahan koneksi' };
+    }
+  },
+
+  // Create new pendidik
+  createPendidik: async (data) => {
+    try {
+      const response = await api.post('/admin/pendidik', data);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { success: false, message: 'Terjadi kesalahan koneksi' };
+    }
+  },
+
+  // Update pendidik
+  updatePendidik: async (id, data) => {
+    try {
+      const response = await api.put(`/admin/pendidik/${id}`, data);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { success: false, message: 'Terjadi kesalahan koneksi' };
+    }
+  },
+
+  // Delete pendidik
+  deletePendidik: async (id) => {
+    try {
+      const response = await api.delete(`/admin/pendidik/${id}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { success: false, message: 'Terjadi kesalahan koneksi' };
+    }
+  },
+
+  // Search pendidik
+  searchPendidik: async (query) => {
+    try {
+      const response = await api.get('/admin/pendidik/search', {
+        params: { query }
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { success: false, message: 'Terjadi kesalahan koneksi' };
+    }
+  },
 };
 
 export default AdminService;
