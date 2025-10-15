@@ -67,7 +67,7 @@ export default function Santri() {
 
   return (
     <div className="min-h-screen bg-[#f5f6fa]">
-      <header className="w-full flex items-center justify-between px-10 py-5 text-white shadow bg-gradient-to-r from-teal-800 to-teal-600 sticky top-0 z-40">
+      <header className="sticky top-0 z-40 flex items-center justify-between w-full px-10 py-5 text-white shadow bg-gradient-to-r from-teal-800 to-teal-600">
         <div className="flex items-center gap-3">
           <img src="/assets/logo3.png" alt="Logo" className="h-8" />
         </div>
@@ -93,19 +93,22 @@ export default function Santri() {
         <div className="flex-1 ml-64">
           <main className="flex flex-col min-h-screen">
             <section className="p-10 bg-[#f5f6fa] min-h-screen">
-              <h2 className="mb-2 text-3xl font-bold text-slate-900">Santri</h2>
-              <span className="text-slate-500 font-medium mb-6 block">
-                Santri
-              </span>
-              {/* Tabel dan filter sesuai desain Santri.jpg */}
-              <div className="bg-white rounded-2xl shadow border border-slate-100 p-8">
-                {/* Filter dan search */}
-                <div className="flex items-center justify-end gap-4 mb-4">
+              {/* Search bar and filter row above card, aligned with title */}
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="mb-2 text-3xl font-bold text-slate-900">
+                    Santri
+                  </h2>
+                  <span className="block font-medium text-slate-500">
+                    Santri
+                  </span>
+                </div>
+                <div className="flex items-center gap-4">
                   <div className="relative">
-                    <select className="px-6 py-2 pr-10 font-semibold border-2 border-teal-700 rounded-full text-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-400 transition-all appearance-none">
+                    <select className="px-6 py-2 pr-10 font-semibold text-teal-700 bg-white border border-teal-700 rounded-full shadow-sm appearance-none focus:outline-none focus:ring-2 focus:ring-teal-400">
                       <option>Semua</option>
                     </select>
-                    <span className="pointer-events-none absolute right-4 top-1/2 transform -translate-y-1/2 text-teal-700">
+                    <span className="absolute text-teal-700 transform -translate-y-1/2 pointer-events-none right-4 top-1/2">
                       <svg
                         width="18"
                         height="18"
@@ -141,6 +144,9 @@ export default function Santri() {
                     </button>
                   </form>
                 </div>
+              </div>
+              {/* Card and table */}
+              <div className="p-8 bg-white border shadow rounded-2xl border-slate-100">
                 {/* Tabel data santri */}
                 <div className="overflow-x-auto">
                   <table className="min-w-full text-left">
@@ -190,7 +196,7 @@ export default function Santri() {
                   </table>
                 </div>
                 {/* Pagination */}
-                <div className="flex justify-end items-center gap-2 mt-4">
+                <div className="flex items-center justify-end gap-2 mt-4">
                   <button className="px-2 py-1 rounded bg-slate-100 text-slate-700">
                     &lt;
                   </button>

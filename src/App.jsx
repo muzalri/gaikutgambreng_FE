@@ -1,3 +1,4 @@
+import BerandaPengguna from "./pages/Pengguna/Beranda";
 import React from "react";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import Navbar from "./components/Navbar";
@@ -16,6 +17,7 @@ import Artikel from "./pages/Artikel";
 import PPDB from "./pages/PPDB";
 
 export default function App() {
+  // ...existing code...
   return (
     <BrowserRouter>
       <Routes>
@@ -64,7 +66,8 @@ export default function App() {
           path="*"
           element={
             <div className="text-slate-800">
-              {window.location.pathname !== "/pendaftaran" && <Navbar />}
+              {window.location.pathname !== "/pendaftaran" &&
+                window.location.pathname !== "/loginpengguna" && <Navbar />}
               <main>
                 <Routes>
                   <Route path="/" element={<Home />} />
@@ -75,6 +78,11 @@ export default function App() {
                   />
                   <Route path="/artikel" element={<Articles />} />
                   <Route path="/pendaftaran" element={<Register />} />
+                  <Route path="/loginpengguna" element={<LoginPengguna />} />
+                  <Route
+                    path="/registerpengguna"
+                    element={<RegisterPengguna />}
+                  />
                   <Route path="*" element={<Home />} />
                 </Routes>
               </main>

@@ -23,7 +23,7 @@ export default function PPDB() {
 
   return (
     <div className="min-h-screen bg-[#f5f6fa]">
-      <header className="w-full flex items-center justify-between px-10 py-5 text-white shadow bg-gradient-to-r from-teal-800 to-teal-600 sticky top-0 z-40">
+      <header className="sticky top-0 z-40 flex items-center justify-between w-full px-10 py-5 text-white shadow bg-gradient-to-r from-teal-800 to-teal-600">
         <div className="flex items-center gap-3">
           <img src="/assets/logo3.png" alt="Logo" className="h-8" />
         </div>
@@ -49,21 +49,22 @@ export default function PPDB() {
         <div className="flex-1 ml-64">
           <main className="flex flex-col min-h-screen">
             <section className="p-10 bg-[#f5f6fa] min-h-screen">
-              <h2 className="mb-2 text-3xl font-bold text-slate-900">PPDB</h2>
-              <span className="text-slate-500 font-medium mb-6 block">
-                PPDB
-              </span>
-              {/* Tabel dan filter sesuai desain PPDB.png */}
-              <div className="bg-white rounded-2xl shadow border border-slate-100 p-8">
-                <div className="flex items-center justify-end gap-4 mb-4">
-                  <button className="bg-teal-700 text-white px-6 py-2 rounded-full font-semibold shadow">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="mb-2 text-3xl font-bold text-slate-900">
+                    PPDB
+                  </h2>
+                  <span className="block font-medium text-slate-500">PPDB</span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <button className="px-6 py-2 font-semibold text-white bg-teal-700 rounded-full shadow-md">
                     Buka PPDB
                   </button>
                   <div className="relative">
-                    <select className="px-6 py-2 pr-10 font-semibold border-2 border-teal-700 rounded-full text-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-400 transition-all appearance-none">
+                    <select className="px-6 py-2 pr-10 font-semibold text-teal-700 bg-white border border-teal-700 rounded-full shadow-sm appearance-none focus:outline-none focus:ring-2 focus:ring-teal-400">
                       <option>Semua</option>
                     </select>
-                    <span className="pointer-events-none absolute right-4 top-1/2 transform -translate-y-1/2 text-teal-700">
+                    <span className="absolute text-teal-700 transform -translate-y-1/2 pointer-events-none right-4 top-1/2">
                       <svg
                         width="18"
                         height="18"
@@ -80,9 +81,9 @@ export default function PPDB() {
                     <input
                       type="text"
                       placeholder="Cari..."
-                      className="px-6 py-2 font-semibold border-2 border-teal-700 rounded-full text-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-400 transition-all pr-10"
+                      className="px-6 py-2 pr-10 font-semibold text-teal-700 bg-white border border-teal-700 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
                     />
-                    <span className="absolute right-4 top-2.5 text-teal-700">
+                    <span className="absolute text-teal-700 transform -translate-y-1/2 right-4 top-1/2">
                       <svg
                         width="20"
                         height="20"
@@ -97,15 +98,18 @@ export default function PPDB() {
                     </span>
                   </div>
                 </div>
+              </div>
+              {/* Card and table */}
+              <div className="p-8 bg-white border shadow rounded-2xl border-slate-100">
                 <div className="overflow-x-auto">
                   <table className="min-w-full text-left">
                     <thead>
-                      <tr className="text-slate-700 font-bold text-base">
-                        <th className="py-3 px-4">NO</th>
-                        <th className="py-3 px-4">Nama</th>
-                        <th className="py-3 px-4">Angkatan</th>
-                        <th className="py-3 px-4">Status</th>
-                        <th className="py-3 px-4">Aksi</th>
+                      <tr className="text-base font-bold text-slate-700">
+                        <th className="px-4 py-3">NO</th>
+                        <th className="px-4 py-3">Nama</th>
+                        <th className="px-4 py-3">Angkatan</th>
+                        <th className="px-4 py-3">Status</th>
+                        <th className="px-4 py-3">Aksi</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -128,12 +132,12 @@ export default function PPDB() {
                           key={i}
                           className={i % 2 === 0 ? "bg-white" : "bg-slate-50"}
                         >
-                          <td className="py-3 px-4">{i + 1}</td>
-                          <td className="py-3 px-4">{data.nama}</td>
-                          <td className="py-3 px-4">Angkatan 1</td>
-                          <td className="py-3 px-4">{data.status}</td>
-                          <td className="py-3 px-4">
-                            <button className="bg-teal-700 text-white px-4 py-1 rounded-full font-semibold">
+                          <td className="px-4 py-3">{i + 1}</td>
+                          <td className="px-4 py-3">{data.nama}</td>
+                          <td className="px-4 py-3">Angkatan 1</td>
+                          <td className="px-4 py-3">{data.status}</td>
+                          <td className="px-4 py-3">
+                            <button className="px-4 py-1 font-semibold text-white bg-teal-700 rounded-full">
                               Lihat
                             </button>
                           </td>
@@ -142,7 +146,7 @@ export default function PPDB() {
                     </tbody>
                   </table>
                 </div>
-                <div className="flex justify-end items-center gap-2 mt-4">
+                <div className="flex items-center justify-end gap-2 mt-4">
                   <button className="px-2 py-1 rounded bg-slate-100 text-slate-700">
                     &lt;
                   </button>
