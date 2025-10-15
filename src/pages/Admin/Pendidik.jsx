@@ -1,48 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import AdminSidebar from "../components/AdminSidebar";
-import AdminService from "../services/AdminService";
+import AdminSidebar from "../../components/AdminSidebar";
+import AdminHeader from "../../components/AdminHeader";
+import AdminService from "../../services/AdminService";
 
 export default function Pendidik() {
   const navigate = useNavigate();
-  const [adminData, setAdminData] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-    const admin = AdminService.getCurrentAdmin();
-    if (admin) {
-      setAdminData(admin);
+    // Check if admin is logged in
+    if (!AdminService.isLoggedIn()) {
+      navigate("/admin");
+      return;
     }
-  }, []);
-
-  const handleLogout = async () => {
-    await AdminService.logout();
-    navigate("/admin");
-  };
-
-  const adminName = adminData?.nama || "Admin";
+  }, [navigate]);
 
   return (
     <div className="min-h-screen bg-[#f5f6fa]">
-      <header className="sticky top-0 z-40 flex items-center justify-between w-full px-10 py-5 text-white shadow bg-gradient-to-r from-teal-800 to-teal-600">
-        <div className="flex items-center gap-3">
-          <img src="/assets/logo3.png" alt="Logo" className="h-8" />
-        </div>
-        <div className="flex items-center gap-4">
-          <span className="font-semibold">Halo, {adminName}</span>
-          <img
-            src="/assets/teachers/Drs.-K.H.-Mudrik-Qori-MA-Mudir 1.png"
-            alt="Admin"
-            className="object-cover w-8 h-8 border-2 border-white rounded-full"
-          />
-          <button
-            onClick={handleLogout}
-            className="px-4 py-2 text-sm font-semibold transition bg-red-500 rounded-lg hover:bg-red-600"
-          >
-            Logout
-          </button>
-        </div>
-      </header>
+      <AdminHeader />
       <div className="flex">
         <div className="fixed left-0 top-[72px] h-[calc(100vh-72px)] z-30">
           <AdminSidebar activeMenu="Pendidik" />

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import AdminSidebar from "../components/AdminSidebar";
-import AdminService from "../services/AdminService";
+import AdminSidebar from "../../components/AdminSidebar";
+import AdminHeader from "../../components/AdminHeader";
+import AdminService from "../../services/AdminService";
 import {
   FaUserFriends,
   FaChalkboardTeacher,
@@ -11,8 +12,6 @@ import {
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
-  const [adminData, setAdminData] = useState(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Check if admin is logged in
@@ -20,56 +19,11 @@ export default function AdminDashboard() {
       navigate("/admin");
       return;
     }
-
-    // Get admin data from localStorage
-    const admin = AdminService.getCurrentAdmin();
-    setAdminData(admin);
-    setLoading(false);
   }, [navigate]);
-
-  const handleLogout = async () => {
-    try {
-      await AdminService.logout();
-      navigate("/admin");
-    } catch (error) {
-      console.error("Logout error:", error);
-      navigate("/admin");
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg font-semibold text-teal-700">Loading...</div>
-      </div>
-    );
-  }
-
-  const adminName = adminData?.nama || "Admin";
-  const adminAvatar = "/assets/teachers/Drs.-K.H.-Mudrik-Qori-MA-Mudir 1.png";
 
   return (
     <div className="min-h-screen bg-[#f5f6fa]">
-      {/* Sticky header at the top */}
-      <header className="sticky top-0 z-40 flex items-center justify-between w-full px-10 py-5 text-white shadow bg-gradient-to-r from-teal-800 to-teal-600">
-        <div className="flex items-center gap-3">
-          <img src="/assets/logo3.png" alt="Logo" className="h-8" />
-        </div>
-        <div className="flex items-center gap-4">
-          <span className="font-semibold">Halo, {adminName}</span>
-          <img
-            src={adminAvatar}
-            alt="Admin"
-            className="object-cover w-8 h-8 border-2 border-white rounded-full"
-          />
-          <button
-            onClick={handleLogout}
-            className="px-4 py-2 text-sm font-semibold transition bg-red-500 rounded-lg hover:bg-red-600"
-          >
-            Logout
-          </button>
-        </div>
-      </header>
+      <AdminHeader />
       <div className="flex">
         {/* Sidebar fixed on the left, below header */}
         <div className="fixed left-0 top-[72px] h-[calc(100vh-72px)] z-30">
@@ -181,7 +135,7 @@ export default function AdminDashboard() {
                     >
                       <div className="flex items-center gap-2 mb-1">
                         <img
-                          src={adminAvatar}
+                          src="/assets/teachers/Drs.-K.H.-Mudrik-Qori-MA-Mudir 1.png"
                           alt="Admin"
                           className="object-cover w-8 h-8 border-2 border-white rounded-full"
                         />

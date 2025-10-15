@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import AdminService from "../services/AdminService";
+import AdminService from "../../services/AdminService";
 
 // Import Swal dengan try-catch untuk fallback
 let Swal;

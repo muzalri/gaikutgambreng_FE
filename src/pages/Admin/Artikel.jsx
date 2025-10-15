@@ -1,11 +1,23 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import AdminSidebar from "../../components/AdminSidebar";
+import AdminHeader from "../../components/AdminHeader";
+import AdminService from "../../services/AdminService";
 
 export default function Artikel() {
+  const navigate = useNavigate();
   const [showModal, setShowModal] = React.useState(false);
   const [image, setImage] = React.useState(null);
   const [preview, setPreview] = React.useState(null);
   const fileInputRef = React.useRef();
+
+  React.useEffect(() => {
+    // Check if admin is logged in
+    if (!AdminService.isLoggedIn()) {
+      navigate("/admin");
+      return;
+    }
+  }, [navigate]);
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -47,19 +59,7 @@ export default function Artikel() {
 
   return (
     <div className="min-h-screen bg-[#f5f6fa]">
-      <header className="sticky top-0 z-40 flex items-center justify-between w-full px-10 py-5 text-white shadow bg-gradient-to-r from-teal-800 to-teal-600">
-        <div className="flex items-center gap-3">
-          <img src="/assets/logo3.png" alt="Logo" className="h-8" />
-        </div>
-        <a href="/admin/profil" className="flex items-center gap-3">
-          <span className="font-semibold">Halo, Admin Pusat</span>
-          <img
-            src="/assets/teachers/Drs.-K.H.-Mudrik-Qori-MA-Mudir 1.png"
-            alt="Admin"
-            className="object-cover w-8 h-8 border-2 border-white rounded-full"
-          />
-        </a>
-      </header>
+      <AdminHeader />
       <div className="flex">
         <div className="fixed left-0 top-[72px] h-[calc(100vh-72px)] z-30">
           <AdminSidebar activeMenu="Artikel" />
