@@ -13,19 +13,21 @@ export default function Artikel() {
   const [image, setImage] = React.useState(null);
   const [preview, setPreview] = React.useState(null);
   const fileInputRef = React.useRef();
-  
+
   // State untuk data artikel
   const [artikelList, setArtikelList] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
   const [searchKeyword, setSearchKeyword] = React.useState("");
   const [editMode, setEditMode] = React.useState(false);
   const [currentArtikel, setCurrentArtikel] = React.useState(null);
-  
+
   // Form state
   const [formData, setFormData] = React.useState({
     judul: "",
     isi: "",
-    foto: ""
+    foto: "",
+    kategori: "",
+    kategori_lainnya: "",
   });
 
   React.useEffect(() => {
@@ -50,7 +52,7 @@ export default function Artikel() {
       Swal.fire({
         icon: "error",
         title: "Gagal",
-        text: "Gagal mengambil data artikel"
+        text: "Gagal mengambil data artikel",
       });
     } finally {
       setLoading(false);
@@ -61,7 +63,7 @@ export default function Artikel() {
   const handleSearch = async (e) => {
     const keyword = e.target.value;
     setSearchKeyword(keyword);
-    
+
     if (keyword.trim() === "") {
       fetchArtikel();
       return;
@@ -76,7 +78,7 @@ export default function Artikel() {
       console.error("Error searching artikel:", error);
     }
   };
-  
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -85,18 +87,24 @@ export default function Artikel() {
         Swal.fire({
           icon: "warning",
           title: "File Terlalu Besar",
-          text: "Ukuran file maksimal 5MB"
+          text: "Ukuran file maksimal 5MB",
         });
         return;
       }
 
       // Validasi tipe file
-      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+      const allowedTypes = [
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+        "image/gif",
+        "image/webp",
+      ];
       if (!allowedTypes.includes(file.type)) {
         Swal.fire({
           icon: "warning",
           title: "Tipe File Tidak Valid",
-          text: "Hanya file gambar (JPEG, JPG, PNG, GIF, WEBP) yang diizinkan"
+          text: "Hanya file gambar (JPEG, JPG, PNG, GIF, WEBP) yang diizinkan",
         });
         return;
       }
@@ -105,7 +113,7 @@ export default function Artikel() {
       setPreview(URL.createObjectURL(file));
     }
   };
-  
+
   const handleImageClick = () => {
     if (fileInputRef.current) fileInputRef.current.click();
   };
@@ -126,7 +134,13 @@ export default function Artikel() {
 
   // Reset form
   const resetForm = () => {
-    setFormData({ judul: "", isi: "", foto: "" });
+    setFormData({
+      judul: "",
+      isi: "",
+      foto: "",
+      kategori: "",
+      kategori_lainnya: "",
+    });
     setImage(null);
     setPreview(null);
     setEditMode(false);
@@ -142,12 +156,22 @@ export default function Artikel() {
   // Handle create artikel
   const handleCreate = async (e) => {
     e.preventDefault();
-    
-    if (!formData.judul || !formData.isi) {
+
+    if (!formData.judul || !formData.isi || !formData.kategori) {
       Swal.fire({
         icon: "warning",
         title: "Perhatian",
-        text: "Judul dan isi artikel harus diisi!"
+        text: "Judul, isi, dan kategori artikel harus diisi!",
+      });
+      return;
+    }
+
+    // Validasi jika kategori "Lainnya" dipilih tapi tidak diisi
+    if (formData.kategori === "Lainnya" && !formData.kategori_lainnya.trim()) {
+      Swal.fire({
+        icon: "warning",
+        title: "Perhatian",
+        text: "Silakan isi kategori lainnya!",
       });
       return;
     }
@@ -155,12 +179,12 @@ export default function Artikel() {
     try {
       // Show loading
       Swal.fire({
-        title: 'Membuat artikel...',
-        text: 'Mohon tunggu',
+        title: "Membuat artikel...",
+        text: "Mohon tunggu",
         allowOutsideClick: false,
         didOpen: () => {
           Swal.showLoading();
-        }
+        },
       });
 
       let fotoUrl = formData.foto;
@@ -171,11 +195,17 @@ export default function Artikel() {
       }
 
       const admin = AdminService.getCurrentAdmin();
+      const finalKategori =
+        formData.kategori === "Lainnya"
+          ? formData.kategori_lainnya
+          : formData.kategori;
+
       const response = await ArtikelService.createArtikel({
         judul: formData.judul,
         isi: formData.isi,
         foto: fotoUrl,
-        id_pengguna: admin.id
+        kategori: finalKategori,
+        id_pengguna: admin.id,
       });
 
       if (response.success) {
@@ -184,7 +214,7 @@ export default function Artikel() {
           title: "Berhasil",
           text: "Artikel berhasil dibuat!",
           timer: 2000,
-          showConfirmButton: false
+          showConfirmButton: false,
         });
         setShowModal(false);
         fetchArtikel();
@@ -195,7 +225,7 @@ export default function Artikel() {
       Swal.fire({
         icon: "error",
         title: "Gagal",
-        text: error.message || "Gagal membuat artikel"
+        text: error.message || "Gagal membuat artikel",
       });
     }
   };
@@ -204,11 +234,21 @@ export default function Artikel() {
   const handleUpdate = async (e) => {
     e.preventDefault();
 
-    if (!formData.judul || !formData.isi) {
+    if (!formData.judul || !formData.isi || !formData.kategori) {
       Swal.fire({
         icon: "warning",
         title: "Perhatian",
-        text: "Judul dan isi artikel harus diisi!"
+        text: "Judul, isi, dan kategori artikel harus diisi!",
+      });
+      return;
+    }
+
+    // Validasi jika kategori "Lainnya" dipilih tapi tidak diisi
+    if (formData.kategori === "Lainnya" && !formData.kategori_lainnya.trim()) {
+      Swal.fire({
+        icon: "warning",
+        title: "Perhatian",
+        text: "Silakan isi kategori lainnya!",
       });
       return;
     }
@@ -216,12 +256,12 @@ export default function Artikel() {
     try {
       // Show loading
       Swal.fire({
-        title: 'Mengupdate artikel...',
-        text: 'Mohon tunggu',
+        title: "Mengupdate artikel...",
+        text: "Mohon tunggu",
         allowOutsideClick: false,
         didOpen: () => {
           Swal.showLoading();
-        }
+        },
       });
 
       let fotoUrl = formData.foto;
@@ -231,14 +271,17 @@ export default function Artikel() {
         fotoUrl = await uploadFotoToServer(image);
       }
 
-      const response = await ArtikelService.updateArtikel(
-        currentArtikel.id,
-        {
-          judul: formData.judul,
-          isi: formData.isi,
-          foto: fotoUrl
-        }
-      );
+      const finalKategori =
+        formData.kategori === "Lainnya"
+          ? formData.kategori_lainnya
+          : formData.kategori;
+
+      const response = await ArtikelService.updateArtikel(currentArtikel.id, {
+        judul: formData.judul,
+        isi: formData.isi,
+        foto: fotoUrl,
+        kategori: finalKategori,
+      });
 
       if (response.success) {
         Swal.fire({
@@ -246,7 +289,7 @@ export default function Artikel() {
           title: "Berhasil",
           text: "Artikel berhasil diupdate!",
           timer: 2000,
-          showConfirmButton: false
+          showConfirmButton: false,
         });
         setViewModal(false);
         fetchArtikel();
@@ -257,7 +300,7 @@ export default function Artikel() {
       Swal.fire({
         icon: "error",
         title: "Gagal",
-        text: error.message || "Gagal mengupdate artikel"
+        text: error.message || "Gagal mengupdate artikel",
       });
     }
   };
@@ -272,7 +315,7 @@ export default function Artikel() {
       confirmButtonColor: "#0f766e",
       cancelButtonColor: "#dc2626",
       confirmButtonText: "Ya, Hapus",
-      cancelButtonText: "Batal"
+      cancelButtonText: "Batal",
     });
 
     if (!result.isConfirmed) return;
@@ -285,7 +328,7 @@ export default function Artikel() {
           title: "Berhasil",
           text: "Artikel berhasil dihapus!",
           timer: 2000,
-          showConfirmButton: false
+          showConfirmButton: false,
         });
         setViewModal(false);
         fetchArtikel();
@@ -296,7 +339,7 @@ export default function Artikel() {
       Swal.fire({
         icon: "error",
         title: "Gagal",
-        text: error.message || "Gagal menghapus artikel"
+        text: error.message || "Gagal menghapus artikel",
       });
     }
   };
@@ -304,9 +347,9 @@ export default function Artikel() {
   // Handle form input change
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -319,7 +362,9 @@ export default function Artikel() {
     setFormData({
       judul: article.judul,
       isi: article.isi,
-      foto: article.foto || ""
+      foto: article.foto || "",
+      kategori: article.kategori || "",
+      kategori_lainnya: "",
     });
     // Set preview dengan URL lengkap dari server jika ada foto
     if (article.foto) {
@@ -384,7 +429,10 @@ export default function Artikel() {
                           Silakan lengkapi data berikut menambah artikel
                           Pesantren Al Ihsan Bekasi.
                         </p>
-                        <form className="flex flex-col gap-2" onSubmit={handleCreate}>
+                        <form
+                          className="flex flex-col gap-2"
+                          onSubmit={handleCreate}
+                        >
                           <span className="text-sm font-medium text-slate-700">
                             Foto Artikel
                           </span>
@@ -418,8 +466,36 @@ export default function Artikel() {
                           </div>
                           {image && (
                             <span className="text-xs text-slate-600">
-                              File: {image.name} ({(image.size / 1024).toFixed(2)} KB)
+                              File: {image.name} (
+                              {(image.size / 1024).toFixed(2)} KB)
                             </span>
+                          )}
+                          <span className="text-sm font-medium text-slate-700">
+                            Kategori <span className="text-red-500">*</span>
+                          </span>
+                          <select
+                            name="kategori"
+                            value={formData.kategori}
+                            onChange={handleInputChange}
+                            className="w-full px-5 py-3 font-medium rounded-lg bg-slate-100 text-slate-700 focus:outline-none"
+                            required
+                          >
+                            <option value="">Pilih Kategori</option>
+                            <option value="Prestasi">Prestasi</option>
+                            <option value="Kegiatan">Kegiatan</option>
+                            <option value="Berita Islami">Berita Islami</option>
+                            <option value="Lainnya">Lainnya</option>
+                          </select>
+                          {formData.kategori === "Lainnya" && (
+                            <input
+                              type="text"
+                              name="kategori_lainnya"
+                              value={formData.kategori_lainnya}
+                              onChange={handleInputChange}
+                              placeholder="Masukkan kategori lainnya..."
+                              className="w-full px-5 py-3 mt-2 font-medium rounded-lg bg-slate-100 text-slate-700 focus:outline-none"
+                              required
+                            />
                           )}
                           <span className="text-sm font-medium text-slate-700">
                             Judul <span className="text-red-500">*</span>
@@ -514,6 +590,7 @@ export default function Artikel() {
                           <tr className="text-base font-bold text-slate-700">
                             <th className="px-4 py-3">NO</th>
                             <th className="px-4 py-3">Judul</th>
+                            <th className="px-4 py-3">Kategori</th>
                             <th className="px-4 py-3">Penulis</th>
                             <th className="px-4 py-3">Tanggal</th>
                             <th className="px-4 py-3">Aksi</th>
@@ -523,15 +600,24 @@ export default function Artikel() {
                           {artikelList.map((artikel, i) => (
                             <tr
                               key={artikel.id}
-                              className={i % 2 === 0 ? "bg-white" : "bg-slate-50"}
+                              className={
+                                i % 2 === 0 ? "bg-white" : "bg-slate-50"
+                              }
                             >
                               <td className="px-4 py-3">{i + 1}</td>
                               <td className="px-4 py-3">{artikel.judul}</td>
                               <td className="px-4 py-3">
+                                <span className="px-2 py-1 text-xs font-medium text-teal-700 bg-teal-100 rounded-full">
+                                  {artikel.kategori || "Tidak ada"}
+                                </span>
+                              </td>
+                              <td className="px-4 py-3">
                                 {artikel.penulis?.nama || "Admin"}
                               </td>
                               <td className="px-4 py-3">
-                                {new Date(artikel.created_at).toLocaleDateString("id-ID")}
+                                {new Date(
+                                  artikel.created_at
+                                ).toLocaleDateString("id-ID")}
                               </td>
                               <td className="px-4 py-3">
                                 <button
@@ -625,6 +711,34 @@ export default function Artikel() {
                 <span className="text-xs text-slate-600">
                   File baru: {image.name} ({(image.size / 1024).toFixed(2)} KB)
                 </span>
+              )}
+
+              <label className="text-sm font-medium text-slate-700">
+                Kategori <span className="text-red-500">*</span>
+              </label>
+              <select
+                name="kategori"
+                value={formData.kategori}
+                onChange={handleInputChange}
+                className="w-full px-5 py-3 font-medium rounded-lg bg-slate-100 text-slate-700 focus:outline-none"
+                required
+              >
+                <option value="">Pilih Kategori</option>
+                <option value="Prestasi">Prestasi</option>
+                <option value="Kegiatan">Kegiatan</option>
+                <option value="Berita Islami">Berita Islami</option>
+                <option value="Lainnya">Lainnya</option>
+              </select>
+              {formData.kategori === "Lainnya" && (
+                <input
+                  type="text"
+                  name="kategori_lainnya"
+                  value={formData.kategori_lainnya}
+                  onChange={handleInputChange}
+                  placeholder="Masukkan kategori lainnya..."
+                  className="w-full px-5 py-3 mt-2 font-medium rounded-lg bg-slate-100 text-slate-700 focus:outline-none"
+                  required
+                />
               )}
 
               <label className="text-sm font-medium text-slate-700">

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import AdminSidebar from "../../components/AdminSidebar";
 import AdminHeader from "../../components/AdminHeader";
 import AdminService from "../../services/AdminService";
+import SantriService from "../../services/SantriService";
 
 export default function PPDB() {
   const navigate = useNavigate();
@@ -14,6 +15,58 @@ export default function PPDB() {
       return;
     }
   }, [navigate]);
+
+  // Modal state for viewing applicant details
+  const [showModal, setShowModal] = useState(false);
+  const [selectedSantri, setSelectedSantri] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const openModal = async (id) => {
+    setShowModal(true);
+    setLoading(true);
+    setSelectedSantri(null);
+    try {
+      const resp = await SantriService.getSantriById(id);
+      // API may return { data: {...} } or the object directly depending on implementation
+      const data = resp?.data || resp;
+      setSelectedSantri(data);
+    } catch (err) {
+      console.error("Error fetching santri:", err);
+      // Fallback: create a minimal mock so modal can still render
+      setSelectedSantri({
+        id,
+        nama: "-",
+        asal_sekolah: "-",
+        alamat: "-",
+        angkatan: "-",
+        berkas: [],
+        status: "-",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setSelectedSantri(null);
+  };
+
+  const handleAction = async (action) => {
+    if (!selectedSantri) return;
+    try {
+      const payload = { status: action };
+      await SantriService.updateSantri(
+        selectedSantri.id || selectedSantri._id || 1,
+        payload
+      );
+      alert(`Berhasil mengubah status: ${action}`);
+      closeModal();
+    } catch (err) {
+      console.error("Error updating status:", err);
+      alert("Gagal mengubah status");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#f5f6fa]">
@@ -90,22 +143,30 @@ export default function PPDB() {
                     </thead>
                     <tbody>
                       {[
-                        { nama: "Bilal Abdurrahman", status: "Diterima" },
-                        { nama: "Dhiyaurrahman Hamizan", status: "Diterima" },
-                        { nama: "Raffa Danendra", status: "Diterima" },
-                        { nama: "Zaki Algifari", status: "Diterima" },
-                        { nama: "Faris Fadhil", status: "Perbaikan" },
-                        { nama: "Rafi Alexander", status: "Perbaikan" },
-                        { nama: "Cahya Ilham", status: "Ditolak" },
-                        { nama: "Dzaky Ikbaar", status: "Ditolak" },
-                        { nama: "Frizaski Alfath", status: "Diterima" },
-                        { nama: "Daffa Abiyya", status: "Diterima" },
-                        { nama: "Hakkam Zakka", status: "Diterima" },
-                        { nama: "Raden Muhammad", status: "Diterima" },
-                        { nama: "Rafii Khairan", status: "Diterima" },
+                        {
+                          id: 1,
+                          nama: "Bilal Abdurrahman",
+                          status: "Diterima",
+                        },
+                        {
+                          id: 2,
+                          nama: "Dhiyaurrahman Hamizan",
+                          status: "Diterima",
+                        },
+                        { id: 3, nama: "Raffa Danendra", status: "Diterima" },
+                        { id: 4, nama: "Zaki Algifari", status: "Diterima" },
+                        { id: 5, nama: "Faris Fadhil", status: "Perbaikan" },
+                        { id: 6, nama: "Rafi Alexander", status: "Perbaikan" },
+                        { id: 7, nama: "Cahya Ilham", status: "Ditolak" },
+                        { id: 8, nama: "Dzaky Ikbaar", status: "Ditolak" },
+                        { id: 9, nama: "Frizaski Alfath", status: "Diterima" },
+                        { id: 10, nama: "Daffa Abiyya", status: "Diterima" },
+                        { id: 11, nama: "Hakkam Zakka", status: "Diterima" },
+                        { id: 12, nama: "Raden Muhammad", status: "Diterima" },
+                        { id: 13, nama: "Rafii Khairan", status: "Diterima" },
                       ].map((data, i) => (
                         <tr
-                          key={i}
+                          key={data.id}
                           className={i % 2 === 0 ? "bg-white" : "bg-slate-50"}
                         >
                           <td className="px-4 py-3">{i + 1}</td>
@@ -113,7 +174,10 @@ export default function PPDB() {
                           <td className="px-4 py-3">Angkatan 1</td>
                           <td className="px-4 py-3">{data.status}</td>
                           <td className="px-4 py-3">
-                            <button className="px-4 py-1 font-semibold text-white bg-teal-700 rounded-full">
+                            <button
+                              onClick={() => openModal(data.id)}
+                              className="px-4 py-1 font-semibold text-white bg-teal-700 rounded-full"
+                            >
                               Lihat
                             </button>
                           </td>
@@ -121,6 +185,127 @@ export default function PPDB() {
                       ))}
                     </tbody>
                   </table>
+                  {/* Viewer modal */}
+                  {showModal && (
+                    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black bg-opacity-30">
+                      <div className="relative w-full max-w-3xl p-8 mx-auto mt-5 mb-12 bg-white shadow-lg rounded-2xl">
+                        <button
+                          className="absolute text-2xl top-6 right-6 text-slate-400 hover:text-teal-700"
+                          onClick={closeModal}
+                          aria-label="Tutup"
+                        >
+                          &#10005;
+                        </button>
+                        <h3 className="text-2xl font-extrabold text-center">
+                          Data Berkas Santri
+                        </h3>
+                        <p className="mb-6 text-sm text-center text-slate-500">
+                          Periksa kembali berkas calon santri agar proses
+                          verifikasi berjalan lancar.
+                        </p>
+
+                        {loading ? (
+                          <div className="py-16 text-center">Memuat...</div>
+                        ) : (
+                          <div>
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                              <div>
+                                <label className="text-sm text-slate-600">
+                                  Nama
+                                </label>
+                                <div className="p-3 mt-1 bg-slate-50 rounded">
+                                  {selectedSantri?.nama || "-"}
+                                </div>
+                              </div>
+                              <div>
+                                <label className="text-sm text-slate-600">
+                                  Asal Sekolah Dasar/Madrasah Ibtidaiyah
+                                </label>
+                                <div className="p-3 mt-1 bg-slate-50 rounded">
+                                  {selectedSantri?.asal_sekolah || "-"}
+                                </div>
+                              </div>
+                              <div>
+                                <label className="text-sm text-slate-600">
+                                  Alamat
+                                </label>
+                                <div className="p-3 mt-1 bg-slate-50 rounded">
+                                  {selectedSantri?.alamat || "-"}
+                                </div>
+                              </div>
+                              <div>
+                                <label className="text-sm text-slate-600">
+                                  Angkatan
+                                </label>
+                                <div className="p-3 mt-1 bg-slate-50 rounded">
+                                  {selectedSantri?.angkatan || "1"}
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 gap-4 mt-6 md:grid-cols-2">
+                              {/* Documents list - try to render selectedSantri.berkas if present */}
+                              {(selectedSantri?.berkas?.length > 0
+                                ? selectedSantri.berkas
+                                : [
+                                    "Surat Pernyataan Taat Peraturan",
+                                    "Fotokopi Rapor Kelas",
+                                    "Fotokopi Ijazah (Menyusul)",
+                                    "Fotokopi KTP Orang Tua",
+                                    "Fotokopi Kartu Keluarga",
+                                    "Fotokopi Akta Kelahiran",
+                                    "Pas Foto 4x6 Latar Biru (4 Lembar)",
+                                    "Surat Keterangan Bebas TBC & Hepatitis",
+                                  ]
+                              ).map((label, idx) => (
+                                <div
+                                  key={idx}
+                                  className="flex items-center justify-between p-3 bg-slate-50 rounded"
+                                >
+                                  <div className="text-sm text-slate-700">
+                                    {typeof label === "string"
+                                      ? label
+                                      : label.label}
+                                  </div>
+                                  <div className="flex items-center gap-3">
+                                    <button className="px-3 py-1 text-sm font-semibold text-emerald-700 bg-emerald-100 rounded-full">
+                                      Lihat
+                                    </button>
+                                    <div className="text-sm text-slate-500">
+                                      {typeof label === "string"
+                                        ? "KTP_ORTU.PDF"
+                                        : label.filename || ""}
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+
+                            <div className="flex items-center justify-center gap-6 mt-8">
+                              <button
+                                onClick={() => handleAction("Diterima")}
+                                className="px-8 py-3 text-white rounded-full bg-teal-700 shadow"
+                              >
+                                Terima
+                              </button>
+                              <button
+                                onClick={() => handleAction("Perbaikan")}
+                                className="px-8 py-3 text-white rounded-full bg-amber-400 shadow"
+                              >
+                                Revisi
+                              </button>
+                              <button
+                                onClick={() => handleAction("Ditolak")}
+                                className="px-8 py-3 text-white rounded-full bg-rose-600 shadow"
+                              >
+                                Tolak
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <div className="flex items-center justify-end gap-2 mt-4">
                   <button className="px-2 py-1 rounded bg-slate-100 text-slate-700">

@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 
 export default function Home() {
-  const GMAPS_LINK = "https://maps.app.goo.gl/zRdQEYKuSS5jb72C7";
-  const GMAPS_EMBED = `https://www.google.com/maps?q=${encodeURIComponent(
-    GMAPS_LINK
-  )}&output=embed`;
+  const GMAPS_LINK = "https://maps.app.goo.gl/1WZnr4KbYHjEhZP96";
+  const GMAPS_EMBED =
+    "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.1234567890!2d106.1234567890!3d-6.1234567890!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNsKwMDcnMjQuNCJTIDEwNsKwMDcnMjQuNCJF!5e0!3m2!1sen!2sid!4v1234567890123!5m2!1sen!2sid";
   const WHATSAPP_NUMBER = "6281234567890"; // ganti dengan nomor WA admin
   const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}`;
 
@@ -63,18 +62,19 @@ export default function Home() {
 
       {/* Tentang */}
       <section id="about" className="py-20">
-        <div className="grid items-start gap-8 px-4 mx-auto max-w-7xl sm:px-6 lg:px-8 md:grid-cols-2">
+        <h2 className="text-2xl font-extrabold text-slate-900 text-center ">
+          Kenapa Memilih Pesantren{" "}
+          <span className="text-amber-500">Al-Ihsan ?</span>
+        </h2>
+        <div className="grid items-start gap-8 px-4 mx-auto max-w-7xl sm:px-6 lg:px-8 md:grid-cols-2 mt-10">
           <div className="overflow-hidden border rounded-xl border-slate-200">
             <div
               className="aspect-[16/10] bg-cover bg-center"
-              style={{ backgroundImage: "url(/assets/articles/about.jpg)" }}
+              style={{ backgroundImage: "url(/assets/FotoSejarah.png)" }}
             />
           </div>
+
           <div>
-            <h2 className="text-2xl font-bold text-slate-900">
-              Kenapa Memilih Pesantren <br></br>{" "}
-              <span className="text-teal-700">Al-Ihsan</span> Bekasi ?
-            </h2>
             <p className="mt-4 leading-7 text-slate-600">
               Pondok Pesantren Al Ihsan berkomitmen mencetak generasi muslim
               yang berilmu dan berakhlak mulia melalui pembelajaran agama yang
@@ -99,8 +99,8 @@ export default function Home() {
       {/* Prestasi */}
       <section className="py-20 bg-slate-50">
         <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-          <h2 className="text-2xl font-bold text-slate-900">
-            Prestasi <span className="text-teal-700">Pesantren</span>
+          <h2 className="text-2xl font-extrabold text-center">
+            Prestasi <span className="text-amber-600">Pesantren</span>
           </h2>
           <div className="grid gap-6 mt-8 md:grid-cols-3">
             {[1, 2, 3].map((i) => (
@@ -142,8 +142,8 @@ export default function Home() {
       {/* Kegiatan */}
       <section className="py-20">
         <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-          <h2 className="text-2xl font-bold text-slate-900">
-            Kegiatan <span className="text-teal-700">Pesantren</span>
+          <h2 className="text-2xl font-extrabold text-center">
+            Kegiatan <span className="text-amber-600">Pesantren</span>
           </h2>
           <div className="grid gap-6 mt-8 md:grid-cols-3">
             {[1, 2, 3].map((i) => (
@@ -300,7 +300,7 @@ export default function Home() {
             <div className="relative rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.12)] ring-1 ring-slate-100">
               <iframe
                 title="Lokasi Pesantren Al-Ihsan Bekasi"
-                src={GMAPS_EMBED}
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.1234567890!2d106.1234567890!3d-6.1234567890!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNsKwMDcnMjQuNCJTIDEwNsKwMDcnMjQuNCJF!5e0!3m2!1sen!2sid!4v1234567890123!5m2!1sen!2sid"
                 className="w-full aspect-[16/10]"
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"

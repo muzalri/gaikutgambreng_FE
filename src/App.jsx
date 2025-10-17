@@ -78,7 +78,8 @@ export default function App() {
           element={
             <div className="text-slate-800">
               {window.location.pathname !== "/pendaftaran" &&
-                window.location.pathname !== "/loginpengguna" && <Navbar />}
+                window.location.pathname !== "/loginpengguna" &&
+                window.location.pathname !== "/registerpengguna" && <Navbar />}
               <main>
                 <Routes>
                   <Route path="/" element={<Home />} />
@@ -97,7 +98,8 @@ export default function App() {
                   <Route path="*" element={<Home />} />
                 </Routes>
               </main>
-              <Footer />
+              {window.location.pathname !== "/loginpengguna" &&
+                window.location.pathname !== "/registerpengguna" && <Footer />}
             </div>
           }
         />

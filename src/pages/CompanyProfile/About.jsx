@@ -20,10 +20,11 @@ export default function About() {
               style={{ backgroundImage: "url(/assets/FotoPesantren.png)" }}
             />
           </div>
-          <h2 className="mt-8 text-2xl font-bold text-slate-900">
-            Sejarah Pesantren Al-Ihsan Bekasi
+          <h2 className="mt-8 text-2xl font-bold text-slate-900 text-center">
+            <span className="text-amber-500">Sejarah</span> Pesantren Al-Ihsan
+            Bekasi
           </h2>
-          <p className="mt-4 leading-7 text-slate-700">
+          <p className="mt-4 leading-7 text-slate-700 text-justify">
             PPesantren Al Ihsan Bekasi berdiri pada bulan Juli tahun 2021 di
             bawah naungan Yayasan Al Ihsan Al Khairiyyah. Kehadirannya dilandasi
             semangat untuk ikut serta dalam mengemban estafet dakwah Islam,
@@ -38,17 +39,19 @@ export default function About() {
             Proin at volutpat tortor, nec imperdiet quam. Aenean porttitor
             semper purus ...
           </p>
-          <h3 className="mt-8 text-xl font-bold text-slate-900">
-            Visi Pesantren Al-Ihsan Bekasi
+          <h3 className="mt-8 text-xl font-bold text-slate-900 text-center">
+            <span className="text-amber-500">Visi</span> Pesantren Al-Ihsan
+            Bekasi
           </h3>
-          <p className="mt-2 text-slate-700">
+          <p className="mt-2 text-slate-700 text-center">
             Terbentuknya Generasi Rabbani yang Mandiri Berakhlaqul Karimah dan
             Siap Berkhidmat Untuk Ummat
           </p>
-          <h3 className="mt-6 text-xl font-bold text-slate-900">
-            Misi Pesantren Al-Ihsan Bekasi
+          <h3 className="mt-6 text-xl font-bold text-slate-900 text-center">
+            <span className="text-amber-500">Misi</span> Pesantren Al-Ihsan
+            Bekasi
           </h3>
-          <ol className="pl-6 mt-2 space-y-2 list-decimal text-slate-700">
+          <ol className="pl-6 mt-2 space-y-2 list-decimal text-slate-700 text-justify">
             <li>
               Menyelenggarakan Sistem Pendidikan Berbasis Diniyyah Untuk
               Membantu Para Santri Memahami Al Quran dan As Sunnah
