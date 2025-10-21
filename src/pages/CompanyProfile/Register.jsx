@@ -46,7 +46,7 @@ export default function Register() {
 
       {/* Hero section full width */}
       <div
-        className="w-full relative h-[260px] sm:h-[340px] bg-cover bg-center"
+        className="w-full relative h-[300px] sm:h-[500px] bg-cover bg-center"
         style={{ backgroundImage: "url(/assets/FotoPesantren.png)" }}
       >
         <div className="absolute inset-0 bg-black/40" />
@@ -90,65 +90,75 @@ export default function Register() {
       </section>
 
       {/* Timeline section */}
-      <section className="w-full max-w-4xl px-4 mx-auto mt-16">
-        <h3 className="mb-8 text-2xl font-bold text-center text-slate-900">
+      <section className="w-full max-w-6xl px-4 mx-auto mt-16">
+        <h3 className="mb-12 text-3xl font-bold text-center text-slate-900">
           Timeline <span className="text-amber-500">Pendaftaran</span>
         </h3>
-        <div
-          className="relative flex flex-row items-end justify-between w-full"
-          style={{ minHeight: "120px" }}
-        >
+
+        {/* Timeline Container dengan background terang */}
+        <div className="relative bg-gradient-to-r from-slate-50 to-orange-50 rounded-2xl p-12 shadow-lg">
           {/* Garis horizontal oranye */}
-          <div
-            className="absolute left-0 right-0 z-0 h-2 rounded-full top-1/2 bg-gradient-to-r from-amber-400 to-amber-300"
-            style={{ transform: "translateY(-50%)" }}
-          />
-          {/* Step/titik dan label */}
-          {[
-            {
-              atas: (
-                <span className="block text-sm text-slate-800">
-                  Seleksi <b>Administrasi</b>
-                </span>
-              ),
-              bawah: (
-                <span className="block mt-2 text-sm font-bold text-slate-900">
-                  Tes <span className="text-amber-500">Psikologi</span>
-                </span>
-              ),
-            },
-            {
-              atas: (
-                <span className="block text-sm text-slate-800">
-                  Tes Baca <b>Al-Quran</b>
-                </span>
-              ),
-              bawah: (
-                <span className="block mt-2 text-sm font-bold text-slate-900">
-                  Wawancara <b className="text-amber-500">Casantri</b>
-                </span>
-              ),
-            },
-            {
-              atas: (
-                <span className="block text-sm text-slate-800">
-                  Karantina <b>Casantri</b>
-                </span>
-              ),
-              bawah: null,
-            },
-          ].map((step, i) => (
-            <div key={i} className="z-10 flex flex-col items-center flex-1">
-              {/* Label atas */}
-              <div className="mb-2 text-center w-max">{step.atas}</div>
-              {/* Titik oranye */}
-              <div className="flex items-center justify-center w-6 h-6 border-4 border-white rounded-full shadow-lg bg-amber-400" />
-              {/* Label bawah */}
-              {step.bawah && (
-                <div className="mt-2 text-center w-max">{step.bawah}</div>
-              )}
-            </div>
-          ))}
+          <div className="absolute left-12 right-12 top-1/2 h-1 bg-amber-500 rounded-full transform -translate-y-1/2" />
+
+          {/* Timeline steps */}
+          <div className="relative flex justify-between">
+            {[
+              {
+                title: "Seleksi",
+                bold: "Administrasi",
+                position: "above",
+              },
+              {
+                title: "Tes",
+                bold: "Psikologi",
+                position: "below",
+              },
+              {
+                title: "Tes Baca",
+                bold: "Al-Quran",
+                position: "above",
+              },
+              {
+                title: "Wawancara",
+                bold: "Casantri",
+                position: "below",
+              },
+              {
+                title: "Karantina",
+                bold: "Casantri",
+                position: "above",
+              },
+            ].map((step, i) => (
+              <div key={i} className="relative flex flex-col items-center z-10">
+                {/* Label atas atau bawah */}
+                {step.position === "above" && (
+                  <div className="mb-4 text-center">
+                    <span className="text-sm text-slate-800">
+                      {step.title}{" "}
+                      <span className="font-bold text-slate-900">
+                        {step.bold}
+                      </span>
+                    </span>
+                  </div>
+                )}
+
+                {/* Titik oranye bulat */}
+                <div className="w-4 h-4 bg-amber-500 rounded-full shadow-md" />
+
+                {/* Label bawah */}
+                {step.position === "below" && (
+                  <div className="mt-4 text-center">
+                    <span className="text-sm text-slate-800">
+                      {step.title}{" "}
+                      <span className="font-bold text-slate-900">
+                        {step.bold}
+                      </span>
+                    </span>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       </section>
       {/* Accordion Info section */}

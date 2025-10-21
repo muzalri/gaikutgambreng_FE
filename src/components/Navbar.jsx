@@ -1,16 +1,32 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
   const isHome = location.pathname === "/";
+
+  useEffect(() => {
+    const handleScroll = () => {
+      // Mengubah navbar ketika scroll lebih dari 100px (setelah hero section)
+      const scrollTop = window.scrollY;
+      setIsScrolled(scrollTop > 100);
+    };
+
+    if (isHome) {
+      window.addEventListener("scroll", handleScroll);
+      return () => window.removeEventListener("scroll", handleScroll);
+    }
+  }, [isHome]);
   return (
     <header
       className={
-        `fixed inset-x-0 top-0 z-50 transition-all ` +
+        `fixed inset-x-0 top-0 z-50 transition-all duration-300 ` +
         (isHome
-          ? "bg-transparent"
+          ? isScrolled
+            ? "bg-teal-700 shadow-lg"
+            : "bg-transparent"
           : "bg-teal-900 border-b border-teal-900 shadow")
       }
     >
@@ -18,8 +34,12 @@ export default function Navbar() {
         <Link
           to="/"
           className={
-            `flex items-center gap-4 font-bold pl-2 ` +
-            (isHome ? "text-white drop-shadow" : "text-white")
+            `flex items-center gap-4 font-bold pl-2 transition-all duration-300 ` +
+            (isHome
+              ? isScrolled
+                ? "text-white"
+                : "text-white drop-shadow"
+              : "text-white")
           }
           style={{ minWidth: "220px" }}
         >
@@ -32,8 +52,8 @@ export default function Navbar() {
         </Link>
         <nav
           className={
-            `relative items-center hidden gap-6 text-sm md:flex ` +
-            (isHome ? "text-white" : "text-white")
+            `relative items-center hidden gap-6 text-sm md:flex transition-all duration-300 ` +
+            (isHome ? (isScrolled ? "text-white" : "text-white") : "text-white")
           }
         >
           <Link to="/" className="hover:underline">
