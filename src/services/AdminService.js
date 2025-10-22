@@ -130,6 +130,33 @@ const AdminService = {
       throw error.response?.data || { success: false, message: 'Terjadi kesalahan koneksi' };
     }
   },
+
+  // Upload foto pendidik
+  uploadFotoPendidik: async (file) => {
+    try {
+      const formData = new FormData();
+      formData.append('foto', file);
+      
+      const response = await api.post('/admin/pendidik/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { success: false, message: 'Terjadi kesalahan saat mengupload foto' };
+    }
+  },
+
+  // Delete foto pendidik
+  deleteFotoPendidik: async (filename) => {
+    try {
+      const response = await api.delete(`/admin/pendidik/upload/${filename}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { success: false, message: 'Terjadi kesalahan saat menghapus foto' };
+    }
+  },
 };
 
 export default AdminService;
