@@ -1,4 +1,5 @@
 import BerandaPengguna from "./pages/Pengguna/Beranda";
+import BerkasPengguna from "./pages/Pengguna/Berkas";
 import LoginPengguna from "./pages/Pengguna/LoginPengguna";
 import RegisterPengguna from "./pages/Pengguna/RegisterPengguna";
 import React from "react";
@@ -103,7 +104,7 @@ export default function App() {
                   />
                   <Route
                     path="/pengguna/berkas"
-                    element={<Navigate to="/pengguna/beranda" replace />}
+                    element={<BerkasPengguna />}
                   />
                   <Route path="*" element={<Home />} />
                 </Routes>
