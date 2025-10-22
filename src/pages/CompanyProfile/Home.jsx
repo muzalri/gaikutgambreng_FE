@@ -174,8 +174,6 @@ export default function Home() {
                   imageUrl = encodeURI(imageUrl);
                 }
                 
-                console.log('🎨 Prestasi Image URL:', imageUrl, 'from path:', article.foto);
-                
                 return (
                   <article
                     key={article.id}
@@ -254,8 +252,6 @@ export default function Home() {
                 if (imagePath && !imagePath.startsWith('http')) {
                   imageUrl = encodeURI(imageUrl);
                 }
-                
-                console.log('🎨 Kegiatan Image URL:', imageUrl, 'from path:', article.foto);
                 
                 return (
                   <article
