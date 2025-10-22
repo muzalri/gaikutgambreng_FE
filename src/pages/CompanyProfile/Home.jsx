@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "aos/dist/aos.css";
 import AOS from "aos";
+import ArtikelService from "../../services/ArtikelService";
+import { getImageUrl } from "../../config/api";
 
 export default function Home() {
   const GMAPS_LINK = "https://maps.app.goo.gl/1WZnr4KbYHjEhZP96";
@@ -8,6 +10,11 @@ export default function Home() {
     "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.1234567890!2d106.1234567890!3d-6.1234567890!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNsKwMDcnMjQuNCJTIDEwNsKwMDcnMjQuNCJF!5e0!3m2!1sen!2sid!4v1234567890123!5m2!1sen!2sid";
   const WHATSAPP_NUMBER = "6281234567890"; // ganti dengan nomor WA admin
   const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}`;
+
+  // State untuk artikel
+  const [prestasiArticles, setPrestasiArticles] = useState([]);
+  const [kegiatanArticles, setKegiatanArticles] = useState([]);
+  const [loadingArticles, setLoadingArticles] = useState(true);
 
   // Placeholder data testimonial (nanti diganti API)
   const testimonials = [
@@ -40,6 +47,33 @@ export default function Home() {
 
   useEffect(() => {
     AOS.init({ duration: 700, once: true, easing: "ease-out-quart" });
+  }, []);
+
+  // Fetch articles by category
+  useEffect(() => {
+    const fetchArticles = async () => {
+      try {
+        setLoadingArticles(true);
+        const response = await ArtikelService.getAllArtikel();
+        
+        if (response.success) {
+          const articles = response.data;
+          
+          // Filter artikel berdasarkan kategori
+          const prestasi = articles.filter(article => article.kategori === 'Prestasi').slice(0, 3);
+          const kegiatan = articles.filter(article => article.kategori === 'Kegiatan').slice(0, 3);
+          
+          setPrestasiArticles(prestasi);
+          setKegiatanArticles(kegiatan);
+        }
+      } catch (error) {
+        console.error('Error fetching articles:', error);
+      } finally {
+        setLoadingArticles(false);
+      }
+    };
+
+    fetchArticles();
   }, []);
 
   return (
@@ -109,30 +143,69 @@ export default function Home() {
             Prestasi <span className="text-amber-500">Pesantren</span>
           </h2>
           <div className="grid gap-6 mt-8 md:grid-cols-3">
-            {[1, 2, 3].map((i) => (
-              <article
-                key={i}
-                className="overflow-hidden bg-white border shadow-sm border-slate-200 rounded-xl"
-              >
+            {loadingArticles ? (
+              // Loading skeleton
+              [1, 2, 3].map((i) => (
                 <div
-                  className="h-40 bg-center bg-cover"
-                  style={{
-                    backgroundImage: "url(/assets/achievements/sample.jpg)",
-                  }}
-                />
-                <div className="p-4">
-                  <p className="text-sm font-semibold text-amber-500">
-                    Juara 1
-                  </p>
-                  <h3 className="mt-1 font-semibold text-slate-900">
-                    Kompetisi MQK
-                  </h3>
-                  <p className="mt-2 text-xs text-slate-600">
-                    Alhamdulillah, kabar gembira ...
-                  </p>
+                  key={i}
+                  className="overflow-hidden bg-white border shadow-sm border-slate-200 rounded-xl animate-pulse"
+                >
+                  <div className="h-40 bg-slate-200" />
+                  <div className="p-4 space-y-3">
+                    <div className="w-16 h-4 bg-slate-200 rounded" />
+                    <div className="w-3/4 h-5 bg-slate-200 rounded" />
+                    <div className="w-full h-3 bg-slate-200 rounded" />
+                    <div className="w-5/6 h-3 bg-slate-200 rounded" />
+                  </div>
                 </div>
-              </article>
-            ))}
+              ))
+            ) : prestasiArticles.length > 0 ? (
+              prestasiArticles.map((article) => {
+                // Explicitly construct the URL and encode it
+                const imagePath = article.foto;
+                let imageUrl = imagePath 
+                  ? (imagePath.startsWith('http') 
+                      ? imagePath 
+                      : `http://localhost:5000${imagePath}`)
+                  : '/assets/achievements/sample.jpg';
+                
+                // Encode the URL to handle spaces and special characters
+                if (imagePath && !imagePath.startsWith('http')) {
+                  imageUrl = encodeURI(imageUrl);
+                }
+                
+                console.log('🎨 Prestasi Image URL:', imageUrl, 'from path:', article.foto);
+                
+                return (
+                  <article
+                    key={article.id}
+                    className="overflow-hidden bg-white border shadow-sm border-slate-200 rounded-xl hover:shadow-md transition-shadow"
+                  >
+                    <div
+                      className="h-40 bg-center bg-cover"
+                      style={{
+                        backgroundImage: `url("${imageUrl}")`,
+                      }}
+                    />
+                    <div className="p-4">
+                      <p className="text-sm font-semibold text-amber-500">
+                        Prestasi
+                      </p>
+                      <h3 className="mt-1 font-semibold text-slate-900 line-clamp-2">
+                        {article.judul}
+                      </h3>
+                      <p className="mt-2 text-xs text-slate-600 line-clamp-3">
+                        {article.isi.substring(0, 100)}...
+                      </p>
+                    </div>
+                  </article>
+                );
+              })
+            ) : (
+              <div className="col-span-3 py-8 text-center text-slate-500">
+                Belum ada artikel prestasi
+              </div>
+            )}
           </div>
           <div className="mt-6">
             <a
@@ -152,27 +225,65 @@ export default function Home() {
             Kegiatan <span className="text-amber-500">Pesantren</span>
           </h2>
           <div className="grid gap-6 mt-8 md:grid-cols-3">
-            {[1, 2, 3].map((i) => (
-              <article
-                key={i}
-                className="overflow-hidden bg-white border shadow-sm border-slate-200 rounded-xl"
-              >
+            {loadingArticles ? (
+              // Loading skeleton
+              [1, 2, 3].map((i) => (
                 <div
-                  className="h-40 bg-center bg-cover"
-                  style={{
-                    backgroundImage: "url(/assets/activities/sample.jpg)",
-                  }}
-                />
-                <div className="p-4">
-                  <h3 className="font-semibold text-slate-900">
-                    Pengarahan Santri
-                  </h3>
-                  <p className="mt-2 text-xs text-slate-600">
-                    Pengarahan santri sebagai ...
-                  </p>
+                  key={i}
+                  className="overflow-hidden bg-white border shadow-sm border-slate-200 rounded-xl animate-pulse"
+                >
+                  <div className="h-40 bg-slate-200" />
+                  <div className="p-4 space-y-3">
+                    <div className="w-3/4 h-5 bg-slate-200 rounded" />
+                    <div className="w-full h-3 bg-slate-200 rounded" />
+                    <div className="w-5/6 h-3 bg-slate-200 rounded" />
+                  </div>
                 </div>
-              </article>
-            ))}
+              ))
+            ) : kegiatanArticles.length > 0 ? (
+              kegiatanArticles.map((article) => {
+                // Explicitly construct the URL and encode it
+                const imagePath = article.foto;
+                let imageUrl = imagePath 
+                  ? (imagePath.startsWith('http') 
+                      ? imagePath 
+                      : `http://localhost:5000${imagePath}`)
+                  : '/assets/activities/sample.jpg';
+                
+                // Encode the URL to handle spaces and special characters
+                if (imagePath && !imagePath.startsWith('http')) {
+                  imageUrl = encodeURI(imageUrl);
+                }
+                
+                console.log('🎨 Kegiatan Image URL:', imageUrl, 'from path:', article.foto);
+                
+                return (
+                  <article
+                    key={article.id}
+                    className="overflow-hidden bg-white border shadow-sm border-slate-200 rounded-xl hover:shadow-md transition-shadow"
+                  >
+                    <div
+                      className="h-40 bg-center bg-cover"
+                      style={{
+                        backgroundImage: `url("${imageUrl}")`,
+                      }}
+                    />
+                    <div className="p-4">
+                      <h3 className="font-semibold text-slate-900 line-clamp-2">
+                        {article.judul}
+                      </h3>
+                      <p className="mt-2 text-xs text-slate-600 line-clamp-3">
+                        {article.isi.substring(0, 100)}...
+                      </p>
+                    </div>
+                  </article>
+                );
+              })
+            ) : (
+              <div className="col-span-3 py-8 text-center text-slate-500">
+                Belum ada artikel kegiatan
+              </div>
+            )}
           </div>
           <div className="mt-6">
             <a
