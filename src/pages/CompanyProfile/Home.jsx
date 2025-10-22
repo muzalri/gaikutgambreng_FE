@@ -100,7 +100,7 @@ export default function Home() {
       <section className="py-20 bg-slate-50">
         <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
           <h2 className="text-2xl font-extrabold text-center">
-            Prestasi <span className="text-amber-600">Pesantren</span>
+            Prestasi <span className="text-amber-500">Pesantren</span>
           </h2>
           <div className="grid gap-6 mt-8 md:grid-cols-3">
             {[1, 2, 3].map((i) => (
@@ -115,7 +115,7 @@ export default function Home() {
                   }}
                 />
                 <div className="p-4">
-                  <p className="text-sm font-semibold text-amber-600">
+                  <p className="text-sm font-semibold text-amber-500">
                     Juara 1
                   </p>
                   <h3 className="mt-1 font-semibold text-slate-900">
@@ -143,7 +143,7 @@ export default function Home() {
       <section className="py-20">
         <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
           <h2 className="text-2xl font-extrabold text-center">
-            Kegiatan <span className="text-amber-600">Pesantren</span>
+            Kegiatan <span className="text-amber-500">Pesantren</span>
           </h2>
           <div className="grid gap-6 mt-8 md:grid-cols-3">
             {[1, 2, 3].map((i) => (
@@ -190,7 +190,7 @@ export default function Home() {
 
         <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
           <h2 className="text-2xl font-extrabold text-center">
-            Testimoni <span className="text-amber-600">Alumni</span>
+            Testimoni <span className="text-amber-500">Alumni</span>
           </h2>
 
           <div className="relative mt-8 min-h-[380px]">
@@ -218,7 +218,7 @@ export default function Home() {
 
             {/* Main card fixed size */}
             <div className="relative z-10 max-w-5xl mx-auto">
-              <div className="bg-white rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.12)] ring-1 ring-slate-100 grid md:grid-cols-[360px_1fr] overflow-hidden h-[300px]">
+              <div className="bg-white rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.12)] absolute mt-10 ring-1 ring-slate-100 grid md:grid-cols-[360px_1fr] overflow-hidden h-[300px]">
                 <div
                   className="h-full bg-center bg-cover"
                   style={{
@@ -228,7 +228,7 @@ export default function Home() {
                 <div className="p-6 md:p-8">
                   <p className="text-lg font-semibold text-slate-900 md:text-xl">
                     {testimonials[current].name} -{" "}
-                    <span className="text-amber-600">
+                    <span className="text-amber-500">
                       {testimonials[current].cohort}
                     </span>
                   </p>
@@ -250,7 +250,7 @@ export default function Home() {
             <button
               onClick={next}
               aria-label="Selanjutnya"
-              className="absolute right-0 z-20 inline-flex items-center justify-center w-12 h-12 text-white -translate-y-1/2 rounded-full shadow md:right-6 top-1/2 bg-amber-500 hover:bg-amber-600"
+              className="absolute right-0 z-20 inline-flex items-center justify-center w-12 h-12 text-4xl text-white -translate-y-1/2 rounded-full shadow md:right-6 top-1/2 bg-amber-500 hover:bg-amber-600"
             >
               ›
             </button>
@@ -262,7 +262,7 @@ export default function Home() {
       <section id="contact" className="py-16">
         <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
           <h2 className="text-2xl font-extrabold text-center">
-            Hubungi <span className="text-teal-700">Kami</span>
+            Hubungi <span className="text-amber-500">Kami</span>
           </h2>
           <div className="grid gap-6 mt-6 md:grid-cols-2">
             {/* Kartu Tanya */}

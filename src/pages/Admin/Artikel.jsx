@@ -27,7 +27,6 @@ export default function Artikel() {
     isi: "",
     foto: "",
     kategori: "",
-    kategori_lainnya: "",
   });
 
   React.useEffect(() => {
@@ -139,7 +138,6 @@ export default function Artikel() {
       isi: "",
       foto: "",
       kategori: "",
-      kategori_lainnya: "",
     });
     setImage(null);
     setPreview(null);
@@ -166,16 +164,6 @@ export default function Artikel() {
       return;
     }
 
-    // Validasi jika kategori "Lainnya" dipilih tapi tidak diisi
-    if (formData.kategori === "Lainnya" && !formData.kategori_lainnya.trim()) {
-      Swal.fire({
-        icon: "warning",
-        title: "Perhatian",
-        text: "Silakan isi kategori lainnya!",
-      });
-      return;
-    }
-
     try {
       // Show loading
       Swal.fire({
@@ -195,10 +183,7 @@ export default function Artikel() {
       }
 
       const admin = AdminService.getCurrentAdmin();
-      const finalKategori =
-        formData.kategori === "Lainnya"
-          ? formData.kategori_lainnya
-          : formData.kategori;
+      const finalKategori = formData.kategori;
 
       const response = await ArtikelService.createArtikel({
         judul: formData.judul,
@@ -243,16 +228,6 @@ export default function Artikel() {
       return;
     }
 
-    // Validasi jika kategori "Lainnya" dipilih tapi tidak diisi
-    if (formData.kategori === "Lainnya" && !formData.kategori_lainnya.trim()) {
-      Swal.fire({
-        icon: "warning",
-        title: "Perhatian",
-        text: "Silakan isi kategori lainnya!",
-      });
-      return;
-    }
-
     try {
       // Show loading
       Swal.fire({
@@ -271,10 +246,7 @@ export default function Artikel() {
         fotoUrl = await uploadFotoToServer(image);
       }
 
-      const finalKategori =
-        formData.kategori === "Lainnya"
-          ? formData.kategori_lainnya
-          : formData.kategori;
+      const finalKategori = formData.kategori;
 
       const response = await ArtikelService.updateArtikel(currentArtikel.id, {
         judul: formData.judul,
@@ -364,7 +336,6 @@ export default function Artikel() {
       isi: article.isi,
       foto: article.foto || "",
       kategori: article.kategori || "",
-      kategori_lainnya: "",
     });
     // Set preview dengan URL lengkap dari server jika ada foto
     if (article.foto) {
@@ -486,17 +457,6 @@ export default function Artikel() {
                             <option value="Berita Islami">Berita Islami</option>
                             <option value="Lainnya">Lainnya</option>
                           </select>
-                          {formData.kategori === "Lainnya" && (
-                            <input
-                              type="text"
-                              name="kategori_lainnya"
-                              value={formData.kategori_lainnya}
-                              onChange={handleInputChange}
-                              placeholder="Masukkan kategori lainnya..."
-                              className="w-full px-5 py-3 mt-2 font-medium rounded-lg bg-slate-100 text-slate-700 focus:outline-none"
-                              required
-                            />
-                          )}
                           <span className="text-sm font-medium text-slate-700">
                             Judul <span className="text-red-500">*</span>
                           </span>
@@ -729,17 +689,6 @@ export default function Artikel() {
                 <option value="Berita Islami">Berita Islami</option>
                 <option value="Lainnya">Lainnya</option>
               </select>
-              {formData.kategori === "Lainnya" && (
-                <input
-                  type="text"
-                  name="kategori_lainnya"
-                  value={formData.kategori_lainnya}
-                  onChange={handleInputChange}
-                  placeholder="Masukkan kategori lainnya..."
-                  className="w-full px-5 py-3 mt-2 font-medium rounded-lg bg-slate-100 text-slate-700 focus:outline-none"
-                  required
-                />
-              )}
 
               <label className="text-sm font-medium text-slate-700">
                 Judul <span className="text-red-500">*</span>

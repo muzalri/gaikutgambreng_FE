@@ -57,7 +57,7 @@ export default function LoginPengguna() {
               </div>
               <button
                 type="submit"
-                className="w-full py-3 mt-2 font-semibold text-white bg-teal-700 rounded-full shadow-lg"
+                className="w-full py-3 mt-2 font-semibold text-white  bg-gradient-to-r from-[#155e63] to-[#1ca7a7] rounded-full shadow-[0_4px_24px_0_rgba(21,94,99,0.15)] hover:from-[#134e53] hover:to-[#178a8a] transition"
               >
                 Masuk
               </button>
