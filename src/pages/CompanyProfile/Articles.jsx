@@ -3,9 +3,13 @@ import ArtikelService from "../../services/ArtikelService";
 
 export default function Articles() {
   const [artikelList, setArtikelList] = useState([]);
+  const [filteredArtikel, setFilteredArtikel] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedArtikel, setSelectedArtikel] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("Semua");
+  const [categories, setCategories] = useState(["Semua"]);
 
   useEffect(() => {
     fetchArtikel();
@@ -17,6 +21,19 @@ export default function Articles() {
       const response = await ArtikelService.getAllArtikel();
       if (response.success) {
         setArtikelList(response.data);
+        setFilteredArtikel(response.data);
+
+        // Extract unique categories from articles
+        const uniqueCategories = ["Semua"];
+        response.data.forEach((artikel) => {
+          if (
+            artikel.kategori &&
+            !uniqueCategories.includes(artikel.kategori)
+          ) {
+            uniqueCategories.push(artikel.kategori);
+          }
+        });
+        setCategories(uniqueCategories);
       }
     } catch (error) {
       console.error("Error fetching artikel:", error);
@@ -34,6 +51,49 @@ export default function Articles() {
     setShowDetailModal(false);
     setSelectedArtikel(null);
   };
+
+  // Handle search
+  const handleSearch = (e) => {
+    e.preventDefault();
+    filterArticles();
+  };
+
+  // Handle category filter
+  const handleCategoryChange = (e) => {
+    setSelectedCategory(e.target.value);
+    filterArticles(e.target.value, searchKeyword);
+  };
+
+  // Filter articles based on search and category
+  const filterArticles = (
+    category = selectedCategory,
+    search = searchKeyword
+  ) => {
+    let filtered = artikelList;
+
+    // Filter by category
+    if (category !== "Semua") {
+      filtered = filtered.filter((artikel) => artikel.kategori === category);
+    }
+
+    // Filter by search keyword
+    if (search.trim()) {
+      filtered = filtered.filter(
+        (artikel) =>
+          artikel.judul.toLowerCase().includes(search.toLowerCase()) ||
+          artikel.isi.toLowerCase().includes(search.toLowerCase()) ||
+          (artikel.penulis?.nama &&
+            artikel.penulis.nama.toLowerCase().includes(search.toLowerCase()))
+      );
+    }
+
+    setFilteredArtikel(filtered);
+  };
+
+  // Update filtered articles when search keyword changes
+  useEffect(() => {
+    filterArticles();
+  }, [searchKeyword, selectedCategory, artikelList]);
 
   // Fungsi untuk memotong teks
   const truncateText = (text, maxLength) => {
@@ -53,13 +113,70 @@ export default function Articles() {
 
       <section className="py-10">
         <div className="max-w-5xl px-4 mx-auto">
-          <div className="px-6">
-            <h2 className="text-2xl font-bold text-slate-900">
-              Artikel <span className="text-teal-700">Pesantren Al Ihsan</span>
-            </h2>
-            <p className="mt-2 text-sm text-slate-600">
-              Berita dan artikel terbaru dari Pesantren Al Ihsan Bekasi
-            </p>
+          <div className="flex items-center justify-between mb-6">
+            <div className="px-6">
+              <h2 className="text-2xl font-bold text-slate-900">
+                Artikel{" "}
+                <span className="text-teal-700">Pesantren Al Ihsan</span>
+              </h2>
+              <p className="mt-2 text-sm text-slate-600">
+                Berita dan artikel terbaru dari Pesantren Al Ihsan Bekasi
+              </p>
+            </div>
+
+            {/* Search and Filter */}
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <select
+                  value={selectedCategory}
+                  onChange={handleCategoryChange}
+                  className="px-6 py-2 pr-10 font-semibold text-teal-700 bg-white border border-teal-700 rounded-full shadow-sm appearance-none focus:outline-none focus:ring-2 focus:ring-teal-400"
+                >
+                  {categories.map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
+                <span className="absolute text-teal-700 transform -translate-y-1/2 pointer-events-none right-4 top-1/2">
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path d="M6 8l4 4 4-4" />
+                  </svg>
+                </span>
+              </div>
+              <form onSubmit={handleSearch} className="relative">
+                <input
+                  type="text"
+                  placeholder="Cari artikel..."
+                  value={searchKeyword}
+                  onChange={(e) => setSearchKeyword(e.target.value)}
+                  className="px-6 py-2 pr-10 font-semibold text-teal-700 bg-white border border-teal-700 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
+                />
+                <button
+                  type="submit"
+                  className="absolute text-teal-700 transform -translate-y-1/2 right-4 top-1/2"
+                >
+                  <svg
+                    width="20"
+                    height="20"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle cx="11" cy="11" r="8" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                  </svg>
+                </button>
+              </form>
+            </div>
           </div>
 
           {loading ? (
@@ -70,9 +187,15 @@ export default function Articles() {
             <div className="py-12 text-center">
               <p className="text-slate-500">Belum ada artikel tersedia</p>
             </div>
+          ) : filteredArtikel.length === 0 ? (
+            <div className="py-12 text-center">
+              <p className="text-slate-500">
+                Tidak ada artikel yang sesuai dengan filter
+              </p>
+            </div>
           ) : (
             <div className="grid gap-6 mt-8 sm:grid-cols-2 lg:grid-cols-3">
-              {artikelList.map((artikel) => (
+              {filteredArtikel.map((artikel) => (
                 <article
                   key={artikel.id}
                   className="overflow-hidden bg-white border shadow-sm border-slate-200 rounded-xl hover:shadow-md transition-shadow"
@@ -85,7 +208,8 @@ export default function Articles() {
                         className="object-cover w-full h-full"
                         onError={(e) => {
                           e.target.style.display = "none";
-                          e.target.parentElement.innerHTML = '<div class="flex items-center justify-center h-full"><span class="text-4xl text-slate-400">📰</span></div>';
+                          e.target.parentElement.innerHTML =
+                            '<div class="flex items-center justify-center h-full"><span class="text-4xl text-slate-400">📰</span></div>';
                         }}
                       />
                     ) : (
@@ -95,6 +219,11 @@ export default function Articles() {
                     )}
                   </div>
                   <div className="p-4">
+                    {artikel.kategori && (
+                      <span className="inline-block px-2 py-1 text-xs font-medium text-teal-700 bg-teal-100 rounded-full mb-2">
+                        {artikel.kategori}
+                      </span>
+                    )}
                     <h3 className="font-semibold text-slate-900 line-clamp-2">
                       {artikel.judul}
                     </h3>
