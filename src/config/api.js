@@ -25,6 +25,13 @@ const api = axios.create({
 // Request interceptor untuk menambahkan token jika ada
 api.interceptors.request.use(
   (config) => {
+    console.log('🚀 Frontend Request:', {
+      method: config.method.toUpperCase(),
+      url: config.baseURL + config.url,
+      headers: config.headers,
+      data: config.data
+    });
+    
     const adminData = localStorage.getItem('adminData');
     if (adminData) {
       const admin = JSON.parse(adminData);
@@ -42,8 +49,23 @@ api.interceptors.request.use(
 
 // Response interceptor untuk handle error
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log('✅ Frontend Response:', {
+      status: response.status,
+      statusText: response.statusText,
+      data: response.data
+    });
+    return response;
+  },
   (error) => {
+    console.error('❌ Frontend Error:', {
+      message: error.message,
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      data: error.response?.data,
+      headers: error.response?.headers
+    });
+    
     if (error.response?.status === 401) {
       // Unauthorized - clear local storage dan redirect ke login
       localStorage.removeItem('adminData');
