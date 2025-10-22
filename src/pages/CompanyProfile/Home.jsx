@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import "aos/dist/aos.css";
+import AOS from "aos";
 
 export default function Home() {
   const GMAPS_LINK = "https://maps.app.goo.gl/1WZnr4KbYHjEhZP96";
@@ -36,10 +38,14 @@ export default function Home() {
   const prev = () => setCurrent((i) => (i - 1 + total) % total);
   const next = () => setCurrent((i) => (i + 1) % total);
 
+  useEffect(() => {
+    AOS.init({ duration: 700, once: true, easing: "ease-out-quart" });
+  }, []);
+
   return (
     <div className="text-slate-800">
       {/* Hero */}
-      <section>
+      <section data-aos="fade-up">
         <div className="relative">
           <div
             className="h-[56vh] sm:h-[64vh] md:h-[72vh] lg:h-[78vh] xl:h-[82vh] bg-cover bg-center"
@@ -61,7 +67,7 @@ export default function Home() {
       </section>
 
       {/* Tentang */}
-      <section id="about" className="py-20">
+      <section id="about" className="py-20" data-aos="fade-up">
         <h2 className="text-2xl font-extrabold text-slate-900 text-center ">
           Kenapa Memilih Pesantren{" "}
           <span className="text-amber-500">Al-Ihsan ?</span>
@@ -97,7 +103,7 @@ export default function Home() {
       </section>
 
       {/* Prestasi */}
-      <section className="py-20 bg-slate-50">
+      <section className="py-20 bg-slate-50" data-aos="fade-up">
         <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
           <h2 className="text-2xl font-extrabold text-center">
             Prestasi <span className="text-amber-500">Pesantren</span>
@@ -140,7 +146,7 @@ export default function Home() {
       </section>
 
       {/* Kegiatan */}
-      <section className="py-20">
+      <section className="py-20" data-aos="fade-up" data-aos-delay="100">
         <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
           <h2 className="text-2xl font-extrabold text-center">
             Kegiatan <span className="text-amber-500">Pesantren</span>
@@ -180,7 +186,11 @@ export default function Home() {
       </section>
 
       {/* Testimoni */}
-      <section className="relative py-16">
+      <section
+        className="relative py-16"
+        data-aos="fade-up"
+        data-aos-delay="150"
+      >
         {/* Background image like design */}
         <div
           className="absolute inset-0 -z-10 bg-cover bg-center filter blur-[2px]"
@@ -259,7 +269,12 @@ export default function Home() {
       </section>
 
       {/* Hubungi */}
-      <section id="contact" className="py-16">
+      <section
+        id="contact"
+        className="py-16"
+        data-aos="fade-up"
+        data-aos-delay="200"
+      >
         <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
           <h2 className="text-2xl font-extrabold text-center">
             Hubungi <span className="text-amber-500">Kami</span>

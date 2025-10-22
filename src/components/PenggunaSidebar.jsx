@@ -4,7 +4,7 @@ import { Link, useLocation } from "react-router-dom";
 
 const menus = [
   { label: "Beranda", icon: <FaHome />, path: "/pengguna/beranda" },
-  { label: "Berkas", icon: <FaFolder />, path: "/pengguna/berkas" },
+  { label: "Berkas", icon: <FaFolder />, path: "/pengguna/beranda" },
 ];
 
 export default function PenggunaSidebar() {

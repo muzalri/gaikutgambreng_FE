@@ -1,7 +1,43 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function LoginPengguna() {
   const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    username: "",
+    password: "",
+  });
+  const navigate = useNavigate();
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+
+    // Simulasi login (ganti dengan API call yang sesungguhnya)
+    if (formData.username && formData.password) {
+      // Simpan data user ke localStorage
+      localStorage.setItem(
+        "pengguna",
+        JSON.stringify({
+          username: formData.username,
+          loginTime: new Date().toISOString(),
+        })
+      );
+
+      // Redirect ke beranda
+      navigate("/pengguna/beranda");
+    } else {
+      alert("Username dan password harus diisi!");
+    }
+  };
+
   return (
     <div className="flex items-center justify-center w-full min-h-screen bg-white">
       <div className="flex w-full h-screen">
@@ -25,23 +61,31 @@ export default function LoginPengguna() {
             <p className="mb-6 text-center text-gray-600">
               Silahkan Masukkan Data Akun Anda!
             </p>
-            <form className="flex flex-col gap-4">
+            <form className="flex flex-col gap-4" onSubmit={handleLogin}>
               <div className="flex items-center px-5 py-3 bg-gray-100 rounded-full">
                 <span className="mr-3 text-gray-400 material-icons">
                   person
                 </span>
                 <input
                   type="text"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleInputChange}
                   placeholder="Masukkan Username..."
                   className="w-full font-medium text-gray-700 bg-transparent outline-none"
+                  required
                 />
               </div>
               <div className="flex items-center px-5 py-3 bg-gray-100 rounded-full">
                 <span className="mr-3 text-gray-400 material-icons">lock</span>
                 <input
                   type={showPassword ? "text" : "password"}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleInputChange}
                   placeholder="Masukkan Kata Sandi..."
                   className="w-full font-medium text-gray-700 bg-transparent outline-none"
+                  required
                 />
                 <span
                   className="ml-3 text-gray-400 cursor-pointer select-none"

@@ -2,7 +2,7 @@ import BerandaPengguna from "./pages/Pengguna/Beranda";
 import LoginPengguna from "./pages/Pengguna/LoginPengguna";
 import RegisterPengguna from "./pages/Pengguna/RegisterPengguna";
 import React from "react";
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Link, Navigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -79,7 +79,8 @@ export default function App() {
             <div className="text-slate-800">
               {window.location.pathname !== "/pendaftaran" &&
                 window.location.pathname !== "/loginpengguna" &&
-                window.location.pathname !== "/registerpengguna" && <Navbar />}
+                window.location.pathname !== "/registerpengguna" &&
+                !window.location.pathname.startsWith("/pengguna") && <Navbar />}
               <main>
                 <Routes>
                   <Route path="/" element={<Home />} />
@@ -95,11 +96,21 @@ export default function App() {
                     path="/registerpengguna"
                     element={<RegisterPengguna />}
                   />
+                  {/* Pengguna routes */}
+                  <Route
+                    path="/pengguna/beranda"
+                    element={<BerandaPengguna />}
+                  />
+                  <Route
+                    path="/pengguna/berkas"
+                    element={<Navigate to="/pengguna/beranda" replace />}
+                  />
                   <Route path="*" element={<Home />} />
                 </Routes>
               </main>
               {window.location.pathname !== "/loginpengguna" &&
-                window.location.pathname !== "/registerpengguna" && <Footer />}
+                window.location.pathname !== "/registerpengguna" &&
+                !window.location.pathname.startsWith("/pengguna") && <Footer />}
             </div>
           }
         />
