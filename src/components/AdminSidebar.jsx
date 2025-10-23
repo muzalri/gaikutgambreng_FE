@@ -5,22 +5,54 @@ import {
   FaFileAlt,
   FaChartLine,
   FaSignOutAlt,
+  FaQuoteLeft,
 } from "react-icons/fa";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import AdminService from "../services/AdminService";
 
 const sidebarMenu = [
-  { label: "Beranda", icon: <FaChartLine />, path: "/admin/dashboard", roles: ["admin", "user"] },
-  { label: "Santri", icon: <FaUserFriends />, path: "/admin/santri", roles: ["admin", "user"] },
-  { label: "Pendidik", icon: <FaChalkboardTeacher />, path: "/admin/pendidik", roles: ["admin"] }, // Only for admin
-  { label: "Artikel", icon: <FaFileAlt />, path: "/admin/artikel", roles: ["admin", "user"] },
-  { label: "PPDB", icon: <FaChartLine />, path: "/admin/ppdb", roles: ["admin", "user"] },
+  {
+    label: "Beranda",
+    icon: <FaChartLine />,
+    path: "/admin/dashboard",
+    roles: ["admin", "user"],
+  },
+  {
+    label: "Santri",
+    icon: <FaUserFriends />,
+    path: "/admin/santri",
+    roles: ["admin", "user"],
+  },
+  {
+    label: "Pendidik",
+    icon: <FaChalkboardTeacher />,
+    path: "/admin/pendidik",
+    roles: ["admin"],
+  }, // Only for admin
+  {
+    label: "Artikel",
+    icon: <FaFileAlt />,
+    path: "/admin/artikel",
+    roles: ["admin", "user"],
+  },
+  {
+    label: "Testimonial",
+    icon: <FaQuoteLeft />,
+    path: "/admin/testimonial",
+    roles: ["admin", "user"],
+  },
+  {
+    label: "PPDB",
+    icon: <FaChartLine />,
+    path: "/admin/ppdb",
+    roles: ["admin", "user"],
+  },
 ];
 
 export default function AdminSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
-  
+
   // Get current admin role from localStorage
   const currentAdmin = AdminService.getCurrentAdmin();
   const userRole = currentAdmin?.role || "user"; // Default to 'user' if not found
@@ -38,7 +70,9 @@ export default function AdminSidebar() {
   };
 
   // Filter menu items based on user role
-  const filteredMenu = sidebarMenu.filter(item => item.roles.includes(userRole));
+  const filteredMenu = sidebarMenu.filter((item) =>
+    item.roles.includes(userRole)
+  );
 
   return (
     <aside
@@ -65,7 +99,7 @@ export default function AdminSidebar() {
         </nav>
       </div>
       <div className="pb-2">
-        <button 
+        <button
           onClick={handleLogout}
           className="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-700 font-semibold text-base hover:bg-red-50 hover:text-red-600 transition w-full"
         >

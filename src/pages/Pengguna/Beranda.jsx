@@ -54,13 +54,11 @@ export default function Beranda() {
         <div className="flex-1 ml-64">
           <main className="px-10 py-8">
             {/* Beranda Title */}
-            <h1 className="text-2xl font-bold text-[#1B8277] mb-2">Beranda</h1>
+            <h1 className="text-2xl font-bold text-black mb-2">Beranda</h1>
             <span className="block mb-6 text-gray-500">Beranda</span>
-            {/* Hero Section & Cardview - Responsive Grid */}
-            {/* Hero Section & Cardview - Responsive Flex Layout */}
-            <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-6 mb-8 items-start">
-              {/* Banner */}
-              <div className="relative w-full h-[240px] rounded-2xl overflow-hidden shadow bg-white">
+            {/* Hero/Banner Full Width */}
+            <div className="mb-8">
+              <div className="relative w-full h-[320px] rounded-2xl overflow-hidden shadow bg-white">
                 <img
                   src="/assets/FotoPesantren.png"
                   alt="Hero"
@@ -78,30 +76,6 @@ export default function Beranda() {
                   </p>
                 </div>
               </div>
-              {/* Cardview Info Boxes */}
-              <div className="flex flex-col w-full gap-5">
-                <div className="flex items-center gap-3 px-8 py-5 bg-white shadow rounded-2xl">
-                  <FaThLarge className="text-[#1B8277] text-2xl" />
-                  <div className="flex-1">
-                    <div className="font-bold text-[#1B8277]">Pendaftar</div>
-                    <div className="text-sm text-gray-500">120 Pendaftar</div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 px-8 py-5 bg-white shadow rounded-2xl">
-                  <FaCalendarAlt className="text-[#1B8277] text-2xl" />
-                  <div className="flex-1">
-                    <div className="font-bold text-[#1B8277]">Tahapan</div>
-                    <div className="text-sm text-gray-500">Seleksi Berkas</div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 px-8 py-5 bg-white shadow rounded-2xl">
-                  <FaRegCalendarCheck className="text-[#1B8277] text-2xl" />
-                  <div className="flex-1">
-                    <div className="font-bold text-[#1B8277]">Status</div>
-                    <div className="text-sm text-gray-500">Pengecekan</div>
-                  </div>
-                </div>
-              </div>
             </div>
             {/* Table Section */}
             <div className="p-6 bg-white shadow rounded-2xl">
@@ -114,6 +88,7 @@ export default function Beranda() {
                     <th className="py-2">NO</th>
                     <th className="py-2">Nama</th>
                     <th className="py-2">Angkatan</th>
+                    <th className="py-2">Tahapan</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -125,6 +100,7 @@ export default function Beranda() {
                       <td className="px-2 py-2">{idx + 1}</td>
                       <td className="px-2 py-2">{nama}</td>
                       <td className="px-2 py-2">Angkatan 1</td>
+                      <td className="px-2 py-2">Seleksi Berkas</td>
                     </tr>
                   ))}
                 </tbody>

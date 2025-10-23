@@ -271,9 +271,7 @@ export default function Santri() {
                       <tr className="text-slate-700 font-bold text-base">
                         <th className="py-3 px-4">NO</th>
                         <th className="py-3 px-4">Nama</th>
-                        <th className="py-3 px-4">Email</th>
-                        <th className="py-3 px-4">No Telepon</th>
-                        <th className="py-3 px-4">Alamat</th>
+                        <th className="py-3 px-4">Angkatan</th>
                         <th className="py-3 px-4">Aksi</th>
                       </tr>
                     </thead>
@@ -281,7 +279,7 @@ export default function Santri() {
                       {loading ? (
                         <tr>
                           <td
-                            colSpan="6"
+                            colSpan="4"
                             className="py-8 text-center text-slate-500"
                           >
                             Loading...
@@ -290,7 +288,7 @@ export default function Santri() {
                       ) : santriList.length === 0 ? (
                         <tr>
                           <td
-                            colSpan="6"
+                            colSpan="4"
                             className="py-8 text-center text-slate-500"
                           >
                             Tidak ada data santri
@@ -304,12 +302,8 @@ export default function Santri() {
                           >
                             <td className="py-3 px-4">{i + 1}</td>
                             <td className="py-3 px-4">{santri.nama}</td>
-                            <td className="py-3 px-4">{santri.email}</td>
                             <td className="py-3 px-4">
-                              {santri.no_telp || "-"}
-                            </td>
-                            <td className="py-3 px-4">
-                              {santri.alamat || "-"}
+                              {santri.angkatan || "-"}
                             </td>
                             <td className="py-3 px-4">
                               <button

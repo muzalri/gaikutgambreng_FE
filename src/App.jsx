@@ -2,6 +2,7 @@ import BerandaPengguna from "./pages/Pengguna/Beranda";
 import BerkasPengguna from "./pages/Pengguna/Berkas";
 import LoginPengguna from "./pages/Pengguna/LoginPengguna";
 import RegisterPengguna from "./pages/Pengguna/RegisterPengguna";
+import Testimonial from "./pages/Admin/Testimonial";
 import React from "react";
 import { BrowserRouter, Routes, Route, Link, Navigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
@@ -75,6 +76,14 @@ export default function App() {
           }
         />
         <Route
+          path="/admin/testimonial"
+          element={
+            <ProtectedRoute>
+              <Testimonial />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="*"
           element={
             <div className="text-slate-800">
@@ -102,10 +111,7 @@ export default function App() {
                     path="/pengguna/beranda"
                     element={<BerandaPengguna />}
                   />
-                  <Route
-                    path="/pengguna/berkas"
-                    element={<BerkasPengguna />}
-                  />
+                  <Route path="/pengguna/berkas" element={<BerkasPengguna />} />
                   <Route path="*" element={<Home />} />
                 </Routes>
               </main>
