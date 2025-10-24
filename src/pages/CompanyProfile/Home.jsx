@@ -16,6 +16,14 @@ export default function Home() {
   const [kegiatanArticles, setKegiatanArticles] = useState([]);
   const [loadingArticles, setLoadingArticles] = useState(true);
 
+  // State untuk modal artikel
+  const [selectedArtikel, setSelectedArtikel] = useState(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+
+  // State untuk swipe artikel
+  const [currentPrestasiIndex, setCurrentPrestasiIndex] = useState(0);
+  const [currentKegiatanIndex, setCurrentKegiatanIndex] = useState(0);
+
   // Placeholder data testimonial (nanti diganti API)
   const testimonials = [
     {
@@ -55,19 +63,23 @@ export default function Home() {
       try {
         setLoadingArticles(true);
         const response = await ArtikelService.getAllArtikel();
-        
+
         if (response.success) {
           const articles = response.data;
-          
+
           // Filter artikel berdasarkan kategori
-          const prestasi = articles.filter(article => article.kategori === 'Prestasi').slice(0, 3);
-          const kegiatan = articles.filter(article => article.kategori === 'Kegiatan').slice(0, 3);
-          
+          const prestasi = articles
+            .filter((article) => article.kategori === "Prestasi")
+            .slice(0, 3);
+          const kegiatan = articles
+            .filter((article) => article.kategori === "Kegiatan")
+            .slice(0, 3);
+
           setPrestasiArticles(prestasi);
           setKegiatanArticles(kegiatan);
         }
       } catch (error) {
-        console.error('Error fetching articles:', error);
+        console.error("Error fetching articles:", error);
       } finally {
         setLoadingArticles(false);
       }
@@ -75,6 +87,59 @@ export default function Home() {
 
     fetchArticles();
   }, []);
+
+  // Fungsi untuk membuka modal detail artikel
+  const openDetailModal = (artikel) => {
+    setSelectedArtikel(artikel);
+    setShowDetailModal(true);
+  };
+
+  // Fungsi untuk menutup modal
+  const closeDetailModal = () => {
+    setShowDetailModal(false);
+    setSelectedArtikel(null);
+  };
+
+  // Fungsi untuk mendapatkan artikel yang ditampilkan (3 artikel per halaman)
+  const getDisplayedPrestasi = () => {
+    return prestasiArticles.slice(
+      currentPrestasiIndex,
+      currentPrestasiIndex + 3
+    );
+  };
+
+  const getDisplayedKegiatan = () => {
+    return kegiatanArticles.slice(
+      currentKegiatanIndex,
+      currentKegiatanIndex + 3
+    );
+  };
+
+  // Fungsi untuk swipe prestasi
+  const nextPrestasi = () => {
+    if (currentPrestasiIndex + 3 < prestasiArticles.length) {
+      setCurrentPrestasiIndex(currentPrestasiIndex + 1);
+    }
+  };
+
+  const prevPrestasi = () => {
+    if (currentPrestasiIndex > 0) {
+      setCurrentPrestasiIndex(currentPrestasiIndex - 1);
+    }
+  };
+
+  // Fungsi untuk swipe kegiatan
+  const nextKegiatan = () => {
+    if (currentKegiatanIndex + 3 < kegiatanArticles.length) {
+      setCurrentKegiatanIndex(currentKegiatanIndex + 1);
+    }
+  };
+
+  const prevKegiatan = () => {
+    if (currentKegiatanIndex > 0) {
+      setCurrentKegiatanIndex(currentKegiatanIndex - 1);
+    }
+  };
 
   return (
     <div className="text-slate-800">
@@ -142,76 +207,139 @@ export default function Home() {
           <h2 className="text-2xl font-extrabold text-center">
             Prestasi <span className="text-amber-500">Pesantren</span>
           </h2>
-          <div className="grid gap-6 mt-8 md:grid-cols-3">
-            {loadingArticles ? (
-              // Loading skeleton
-              [1, 2, 3].map((i) => (
-                <div
-                  key={i}
-                  className="overflow-hidden bg-white border shadow-sm border-slate-200 rounded-xl animate-pulse"
-                >
-                  <div className="h-40 bg-slate-200" />
-                  <div className="p-4 space-y-3">
-                    <div className="w-16 h-4 bg-slate-200 rounded" />
-                    <div className="w-3/4 h-5 bg-slate-200 rounded" />
-                    <div className="w-full h-3 bg-slate-200 rounded" />
-                    <div className="w-5/6 h-3 bg-slate-200 rounded" />
-                  </div>
-                </div>
-              ))
-            ) : prestasiArticles.length > 0 ? (
-              prestasiArticles.map((article) => {
-                // Explicitly construct the URL and encode it
-                const imagePath = article.foto;
-                let imageUrl = imagePath 
-                  ? (imagePath.startsWith('http') 
-                      ? imagePath 
-                      : `http://localhost:5000${imagePath}`)
-                  : '/assets/achievements/sample.jpg';
-                
-                // Encode the URL to handle spaces and special characters
-                if (imagePath && !imagePath.startsWith('http')) {
-                  imageUrl = encodeURI(imageUrl);
-                }
-                
-                return (
-                  <article
-                    key={article.id}
-                    className="overflow-hidden bg-white border shadow-sm border-slate-200 rounded-xl hover:shadow-md transition-shadow"
+          <div className="relative">
+            <div className="grid gap-6 mt-8 md:grid-cols-3">
+              {loadingArticles ? (
+                // Loading skeleton
+                [1, 2, 3].map((i) => (
+                  <div
+                    key={i}
+                    className="overflow-hidden bg-white border shadow-sm border-slate-200 rounded-xl animate-pulse"
                   >
-                    <div
-                      className="h-40 bg-center bg-cover"
-                      style={{
-                        backgroundImage: `url("${imageUrl}")`,
-                      }}
-                    />
-                    <div className="p-4">
-                      <p className="text-sm font-semibold text-amber-500">
-                        Prestasi
-                      </p>
-                      <h3 className="mt-1 font-semibold text-slate-900 line-clamp-2">
-                        {article.judul}
-                      </h3>
-                      <p className="mt-2 text-xs text-slate-600 line-clamp-3">
-                        {article.isi.substring(0, 100)}...
-                      </p>
+                    <div className="h-40 bg-slate-200" />
+                    <div className="p-4 space-y-3">
+                      <div className="w-16 h-4 bg-slate-200 rounded" />
+                      <div className="w-3/4 h-5 bg-slate-200 rounded" />
+                      <div className="w-full h-3 bg-slate-200 rounded" />
+                      <div className="w-5/6 h-3 bg-slate-200 rounded" />
                     </div>
-                  </article>
-                );
-              })
-            ) : (
-              <div className="col-span-3 py-8 text-center text-slate-500">
-                Belum ada artikel prestasi
+                  </div>
+                ))
+              ) : getDisplayedPrestasi().length > 0 ? (
+                getDisplayedPrestasi().map((article) => {
+                  // Explicitly construct the URL and encode it
+                  const imagePath = article.foto;
+                  let imageUrl = imagePath
+                    ? imagePath.startsWith("http")
+                      ? imagePath
+                      : `http://localhost:5000${imagePath}`
+                    : "/assets/achievements/sample.jpg";
+
+                  // Encode the URL to handle spaces and special characters
+                  if (imagePath && !imagePath.startsWith("http")) {
+                    imageUrl = encodeURI(imageUrl);
+                  }
+
+                  return (
+                    <article
+                      key={article.id}
+                      className="overflow-hidden bg-white border shadow-sm border-slate-200 rounded-xl hover:shadow-md transition-shadow cursor-pointer"
+                      onClick={() => openDetailModal(article)}
+                    >
+                      <div
+                        className="h-40 bg-center bg-cover"
+                        style={{
+                          backgroundImage: `url("${imageUrl}")`,
+                        }}
+                      />
+                      <div className="p-4">
+                        <p className="text-sm font-semibold text-amber-500">
+                          Prestasi
+                        </p>
+                        <h3 className="mt-1 font-semibold text-slate-900 line-clamp-2">
+                          {article.judul}
+                        </h3>
+                        <p className="mt-2 text-xs text-slate-600 line-clamp-3">
+                          {article.isi.substring(0, 100)}...
+                        </p>
+                      </div>
+                    </article>
+                  );
+                })
+              ) : (
+                <div className="col-span-3 py-8 text-center text-slate-500">
+                  Belum ada artikel prestasi
+                </div>
+              )}
+            </div>
+
+            {/* Navigation buttons untuk prestasi */}
+            {prestasiArticles.length > 3 && (
+              <div className="flex items-center justify-center gap-4 mt-6">
+                <button
+                  onClick={prevPrestasi}
+                  disabled={currentPrestasiIndex === 0}
+                  className={`p-2 rounded-full ${
+                    currentPrestasiIndex === 0
+                      ? "bg-slate-200 text-slate-400 cursor-not-allowed"
+                      : "bg-amber-500 text-white hover:bg-amber-600"
+                  }`}
+                  aria-label="Artikel sebelumnya"
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 19l-7-7 7-7"
+                    />
+                  </svg>
+                </button>
+                <span className="text-sm text-slate-600">
+                  {currentPrestasiIndex + 1}-
+                  {Math.min(currentPrestasiIndex + 3, prestasiArticles.length)}{" "}
+                  dari {prestasiArticles.length}
+                </span>
+                <button
+                  onClick={nextPrestasi}
+                  disabled={currentPrestasiIndex + 3 >= prestasiArticles.length}
+                  className={`p-2 rounded-full ${
+                    currentPrestasiIndex + 3 >= prestasiArticles.length
+                      ? "bg-slate-200 text-slate-400 cursor-not-allowed"
+                      : "bg-amber-500 text-white hover:bg-amber-600"
+                  }`}
+                  aria-label="Artikel selanjutnya"
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </button>
               </div>
             )}
-          </div>
-          <div className="mt-6">
-            <a
-              href="/artikel"
-              className="text-sm text-slate-600 hover:text-slate-900"
-            >
-              Lihat Selengkapnya
-            </a>
+
+            <div className="mt-6">
+              <a
+                href="/artikel"
+                className="text-sm text-slate-600 hover:text-slate-900"
+              >
+                Lihat Selengkapnya
+              </a>
+            </div>
           </div>
         </div>
       </section>
@@ -222,72 +350,135 @@ export default function Home() {
           <h2 className="text-2xl font-extrabold text-center">
             Kegiatan <span className="text-amber-500">Pesantren</span>
           </h2>
-          <div className="grid gap-6 mt-8 md:grid-cols-3">
-            {loadingArticles ? (
-              // Loading skeleton
-              [1, 2, 3].map((i) => (
-                <div
-                  key={i}
-                  className="overflow-hidden bg-white border shadow-sm border-slate-200 rounded-xl animate-pulse"
-                >
-                  <div className="h-40 bg-slate-200" />
-                  <div className="p-4 space-y-3">
-                    <div className="w-3/4 h-5 bg-slate-200 rounded" />
-                    <div className="w-full h-3 bg-slate-200 rounded" />
-                    <div className="w-5/6 h-3 bg-slate-200 rounded" />
-                  </div>
-                </div>
-              ))
-            ) : kegiatanArticles.length > 0 ? (
-              kegiatanArticles.map((article) => {
-                // Explicitly construct the URL and encode it
-                const imagePath = article.foto;
-                let imageUrl = imagePath 
-                  ? (imagePath.startsWith('http') 
-                      ? imagePath 
-                      : `http://localhost:5000${imagePath}`)
-                  : '/assets/activities/sample.jpg';
-                
-                // Encode the URL to handle spaces and special characters
-                if (imagePath && !imagePath.startsWith('http')) {
-                  imageUrl = encodeURI(imageUrl);
-                }
-                
-                return (
-                  <article
-                    key={article.id}
-                    className="overflow-hidden bg-white border shadow-sm border-slate-200 rounded-xl hover:shadow-md transition-shadow"
+          <div className="relative">
+            <div className="grid gap-6 mt-8 md:grid-cols-3">
+              {loadingArticles ? (
+                // Loading skeleton
+                [1, 2, 3].map((i) => (
+                  <div
+                    key={i}
+                    className="overflow-hidden bg-white border shadow-sm border-slate-200 rounded-xl animate-pulse"
                   >
-                    <div
-                      className="h-40 bg-center bg-cover"
-                      style={{
-                        backgroundImage: `url("${imageUrl}")`,
-                      }}
-                    />
-                    <div className="p-4">
-                      <h3 className="font-semibold text-slate-900 line-clamp-2">
-                        {article.judul}
-                      </h3>
-                      <p className="mt-2 text-xs text-slate-600 line-clamp-3">
-                        {article.isi.substring(0, 100)}...
-                      </p>
+                    <div className="h-40 bg-slate-200" />
+                    <div className="p-4 space-y-3">
+                      <div className="w-3/4 h-5 bg-slate-200 rounded" />
+                      <div className="w-full h-3 bg-slate-200 rounded" />
+                      <div className="w-5/6 h-3 bg-slate-200 rounded" />
                     </div>
-                  </article>
-                );
-              })
-            ) : (
-              <div className="col-span-3 py-8 text-center text-slate-500">
-                Belum ada artikel kegiatan
+                  </div>
+                ))
+              ) : getDisplayedKegiatan().length > 0 ? (
+                getDisplayedKegiatan().map((article) => {
+                  // Explicitly construct the URL and encode it
+                  const imagePath = article.foto;
+                  let imageUrl = imagePath
+                    ? imagePath.startsWith("http")
+                      ? imagePath
+                      : `http://localhost:5000${imagePath}`
+                    : "/assets/activities/sample.jpg";
+
+                  // Encode the URL to handle spaces and special characters
+                  if (imagePath && !imagePath.startsWith("http")) {
+                    imageUrl = encodeURI(imageUrl);
+                  }
+
+                  return (
+                    <article
+                      key={article.id}
+                      className="overflow-hidden bg-white border shadow-sm border-slate-200 rounded-xl hover:shadow-md transition-shadow cursor-pointer"
+                      onClick={() => openDetailModal(article)}
+                    >
+                      <div
+                        className="h-40 bg-center bg-cover"
+                        style={{
+                          backgroundImage: `url("${imageUrl}")`,
+                        }}
+                      />
+                      <div className="p-4">
+                        <h3 className="font-semibold text-slate-900 line-clamp-2">
+                          {article.judul}
+                        </h3>
+                        <p className="mt-2 text-xs text-slate-600 line-clamp-3">
+                          {article.isi.substring(0, 100)}...
+                        </p>
+                      </div>
+                    </article>
+                  );
+                })
+              ) : (
+                <div className="col-span-3 py-8 text-center text-slate-500">
+                  Belum ada artikel kegiatan
+                </div>
+              )}
+            </div>
+
+            {/* Navigation buttons untuk kegiatan */}
+            {kegiatanArticles.length > 3 && (
+              <div className="flex items-center justify-center gap-4 mt-6">
+                <button
+                  onClick={prevKegiatan}
+                  disabled={currentKegiatanIndex === 0}
+                  className={`p-2 rounded-full ${
+                    currentKegiatanIndex === 0
+                      ? "bg-slate-200 text-slate-400 cursor-not-allowed"
+                      : "bg-amber-500 text-white hover:bg-amber-600"
+                  }`}
+                  aria-label="Artikel sebelumnya"
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 19l-7-7 7-7"
+                    />
+                  </svg>
+                </button>
+                <span className="text-sm text-slate-600">
+                  {currentKegiatanIndex + 1}-
+                  {Math.min(currentKegiatanIndex + 3, kegiatanArticles.length)}{" "}
+                  dari {kegiatanArticles.length}
+                </span>
+                <button
+                  onClick={nextKegiatan}
+                  disabled={currentKegiatanIndex + 3 >= kegiatanArticles.length}
+                  className={`p-2 rounded-full ${
+                    currentKegiatanIndex + 3 >= kegiatanArticles.length
+                      ? "bg-slate-200 text-slate-400 cursor-not-allowed"
+                      : "bg-amber-500 text-white hover:bg-amber-600"
+                  }`}
+                  aria-label="Artikel selanjutnya"
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </button>
               </div>
             )}
-          </div>
-          <div className="mt-6">
-            <a
-              href="/artikel"
-              className="text-sm text-slate-600 hover:text-slate-900"
-            >
-              Lihat Selengkapnya
-            </a>
+
+            <div className="mt-6">
+              <a
+                href="/artikel"
+                className="text-sm text-slate-600 hover:text-slate-900"
+              >
+                Lihat Selengkapnya
+              </a>
+            </div>
           </div>
         </div>
       </section>
@@ -441,6 +632,95 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Modal Detail Artikel */}
+      {showDetailModal && selectedArtikel && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50"
+          onClick={closeDetailModal}
+        >
+          <div
+            className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-white rounded-2xl shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="absolute text-2xl top-4 right-4 text-slate-400 hover:text-teal-700"
+              onClick={closeDetailModal}
+              aria-label="Tutup"
+            >
+              &#10005;
+            </button>
+
+            {selectedArtikel.foto && (
+              <div className="w-full h-64 bg-slate-200">
+                <img
+                  src={`http://localhost:5000${selectedArtikel.foto}`}
+                  alt={selectedArtikel.judul}
+                  className="object-cover w-full h-full"
+                  onError={(e) => {
+                    e.target.style.display = "none";
+                  }}
+                />
+              </div>
+            )}
+
+            <div className="p-8">
+              <h2 className="mb-4 text-3xl font-bold text-slate-900">
+                {selectedArtikel.judul}
+              </h2>
+
+              <div className="flex items-center gap-4 pb-4 mb-6 text-sm border-b text-slate-600 border-slate-200">
+                <span className="flex items-center gap-2">
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    />
+                  </svg>
+                  {selectedArtikel.penulis?.nama || "Admin"}
+                </span>
+                <span className="flex items-center gap-2">
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
+                  </svg>
+                  {new Date(selectedArtikel.created_at).toLocaleDateString(
+                    "id-ID",
+                    {
+                      weekday: "long",
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    }
+                  )}
+                </span>
+              </div>
+
+              <div className="prose prose-slate max-w-none">
+                <p className="text-base leading-relaxed text-slate-700 whitespace-pre-line">
+                  {selectedArtikel.isi}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

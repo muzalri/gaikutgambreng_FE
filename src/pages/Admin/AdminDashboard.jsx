@@ -80,7 +80,7 @@ export default function AdminDashboard() {
               </div>
               {/* Grafik PPDB */}
               <div className="p-8 mb-10 bg-white border shadow rounded-2xl border-slate-100">
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-6">
                   <div className="text-lg font-bold text-slate-900">
                     Grafik PPDB
                   </div>
@@ -88,37 +88,84 @@ export default function AdminDashboard() {
                     <option>5 Tahun Terakhir</option>
                   </select>
                 </div>
-                {/* Dummy Chart */}
-                <div className="flex items-center justify-center w-full h-48">
-                  <svg width="100%" height="100%" viewBox="0 0 400 120">
-                    <polyline
-                      fill="none"
-                      stroke="#14b8a6"
-                      strokeWidth="3"
-                      points="40,100 100,60 160,60 220,80 280,60 340,100"
-                    />
-                    {[40, 100, 160, 220, 280, 340].map((x, i) => (
-                      <circle
-                        key={i}
-                        cx={x}
-                        cy={[100, 60, 60, 80, 60, 100][i]}
-                        r="7"
-                        fill="#14b8a6"
+
+                {/* Chart Container */}
+                <div className="relative w-full h-80 bg-white rounded-lg">
+                  <svg
+                    width="100%"
+                    height="100%"
+                    viewBox="0 0 800 300"
+                    className="overflow-visible"
+                  >
+                    {/* Horizontal Grid Lines */}
+                    {[20, 40, 60, 80, 100].map((value, i) => (
+                      <line
+                        key={value}
+                        x1="60"
+                        y1={50 + i * 40}
+                        x2="740"
+                        y2={50 + i * 40}
+                        stroke="#f1f5f9"
+                        strokeWidth="1"
                       />
                     ))}
-                    {/* X axis labels */}
-                    {[2021, 2022, 2023, 2024, 2025].map((year, i) => (
+
+                    {/* Y-axis labels */}
+                    {[20, 40, 60, 80, 100].map((value, i) => (
                       <text
-                        key={year}
-                        x={40 + i * 60}
-                        y={115}
-                        fontSize="14"
-                        textAnchor="middle"
-                        fill="#64748b"
+                        key={value}
+                        x="50"
+                        y={55 + i * 40}
+                        fontSize="12"
+                        fill="#94a3b8"
+                        textAnchor="end"
+                        dominantBaseline="middle"
                       >
-                        {year}
+                        {value}
                       </text>
                     ))}
+
+                    {/* Chart Area */}
+                    <g transform="translate(60, 50)">
+                      {/* Data line */}
+                      <polyline
+                        fill="none"
+                        stroke="#0f766e"
+                        strokeWidth="3"
+                        points="0,160 120,80 240,80 360,120 480,40"
+                      />
+
+                      {/* Data points */}
+                      {[
+                        { x: 0, y: 160 },
+                        { x: 120, y: 80 },
+                        { x: 240, y: 80 },
+                        { x: 360, y: 120 },
+                        { x: 480, y: 40 },
+                      ].map((point, i) => (
+                        <circle
+                          key={i}
+                          cx={point.x}
+                          cy={point.y}
+                          r="6"
+                          fill="#0f766e"
+                        />
+                      ))}
+
+                      {/* X-axis labels */}
+                      {[2021, 2022, 2023, 2024, 2025].map((year, i) => (
+                        <text
+                          key={year}
+                          x={i * 120}
+                          y={220}
+                          fontSize="12"
+                          fill="#94a3b8"
+                          textAnchor="middle"
+                        >
+                          {year}
+                        </text>
+                      ))}
+                    </g>
                   </svg>
                 </div>
               </div>

@@ -22,18 +22,30 @@ export default function LoginPengguna() {
 
     // Simulasi login (ganti dengan API call yang sesungguhnya)
     if (formData.username && formData.password) {
-      // Simpan data user ke localStorage
-      localStorage.setItem(
-        "pengguna",
-        JSON.stringify({
-          username: formData.username,
-          loginTime: new Date().toISOString(),
-        })
-      );
+      // Simulasi validasi login
+      if (formData.username === "admin" && formData.password === "admin") {
+        // Simpan data user ke localStorage
+        localStorage.setItem(
+          "pengguna",
+          JSON.stringify({
+            username: formData.username,
+            loginTime: new Date().toISOString(),
+          })
+        );
 
-      // Redirect ke beranda
-      navigate("/pengguna/beranda");
+        // Tampilkan alert sukses
+        alert("Login berhasil!");
+
+        // Redirect ke beranda setelah delay
+        setTimeout(() => {
+          navigate("/pengguna/beranda");
+        }, 1500);
+      } else {
+        // Tampilkan alert error
+        alert("Username atau password salah!");
+      }
     } else {
+      // Tampilkan alert warning
       alert("Username dan password harus diisi!");
     }
   };

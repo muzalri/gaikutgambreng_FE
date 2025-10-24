@@ -2,6 +2,7 @@ import React, { useRef, useState } from "react";
 import PenggunaSidebar from "../../components/PenggunaSidebar";
 
 export default function Berkas() {
+
   // Labels for each required file (keeps order predictable)
   const labels = [
     "Surat Pernyataan Taat Peraturan",
@@ -15,6 +16,12 @@ export default function Berkas() {
   ];
   const initialFiles = Array(labels.length).fill("KTP ORTU.PDF");
   const [files, setFiles] = useState(initialFiles);
+  const [formData, setFormData] = useState({
+    nama: "",
+    asal_sekolah: "",
+    alamat: "",
+    angkatan: "",
+  });
   // create refs for each hidden input
   const fileInputRefs = useRef(labels.map(() => React.createRef()));
 
@@ -30,6 +37,51 @@ export default function Berkas() {
       next[index] = selected ? selected.name : "KTP ORTU.PDF";
       return next;
     });
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    // Validasi form
+    if (
+      !formData.nama ||
+      !formData.asal_sekolah ||
+      !formData.alamat ||
+      !formData.angkatan
+    ) {
+      alert("Lengkapi Data Pendaftaran Anda!");
+      return;
+    }
+
+    // Validasi file upload
+    const hasFiles = files.some((file) => file !== "KTP ORTU.PDF");
+    if (!hasFiles) {
+      alert("Lengkapi Data Pendaftaran Anda!");
+      return;
+    }
+
+    // Simulasi submit
+    console.log("Submitting form:", { formData, files });
+
+    // Tampilkan alert sukses
+    alert("Berhasil Mengirim Data Pendaftaran!");
+
+    // Reset form
+    setFormData({
+      nama: "",
+      asal_sekolah: "",
+      alamat: "",
+      angkatan: "",
+    });
+    setFiles(Array(labels.length).fill("KTP ORTU.PDF"));
   };
 
   return (
@@ -61,9 +113,6 @@ export default function Berkas() {
                   Berkas > Pendaftaran
                 </span>
               </div>
-              <button className="px-6 py-3 bg-teal-700 text-white rounded-full font-semibold">
-                Konfirmasi
-              </button>
             </div>
 
             <p className="mb-6 text-gray-600">
@@ -71,14 +120,19 @@ export default function Berkas() {
               Pesantren Al Ihsan Bekasi.
             </p>
 
-            <div className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Nama
                 </label>
                 <input
+                  type="text"
+                  name="nama"
+                  value={formData.nama}
+                  onChange={handleInputChange}
                   className="w-full px-4 py-3 rounded-lg bg-white border border-gray-300"
                   placeholder="Masukkan Nama Lengkap..."
+                  required
                 />
               </div>
 
@@ -87,8 +141,13 @@ export default function Berkas() {
                   Asal Sekolah Dasar/Madrasah Ibtidaiyah
                 </label>
                 <input
+                  type="text"
+                  name="asal_sekolah"
+                  value={formData.asal_sekolah}
+                  onChange={handleInputChange}
                   className="w-full px-4 py-3 rounded-lg bg-white border border-gray-300"
                   placeholder="Masukkan Asal Sekolah..."
+                  required
                 />
               </div>
 
@@ -97,6 +156,10 @@ export default function Berkas() {
                   Alamat
                 </label>
                 <input
+                  type="text"
+                  name="alamat"
+                  value={formData.alamat}
+                  onChange={handleInputChange}
                   className="w-full px-4 py-3 rounded-lg bg-white border border-gray-300"
                   placeholder="Masukkan Alamat Lengkap..."
                 />
@@ -107,8 +170,13 @@ export default function Berkas() {
                   Angkatan
                 </label>
                 <input
+                  type="text"
+                  name="angkatan"
+                  value={formData.angkatan}
+                  onChange={handleInputChange}
                   className="w-full px-4 py-3 rounded-lg bg-white border border-gray-300"
                   placeholder="Masukkan Angkatan PPDB..."
+                  required
                 />
               </div>
 
@@ -138,7 +206,16 @@ export default function Berkas() {
                   </div>
                 ))}
               </div>
-            </div>
+
+              <div className="flex justify-end pt-6">
+                <button
+                  type="submit"
+                  className="px-6 py-3 bg-teal-700 text-white rounded-full font-semibold hover:bg-teal-800 transition"
+                >
+                  Konfirmasi
+                </button>
+              </div>
+            </form>
           </main>
         </div>
       </div>

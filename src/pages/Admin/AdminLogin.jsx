@@ -4,25 +4,11 @@ import { FiEye, FiEyeOff } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import AdminService from "../../services/AdminService";
 
-// Import Swal dengan try-catch untuk fallback
-let Swal;
-try {
-  Swal = require("sweetalert2").default;
-} catch (error) {
-  // Fallback jika SweetAlert2 belum terinstall
-  console.warn("SweetAlert2 belum terinstall. Menggunakan alert biasa.");
-  Swal = {
-    fire: ({ text, title }) => {
-      return Promise.resolve(alert(`${title}\n${text}`));
-    },
-  };
-}
-
 const AdminLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false); // Keep loading state
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   // Redirect jika sudah login
@@ -33,23 +19,14 @@ const AdminLogin = () => {
   }, [navigate]);
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Mencegah form reload
-    e.stopPropagation(); // Mencegah event bubbling
+    e.preventDefault();
+    e.stopPropagation();
 
     setLoading(true);
 
     // Validasi
     if (!email || !password) {
-      try {
-        await Swal.fire({
-          icon: "warning",
-          title: "Data Tidak Lengkap",
-          text: "Email dan password wajib diisi!",
-          confirmButtonColor: "#0f766e",
-        });
-      } catch (error) {
-        alert("Email dan password wajib diisi!");
-      }
+      alert("Email dan password wajib diisi!");
       setLoading(false);
       return;
     }
@@ -57,49 +34,17 @@ const AdminLogin = () => {
     try {
       const response = await AdminService.login(email, password);
       if (response.success) {
-        try {
-          await Swal.fire({
-            icon: "success",
-            title: "Login Berhasil!",
-            text: `Selamat datang, ${response.data.nama}`,
-            confirmButtonColor: "#0f766e",
-            timer: 1500,
-            showConfirmButton: false,
-          });
+        alert("Login berhasil!");
+        setTimeout(() => {
           navigate("/admin/dashboard");
-        } catch (error) {
-          navigate("/admin/dashboard");
-        }
+        }, 1500);
       } else {
         setLoading(false);
-        try {
-          await Swal.fire({
-            icon: "error",
-            title: "Login Gagal",
-            text: response.message || "Email atau password salah!",
-            confirmButtonColor: "#0f766e",
-          });
-        } catch (error) {
-          alert(response.message || "Email atau password salah!");
-        }
+        alert("Email atau password salah!");
       }
     } catch (err) {
       setLoading(false);
-      try {
-        await Swal.fire({
-          icon: "error",
-          title: "Terjadi Kesalahan",
-          text:
-            err.message ||
-            "Tidak dapat terhubung ke server. Pastikan backend sudah berjalan.",
-          confirmButtonColor: "#0f766e",
-        });
-      } catch (error) {
-        alert(
-          err.message ||
-            "Tidak dapat terhubung ke server. Pastikan backend sudah berjalan."
-        );
-      }
+      alert("Tidak dapat terhubung ke server. Pastikan backend sudah berjalan.");
     }
   };
 
@@ -168,7 +113,6 @@ const AdminLogin = () => {
           >
             {loading ? "Memproses..." : "Masuk"}
           </button>
-          
         </form>
       </div>
     </div>

@@ -6,6 +6,8 @@ import {
   FaChartLine,
   FaSignOutAlt,
   FaQuoteLeft,
+  FaCalendarAlt,
+  FaBullhorn,
 } from "react-icons/fa";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import AdminService from "../services/AdminService";
@@ -45,6 +47,18 @@ const sidebarMenu = [
     label: "PPDB",
     icon: <FaChartLine />,
     path: "/admin/ppdb",
+    roles: ["admin", "user"],
+  },
+  {
+    label: "Pendaftaran",
+    icon: <FaCalendarAlt />,
+    path: "/admin/pendaftaran",
+    roles: ["admin", "user"],
+  },
+  {
+    label: "Promosi",
+    icon: <FaBullhorn />,
+    path: "/admin/promosi",
     roles: ["admin", "user"],
   },
 ];

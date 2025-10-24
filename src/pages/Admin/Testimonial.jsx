@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import AdminSidebar from "../../components/AdminSidebar";
 import AdminHeader from "../../components/AdminHeader";
 import AdminService from "../../services/AdminService";
+import Swal from "sweetalert2";
 
 export default function Testimonial() {
   const navigate = useNavigate();
@@ -16,6 +17,8 @@ export default function Testimonial() {
     asal: "",
     testimonial: "",
     foto: null,
+    kategori: "",
+    angkatan: "",
   });
   const [fotoPreview, setFotoPreview] = useState(null);
 
@@ -30,6 +33,8 @@ export default function Testimonial() {
       rating: 5,
       foto: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
       status: "Aktif",
+      kategori: "Wali Santri",
+      angkatan: "Angkatan 1",
     },
     {
       id: 2,
@@ -40,6 +45,8 @@ export default function Testimonial() {
       rating: 5,
       foto: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
       status: "Aktif",
+      kategori: "Alumni",
+      angkatan: "Angkatan 2",
     },
     {
       id: 3,
@@ -50,6 +57,19 @@ export default function Testimonial() {
       rating: 4,
       foto: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
       status: "Aktif",
+      kategori: "Wali Santri",
+      angkatan: "Angkatan 3",
+    },
+    {
+      id: 4,
+      nama: "Bilal Hamizan",
+      asal: "Santri Aktif",
+      testimonial: "Bagus banget",
+      rating: 5,
+      foto: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
+      status: "Aktif",
+      kategori: "Santri Aktif",
+      angkatan: "Angkatan 6",
     },
   ];
 
@@ -100,16 +120,38 @@ export default function Testimonial() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    // Validasi form
+    if (!formData.nama || !formData.asal || !formData.testimonial) {
+      Swal.fire({
+        icon: "warning",
+        title: "Perhatian",
+        text: "Lengkapi Data Testimonial Anda!",
+      });
+      return;
+    }
+
     // TODO: Implement create testimonial logic
     console.log("Creating testimonial:", formData);
-    alert("Testimonial berhasil ditambahkan!");
+
+    // Simulasi sukses
+    Swal.fire({
+      icon: "success",
+      title: "Berhasil",
+      text: "Testimonial berhasil ditambahkan!",
+      timer: 1500,
+    });
+
     setFormData({
       nama: "",
       asal: "",
       testimonial: "",
       foto: null,
+      kategori: "",
+      angkatan: "",
     });
     setFotoPreview(null);
+    setShowModal(false);
   };
 
   return (
@@ -141,9 +183,12 @@ export default function Testimonial() {
                   </button>
                   <div className="relative">
                     <select className="px-6 py-2 pr-10 font-semibold text-teal-700 bg-white border border-teal-700 rounded-full shadow-sm appearance-none focus:outline-none focus:ring-2 focus:ring-teal-400">
-                      <option>Semua</option>
-                      <option>Aktif</option>
-                      <option>Non-Aktif</option>
+                      <option>Semua Kategori</option>
+                      <option>Wali Santri</option>
+                      <option>Alumni</option>
+                      <option>Santri Aktif</option>
+                      <option>Guru/Ustadz</option>
+                      <option>Lainnya</option>
                     </select>
                     <span className="absolute text-teal-700 transform -translate-y-1/2 pointer-events-none right-4 top-1/2">
                       <svg
@@ -221,6 +266,16 @@ export default function Testimonial() {
                         "{testimonial.testimonial}"
                       </p>
 
+                      {/* Kategori dan Angkatan */}
+                      <div className="flex items-center gap-2 mb-4">
+                        <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-semibold rounded-full">
+                          {testimonial.kategori}
+                        </span>
+                        <span className="px-2 py-1 bg-purple-100 text-purple-800 text-xs font-semibold rounded-full">
+                          {testimonial.angkatan}
+                        </span>
+                      </div>
+
                       {/* Status dan Aksi */}
                       <div className="flex items-center justify-between">
                         <span
@@ -259,35 +314,87 @@ export default function Testimonial() {
                     {selectedTestimonial ? (
                       // View Mode
                       <>
-                        <h3 className="text-2xl font-extrabold text-center mb-6">
-                          Detail Testimonial
+                        <h3 className="text-2xl font-extrabold text-center mb-2">
+                          Lihat Testimoni
                         </h3>
-                        <div className="flex items-center gap-4 mb-6">
-                          <img
-                            src={selectedTestimonial.foto}
-                            alt={selectedTestimonial.nama}
-                            className="w-16 h-16 rounded-full object-cover"
-                          />
-                          <div>
-                            <h4 className="text-xl font-bold text-slate-900">
-                              {selectedTestimonial.nama}
-                            </h4>
-                            <p className="text-slate-500">
-                              {selectedTestimonial.asal}
-                            </p>
+                        <p className="text-sm text-center text-slate-500 mb-6">
+                          Data berikut merupakan testmoni santri Pesantren Al
+                          Ihsan Bekasi.
+                        </p>
+
+                        {/* Foto Santri */}
+                        <div className="mb-6">
+                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                            Foto Santri
+                          </label>
+                          <div className="w-full h-48 bg-slate-100 rounded-lg overflow-hidden">
+                            <img
+                              src={selectedTestimonial.foto}
+                              alt={selectedTestimonial.nama}
+                              className="w-full h-full object-cover"
+                            />
                           </div>
                         </div>
-                        <div className="bg-slate-50 rounded-lg p-4 mb-6">
-                          <p className="text-slate-700 italic">
-                            "{selectedTestimonial.testimonial}"
-                          </p>
+
+                        {/* Nama */}
+                        <div className="mb-4">
+                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                            Nama
+                          </label>
+                          <input
+                            type="text"
+                            value={selectedTestimonial.nama}
+                            readOnly
+                            className="w-full px-4 py-3 rounded-lg bg-slate-50 border border-slate-200 text-slate-700"
+                          />
                         </div>
+
+                        {/* Angkatan */}
+                        <div className="mb-4">
+                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                            Angkatan
+                          </label>
+                          <input
+                            type="text"
+                            value={selectedTestimonial.angkatan || "6"}
+                            readOnly
+                            className="w-full px-4 py-3 rounded-lg bg-slate-50 border border-slate-200 text-slate-700"
+                          />
+                        </div>
+
+                        {/* Isi */}
+                        <div className="mb-6">
+                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                            Isi
+                          </label>
+                          <textarea
+                            value={selectedTestimonial.testimonial}
+                            readOnly
+                            rows="3"
+                            className="w-full px-4 py-3 rounded-lg bg-slate-50 border border-slate-200 text-slate-700"
+                          />
+                        </div>
+
+                        {/* Action Buttons */}
                         <div className="flex items-center justify-center gap-4">
                           <button
                             onClick={closeViewModal}
-                            className="px-6 py-2 bg-teal-700 text-white rounded-full font-semibold hover:bg-teal-800 transition"
+                            className="px-8 py-3 bg-teal-700 text-white rounded-full font-semibold hover:bg-teal-800 transition"
                           >
-                            Tutup
+                            Konfirmasi
+                          </button>
+                          <button
+                            onClick={() => {
+                              // TODO: Implement delete functionality
+                              console.log(
+                                "Delete testimonial:",
+                                selectedTestimonial.id
+                              );
+                              closeViewModal();
+                            }}
+                            className="px-8 py-3 bg-red-600 text-white rounded-full font-semibold hover:bg-red-700 transition"
+                          >
+                            Hapus
                           </button>
                         </div>
                       </>
@@ -330,33 +437,82 @@ export default function Testimonial() {
                             </div>
                           </div>
 
-                          <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-2">
-                              Nama
-                            </label>
-                            <input
-                              type="text"
-                              name="nama"
-                              value={formData.nama}
-                              onChange={handleInputChange}
-                              className="w-full px-4 py-3 rounded-lg bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-400"
-                              placeholder="Masukkan nama lengkap"
-                              required
-                            />
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-sm font-medium text-slate-700 mb-2">
+                                Nama
+                              </label>
+                              <input
+                                type="text"
+                                name="nama"
+                                value={formData.nama}
+                                onChange={handleInputChange}
+                                className="w-full px-4 py-3 rounded-lg bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-400"
+                                placeholder="Masukkan nama lengkap"
+                                required
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-slate-700 mb-2">
+                                Kategori
+                              </label>
+                              <select
+                                name="kategori"
+                                value={formData.kategori}
+                                onChange={handleInputChange}
+                                className="w-full px-4 py-3 rounded-lg bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-400"
+                                required
+                              >
+                                <option value="">Pilih Kategori</option>
+                                <option value="Wali Santri">Wali Santri</option>
+                                <option value="Alumni">Alumni</option>
+                                <option value="Santri Aktif">
+                                  Santri Aktif
+                                </option>
+                                <option value="Guru/Ustadz">Guru/Ustadz</option>
+                                <option value="Lainnya">Lainnya</option>
+                              </select>
+                            </div>
                           </div>
-                          <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-2">
-                              Asal
-                            </label>
-                            <input
-                              type="text"
-                              name="asal"
-                              value={formData.asal}
-                              onChange={handleInputChange}
-                              className="w-full px-4 py-3 rounded-lg bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-400"
-                              placeholder="Masukkan asal (Orang Tua, Alumni, dll)"
-                              required
-                            />
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-sm font-medium text-slate-700 mb-2">
+                                Asal
+                              </label>
+                              <input
+                                type="text"
+                                name="asal"
+                                value={formData.asal}
+                                onChange={handleInputChange}
+                                className="w-full px-4 py-3 rounded-lg bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-400"
+                                placeholder="Masukkan asal (Orang Tua, Alumni, dll)"
+                                required
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-slate-700 mb-2">
+                                Angkatan
+                              </label>
+                              <select
+                                name="angkatan"
+                                value={formData.angkatan}
+                                onChange={handleInputChange}
+                                className="w-full px-4 py-3 rounded-lg bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-400"
+                                required
+                              >
+                                <option value="">Pilih Angkatan</option>
+                                <option value="Angkatan 1">Angkatan 1</option>
+                                <option value="Angkatan 2">Angkatan 2</option>
+                                <option value="Angkatan 3">Angkatan 3</option>
+                                <option value="Angkatan 4">Angkatan 4</option>
+                                <option value="Angkatan 5">Angkatan 5</option>
+                                <option value="Angkatan 6">Angkatan 6</option>
+                                <option value="Angkatan 7">Angkatan 7</option>
+                                <option value="Angkatan 8">Angkatan 8</option>
+                                <option value="Angkatan 9">Angkatan 9</option>
+                                <option value="Angkatan 10">Angkatan 10</option>
+                              </select>
+                            </div>
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-slate-700 mb-2">

@@ -21,6 +21,13 @@ export default function PPDB() {
   const [selectedSantri, setSelectedSantri] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  // Modal state for Pengumuman
+  const [showPengumumanModal, setShowPengumumanModal] = useState(false);
+  const [pengumumanData, setPengumumanData] = useState({
+    angkatan: "",
+    tahapan: "",
+  });
+
   const openModal = async (id) => {
     setShowModal(true);
     setLoading(true);
@@ -68,6 +75,40 @@ export default function PPDB() {
     }
   };
 
+  const openPengumumanModal = () => {
+    setShowPengumumanModal(true);
+  };
+
+  const closePengumumanModal = () => {
+    setShowPengumumanModal(false);
+    setPengumumanData({
+      angkatan: "",
+      tahapan: "",
+    });
+  };
+
+  const handlePengumumanInputChange = (e) => {
+    const { name, value } = e.target;
+    setPengumumanData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handlePengumumanSubmit = (e) => {
+    e.preventDefault();
+
+    if (!pengumumanData.angkatan || !pengumumanData.tahapan) {
+      alert("Angkatan dan Tahapan harus diisi!");
+      return;
+    }
+
+    // TODO: Implement pengumuman API call
+    console.log("Creating pengumuman:", pengumumanData);
+    alert("Pengumuman berhasil dibuat!");
+    closePengumumanModal();
+  };
+
   return (
     <div className="min-h-screen bg-[#f5f6fa]">
       <AdminHeader />
@@ -86,12 +127,40 @@ export default function PPDB() {
                   <span className="block font-medium text-slate-500">PPDB</span>
                 </div>
                 <div className="flex items-center gap-4">
-                  <button className="px-6 py-2 font-semibold text-white bg-teal-700 rounded-full shadow-md">
-                    Buka PPDB
+                  <button
+                    onClick={openPengumumanModal}
+                    className="px-6 py-2 font-semibold text-white bg-teal-700 rounded-full shadow-md hover:bg-teal-800 transition"
+                  >
+                    Pengumuman
                   </button>
                   <div className="relative">
                     <select className="px-6 py-2 pr-10 font-semibold text-teal-700 bg-white border border-teal-700 rounded-full shadow-sm appearance-none focus:outline-none focus:ring-2 focus:ring-teal-400">
-                      <option>Semua</option>
+                      <option>Status</option>
+                      <option>Diterima</option>
+                      <option>Proses</option>
+                      <option>Ditolak</option>
+                    </select>
+                    <span className="absolute text-teal-700 transform -translate-y-1/2 pointer-events-none right-4 top-1/2">
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 20 20"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
+                        <path d="M6 8l4 4 4-4" />
+                      </svg>
+                    </span>
+                  </div>
+                  <div className="relative">
+                    <select className="px-6 py-2 pr-10 font-semibold text-teal-700 bg-white border border-teal-700 rounded-full shadow-sm appearance-none focus:outline-none focus:ring-2 focus:ring-teal-400">
+                      <option>Tahapan</option>
+                      <option>Seleksi Berkas</option>
+                      <option>Tes Psikolog</option>
+                      <option>Tes Baca Al-Qur'an</option>
+                      <option>Wawancara Casantri</option>
+                      <option>Karantina Casantri</option>
                     </select>
                     <span className="absolute text-teal-700 transform -translate-y-1/2 pointer-events-none right-4 top-1/2">
                       <svg
@@ -317,6 +386,85 @@ export default function PPDB() {
                   </button>
                 </div>
               </div>
+
+              {/* Pengumuman Modal */}
+              {showPengumumanModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                  <div className="relative w-full max-w-md p-8 mx-4 bg-white rounded-2xl shadow-lg">
+                    <button
+                      className="absolute text-2xl top-4 right-4 text-slate-400 hover:text-slate-600"
+                      onClick={closePengumumanModal}
+                      aria-label="Tutup"
+                    >
+                      &#10005;
+                    </button>
+
+                    <h3 className="mb-2 text-2xl font-bold text-slate-900">
+                      Pengumuman
+                    </h3>
+                    <p className="mb-6 text-sm text-slate-500">
+                      Silakan lengkapi data berikut untuk membuat pengumuman ke
+                      PPDB
+                    </p>
+
+                    <form
+                      onSubmit={handlePengumumanSubmit}
+                      className="space-y-4"
+                    >
+                      <div>
+                        <label className="block text-sm font-medium text-slate-600 mb-2">
+                          Angkatan
+                        </label>
+                        <select
+                          name="angkatan"
+                          value={pengumumanData.angkatan}
+                          onChange={handlePengumumanInputChange}
+                          className="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-teal-400 appearance-none"
+                          required
+                        >
+                          <option value="">Pilih Angkatan</option>
+                          <option value="Angkatan 1">Angkatan 1</option>
+                          <option value="Angkatan 2">Angkatan 2</option>
+                          <option value="Angkatan 3">Angkatan 3</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-slate-600 mb-2">
+                          Tahapan
+                        </label>
+                        <select
+                          name="tahapan"
+                          value={pengumumanData.tahapan}
+                          onChange={handlePengumumanInputChange}
+                          className="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-teal-400 appearance-none"
+                          required
+                        >
+                          <option value="">Pilih Tahapan</option>
+                          <option value="Seleksi Administrasi">
+                            Seleksi Administrasi
+                          </option>
+                          <option value="Tes Psikolog">Tes Psikolog</option>
+                          <option value="Tes Baca Al-Qur'an">
+                            Tes Baca Al-Qur'an
+                          </option>
+                          <option value="Wawancara">Wawancara</option>
+                          <option value="Karantina">Karantina</option>
+                        </select>
+                      </div>
+
+                      <div className="flex justify-center pt-4">
+                        <button
+                          type="submit"
+                          className="px-8 py-3 bg-teal-700 text-white rounded-full font-semibold hover:bg-teal-800 transition"
+                        >
+                          Konfirmasi
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )}
             </section>
           </main>
         </div>

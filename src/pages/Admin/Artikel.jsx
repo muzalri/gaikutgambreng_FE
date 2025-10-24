@@ -197,9 +197,8 @@ export default function Artikel() {
         Swal.fire({
           icon: "success",
           title: "Berhasil",
-          text: "Artikel berhasil dibuat!",
-          timer: 2000,
-          showConfirmButton: false,
+          text: "Artikel berhasil ditambahkan!",
+          timer: 1500,
         });
         setShowModal(false);
         fetchArtikel();
@@ -210,7 +209,7 @@ export default function Artikel() {
       Swal.fire({
         icon: "error",
         title: "Gagal",
-        text: error.message || "Gagal membuat artikel",
+        text: "Gagal menambahkan artikel",
       });
     }
   };
@@ -260,8 +259,7 @@ export default function Artikel() {
           icon: "success",
           title: "Berhasil",
           text: "Artikel berhasil diupdate!",
-          timer: 2000,
-          showConfirmButton: false,
+          timer: 1500,
         });
         setViewModal(false);
         fetchArtikel();
@@ -272,7 +270,7 @@ export default function Artikel() {
       Swal.fire({
         icon: "error",
         title: "Gagal",
-        text: error.message || "Gagal mengupdate artikel",
+        text: "Gagal mengupdate artikel",
       });
     }
   };

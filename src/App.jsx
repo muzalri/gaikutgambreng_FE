@@ -3,6 +3,8 @@ import BerkasPengguna from "./pages/Pengguna/Berkas";
 import LoginPengguna from "./pages/Pengguna/LoginPengguna";
 import RegisterPengguna from "./pages/Pengguna/RegisterPengguna";
 import Testimonial from "./pages/Admin/Testimonial";
+import Pendaftaran from "./pages/Admin/Pendaftaran";
+import Promosi from "./pages/Admin/Promosi";
 import React from "react";
 import { BrowserRouter, Routes, Route, Link, Navigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
@@ -20,108 +22,135 @@ import Pendidik from "./pages/Admin/Pendidik";
 import Artikel from "./pages/Admin/Artikel";
 import PPDB from "./pages/Admin/PPDB";
 import Profil from "./pages/Admin/Profil";
+import { AlertProvider } from "./contexts/AlertContext";
+import AlertDemo from "./pages/AlertDemo";
 
 export default function App() {
-  // ...existing code...
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/admin" element={<AdminLogin />} />
-        <Route
-          path="/admin/dashboard"
-          element={
-            <ProtectedRoute>
-              <AdminDashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin/santri"
-          element={
-            <ProtectedRoute>
-              <Santri />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin/pendidik"
-          element={
-            <ProtectedRoute>
-              <Pendidik />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin/artikel"
-          element={
-            <ProtectedRoute>
-              <Artikel />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin/ppdb"
-          element={
-            <ProtectedRoute>
-              <PPDB />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin/profil"
-          element={
-            <ProtectedRoute>
-              <Profil />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin/testimonial"
-          element={
-            <ProtectedRoute>
-              <Testimonial />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="*"
-          element={
-            <div className="text-slate-800">
-              {window.location.pathname !== "/pendaftaran" &&
-                window.location.pathname !== "/loginpengguna" &&
-                window.location.pathname !== "/registerpengguna" &&
-                !window.location.pathname.startsWith("/pengguna") && <Navbar />}
-              <main>
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/profil/tentang-kami" element={<About />} />
-                  <Route
-                    path="/profil/tenaga-pendidik"
-                    element={<Teachers />}
-                  />
-                  <Route path="/artikel" element={<Articles />} />
-                  <Route path="/pendaftaran" element={<Register />} />
-                  <Route path="/loginpengguna" element={<LoginPengguna />} />
-                  <Route
-                    path="/registerpengguna"
-                    element={<RegisterPengguna />}
-                  />
-                  {/* Pengguna routes */}
-                  <Route
-                    path="/pengguna/beranda"
-                    element={<BerandaPengguna />}
-                  />
-                  <Route path="/pengguna/berkas" element={<BerkasPengguna />} />
-                  <Route path="*" element={<Home />} />
-                </Routes>
-              </main>
-              {window.location.pathname !== "/loginpengguna" &&
-                window.location.pathname !== "/registerpengguna" &&
-                !window.location.pathname.startsWith("/pengguna") && <Footer />}
-            </div>
-          }
-        />
-      </Routes>
-    </BrowserRouter>
+    <AlertProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/admin" element={<AdminLogin />} />
+          <Route
+            path="/admin/dashboard"
+            element={
+              <ProtectedRoute>
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/santri"
+            element={
+              <ProtectedRoute>
+                <Santri />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/pendidik"
+            element={
+              <ProtectedRoute>
+                <Pendidik />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/artikel"
+            element={
+              <ProtectedRoute>
+                <Artikel />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/ppdb"
+            element={
+              <ProtectedRoute>
+                <PPDB />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/profil"
+            element={
+              <ProtectedRoute>
+                <Profil />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/testimonial"
+            element={
+              <ProtectedRoute>
+                <Testimonial />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/pendaftaran"
+            element={
+              <ProtectedRoute>
+                <Pendaftaran />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/promosi"
+            element={
+              <ProtectedRoute>
+                <Promosi />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="*"
+            element={
+              <div className="text-slate-800">
+                {window.location.pathname !== "/pendaftaran" &&
+                  window.location.pathname !== "/loginpengguna" &&
+                  window.location.pathname !== "/registerpengguna" &&
+                  !window.location.pathname.startsWith("/pengguna") && (
+                    <Navbar />
+                  )}
+                <main>
+                  <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/profil/tentang-kami" element={<About />} />
+                    <Route
+                      path="/profil/tenaga-pendidik"
+                      element={<Teachers />}
+                    />
+                    <Route path="/artikel" element={<Articles />} />
+                    <Route path="/pendaftaran" element={<Register />} />
+                    <Route path="/loginpengguna" element={<LoginPengguna />} />
+                    <Route
+                      path="/registerpengguna"
+                      element={<RegisterPengguna />}
+                    />
+                    <Route path="/alert-demo" element={<AlertDemo />} />
+                    {/* Pengguna routes */}
+                    <Route
+                      path="/pengguna/beranda"
+                      element={<BerandaPengguna />}
+                    />
+                    <Route
+                      path="/pengguna/berkas"
+                      element={<BerkasPengguna />}
+                    />
+                    <Route path="*" element={<Home />} />
+                  </Routes>
+                </main>
+                {window.location.pathname !== "/loginpengguna" &&
+                  window.location.pathname !== "/registerpengguna" &&
+                  !window.location.pathname.startsWith("/pengguna") && (
+                    <Footer />
+                  )}
+              </div>
+            }
+          />
+        </Routes>
+      </BrowserRouter>
+    </AlertProvider>
   );
 }
