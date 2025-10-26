@@ -1,8 +1,175 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import AuthSantriService from "../../services/AuthSantriService";
+import Swal from "sweetalert2";
+import { useGoogleLogin } from '@react-oauth/google';
 
 export default function RegisterPengguna() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    nama: "",
+    email: "",
+    no_telp: "",
+    kata_sandi: "",
+    confirmPassword: ""
+  });
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    
+    // Validasi
+    if (!formData.nama || !formData.email || !formData.kata_sandi || !formData.confirmPassword) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Oops...',
+        text: 'Semua field harus diisi!',
+      });
+      return;
+    }
+
+    if (formData.kata_sandi !== formData.confirmPassword) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Password Tidak Cocok',
+        text: 'Kata sandi dan konfirmasi kata sandi harus sama!',
+      });
+      return;
+    }
+
+    if (formData.kata_sandi.length < 6) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Password Terlalu Pendek',
+        text: 'Kata sandi minimal 6 karakter!',
+      });
+      return;
+    }
+
+    try {
+      setLoading(true);
+      
+      const registerData = {
+        nama: formData.nama,
+        email: formData.email,
+        no_telp: formData.no_telp,
+        kata_sandi: formData.kata_sandi
+      };
+
+      const response = await AuthSantriService.register(registerData);
+
+      if (response.success) {
+        await Swal.fire({
+          icon: 'success',
+          title: 'Registrasi Berhasil!',
+          text: 'Akun Anda berhasil dibuat. Silakan login.',
+          timer: 2000,
+          showConfirmButton: false
+        });
+        
+        navigate('/loginpengguna');
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Registrasi Gagal',
+        text: error.message || 'Terjadi kesalahan saat registrasi',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Google Register Implementation
+  const googleRegister = useGoogleLogin({
+    onSuccess: async (codeResponse) => {
+      try {
+        setLoading(true);
+
+        // Get user info from Google
+        const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+          headers: {
+            Authorization: `Bearer ${codeResponse.access_token}`,
+          },
+        });
+        const userData = await res.json();
+
+        console.log('Google User Data:', userData);
+
+        // Send to backend (will auto-register if not exists)
+        const response = await AuthSantriService.googleAuth({
+          google_id: userData.sub,
+          email: userData.email,
+          nama: userData.name,
+          foto: userData.picture
+        });
+
+        if (response.success) {
+          await Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: 'Akun Anda berhasil dibuat dengan Google. Silakan login.',
+            timer: 2000,
+            showConfirmButton: false
+          });
+
+          // Redirect ke login
+          navigate('/loginpengguna');
+        }
+      } catch (error) {
+        console.error('Google Register Error:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Registrasi Gagal',
+          text: error.message || 'Terjadi kesalahan saat registrasi dengan Google',
+        });
+      } finally {
+        setLoading(false);
+      }
+    },
+    onError: () => {
+      Swal.fire({
+        icon: 'error',
+        title: 'Registrasi Gagal',
+        text: 'Terjadi kesalahan saat registrasi dengan Google',
+      });
+    }
+  });
+
+  const handleGoogleRegister = () => {
+    const clientId = process.env.REACT_APP_GOOGLE_CLIENT_ID;
+    
+    if (!clientId || clientId === 'your-google-client-id-here.apps.googleusercontent.com') {
+      Swal.fire({
+        icon: 'info',
+        title: 'Setup Diperlukan',
+        html: `
+          <p>Untuk menggunakan registrasi Google, silakan:</p>
+          <ol style="text-align: left; margin-left: 20px;">
+            <li>Buka file <code>.env</code></li>
+            <li>Ganti <code>REACT_APP_GOOGLE_CLIENT_ID</code> dengan Client ID dari Google Cloud Console</li>
+            <li>Restart development server</li>
+          </ol>
+          <p style="margin-top: 10px;">Lihat panduan di file <code>CARA_DAPAT_GOOGLE_CLIENT_ID.md</code></p>
+        `,
+        confirmButtonText: 'OK, Mengerti'
+      });
+      return;
+    }
+
+    googleRegister();
+  };
+
   return (
     <div className="flex items-center justify-center w-full min-h-screen bg-white">
       <div className="flex w-full h-screen">
@@ -26,22 +193,41 @@ export default function RegisterPengguna() {
             <p className="mb-6 text-center text-gray-600">
               Silahkan Masukkan Data Akun Anda!
             </p>
-            <form className="flex flex-col gap-4">
+            <form className="flex flex-col gap-4" onSubmit={handleRegister}>
               <div className="flex items-center px-5 py-3 bg-gray-100 rounded-full">
                 <span className="mr-3 text-gray-400 material-icons">
                   person
                 </span>
                 <input
                   type="text"
-                  placeholder="Masukkan Username Anda..."
+                  name="nama"
+                  value={formData.nama}
+                  onChange={handleInputChange}
+                  placeholder="Masukkan Nama Lengkap..."
                   className="w-full font-medium text-gray-700 bg-transparent outline-none"
+                  required
                 />
               </div>
               <div className="flex items-center px-5 py-3 bg-gray-100 rounded-full">
                 <span className="mr-3 text-gray-400 material-icons">email</span>
                 <input
                   type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
                   placeholder="Masukkan Email Anda..."
+                  className="w-full font-medium text-gray-700 bg-transparent outline-none"
+                  required
+                />
+              </div>
+              <div className="flex items-center px-5 py-3 bg-gray-100 rounded-full">
+                <span className="mr-3 text-gray-400 material-icons">phone</span>
+                <input
+                  type="tel"
+                  name="no_telp"
+                  value={formData.no_telp}
+                  onChange={handleInputChange}
+                  placeholder="Masukkan No. Telepon (Opsional)..."
                   className="w-full font-medium text-gray-700 bg-transparent outline-none"
                 />
               </div>
@@ -49,8 +235,12 @@ export default function RegisterPengguna() {
                 <span className="mr-3 text-gray-400 material-icons">lock</span>
                 <input
                   type={showPassword ? "text" : "password"}
+                  name="kata_sandi"
+                  value={formData.kata_sandi}
+                  onChange={handleInputChange}
                   placeholder="Masukkan Kata Sandi Anda..."
                   className="w-full font-medium text-gray-700 bg-transparent outline-none"
+                  required
                 />
                 <span
                   className="ml-3 text-gray-400 cursor-pointer select-none"
@@ -70,8 +260,12 @@ export default function RegisterPengguna() {
                 </span>
                 <input
                   type={showConfirmPassword ? "text" : "password"}
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleInputChange}
                   placeholder="Masukkan Kata Sandi Anda Lagi..."
                   className="w-full font-medium text-gray-700 bg-transparent outline-none"
+                  required
                 />
                 <span
                   className="ml-3 text-gray-400 cursor-pointer select-none"
@@ -87,9 +281,12 @@ export default function RegisterPengguna() {
               </div>
               <button
                 type="submit"
-                className="w-full py-3 mt-2 font-semibold text-white bg-teal-700 rounded-full shadow-lg"
+                disabled={loading}
+                className={`w-full py-3 mt-2 font-semibold text-white bg-teal-700 rounded-full shadow-lg transition ${
+                  loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-teal-800'
+                }`}
               >
-                Buat Akun
+                {loading ? 'Membuat Akun...' : 'Buat Akun'}
               </button>
               <div className="flex items-center my-2">
                 <div className="flex-1 h-px bg-gray-200" />
@@ -98,6 +295,7 @@ export default function RegisterPengguna() {
               </div>
               <button
                 type="button"
+                onClick={handleGoogleRegister}
                 className="w-full flex items-center justify-center gap-3 py-3 mt-2 font-semibold text-white bg-gradient-to-r from-[#155e63] to-[#1ca7a7] rounded-full shadow-[0_4px_24px_0_rgba(21,94,99,0.15)] hover:from-[#134e53] hover:to-[#178a8a] transition"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">

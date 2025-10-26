@@ -1,12 +1,16 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import AuthSantriService from "../../services/AuthSantriService";
+import Swal from "sweetalert2";
+import { useGoogleLogin } from '@react-oauth/google';
 
 export default function LoginPengguna() {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
-    username: "",
-    password: "",
+    email: "",
+    kata_sandi: "",
   });
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
@@ -17,37 +21,140 @@ export default function LoginPengguna() {
     }));
   };
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
 
-    // Simulasi login (ganti dengan API call yang sesungguhnya)
-    if (formData.username && formData.password) {
-      // Simulasi validasi login
-      if (formData.username === "admin" && formData.password === "admin") {
-        // Simpan data user ke localStorage
-        localStorage.setItem(
-          "pengguna",
-          JSON.stringify({
-            username: formData.username,
-            loginTime: new Date().toISOString(),
-          })
-        );
-
-        // Tampilkan alert sukses
-        alert("Login berhasil!");
-
-        // Redirect ke beranda setelah delay
-        setTimeout(() => {
-          navigate("/pengguna/beranda");
-        }, 1500);
-      } else {
-        // Tampilkan alert error
-        alert("Username atau password salah!");
-      }
-    } else {
-      // Tampilkan alert warning
-      alert("Username dan password harus diisi!");
+    // Validasi input
+    if (!formData.email || !formData.kata_sandi) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Oops...',
+        text: 'Email dan kata sandi harus diisi!',
+      });
+      return;
     }
+
+    try {
+      setLoading(true);
+
+      const response = await AuthSantriService.login({
+        email: formData.email,
+        kata_sandi: formData.kata_sandi
+      });
+
+      if (response.success) {
+        // Simpan data santri ke localStorage
+        localStorage.setItem('santriData', JSON.stringify({
+          ...response.data,
+          loginTime: new Date().toISOString()
+        }));
+
+        await Swal.fire({
+          icon: 'success',
+          title: 'Login Berhasil!',
+          text: `Selamat datang, ${response.data.nama}!`,
+          timer: 1500,
+          showConfirmButton: false
+        });
+
+        // Redirect ke beranda
+        navigate('/pengguna/beranda');
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Login Gagal',
+        text: error.message || 'Email atau kata sandi salah!',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Google Login Implementation
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (codeResponse) => {
+      try {
+        setLoading(true);
+
+        // Get user info from Google
+        const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+          headers: {
+            Authorization: `Bearer ${codeResponse.access_token}`,
+          },
+        });
+        const userData = await res.json();
+
+        console.log('Google User Data:', userData);
+
+        // Send to backend
+        const response = await AuthSantriService.googleAuth({
+          google_id: userData.sub,
+          email: userData.email,
+          nama: userData.name,
+          foto: userData.picture
+        });
+
+        if (response.success) {
+          // Simpan data santri ke localStorage
+          localStorage.setItem('santriData', JSON.stringify({
+            ...response.data,
+            loginTime: new Date().toISOString()
+          }));
+
+          await Swal.fire({
+            icon: 'success',
+            title: 'Login Berhasil!',
+            text: `Selamat datang, ${response.data.nama}!`,
+            timer: 1500,
+            showConfirmButton: false
+          });
+
+          // Redirect ke beranda
+          navigate('/pengguna/beranda');
+        }
+      } catch (error) {
+        console.error('Google Login Error:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Login Gagal',
+          text: error.message || 'Terjadi kesalahan saat login dengan Google',
+        });
+      } finally {
+        setLoading(false);
+      }
+    },
+    onError: () => {
+      Swal.fire({
+        icon: 'error',
+        title: 'Login Gagal',
+        text: 'Terjadi kesalahan saat login dengan Google',
+      });
+    }
+  });
+
+  const handleGoogleLogin = () => {
+    const clientId = process.env.REACT_APP_GOOGLE_CLIENT_ID;
+    
+    if (!clientId || clientId === 'your-google-client-id-here.apps.googleusercontent.com') {
+      Swal.fire({
+        icon: 'info',
+        title: 'Setup Diperlukan',
+        html: `
+          <p>Untuk menggunakan login Google, silakan:</p>
+          <ol style="text-align: left; margin-left: 20px;">
+            <li>Buka file <code>.env</code></li>
+            <li>Ganti <code>REACT_APP_GOOGLE_CLIENT_ID</code> dengan Client ID dari Google Cloud Console</li>
+            <li>Restart development server</li>
+          </ol>
+          <p style="margin-top: 10px;">Lihat panduan di file <code>CARA_DAPAT_GOOGLE_CLIENT_ID.md</code></p>
+        `,
+        confirmButtonText: 'OK, Mengerti'
+      });
+      return;
+    }
+
+    googleLogin();
   };
 
   return (
@@ -76,14 +183,14 @@ export default function LoginPengguna() {
             <form className="flex flex-col gap-4" onSubmit={handleLogin}>
               <div className="flex items-center px-5 py-3 bg-gray-100 rounded-full">
                 <span className="mr-3 text-gray-400 material-icons">
-                  person
+                  email
                 </span>
                 <input
-                  type="text"
-                  name="username"
-                  value={formData.username}
+                  type="email"
+                  name="email"
+                  value={formData.email}
                   onChange={handleInputChange}
-                  placeholder="Masukkan Username..."
+                  placeholder="Masukkan Email..."
                   className="w-full font-medium text-gray-700 bg-transparent outline-none"
                   required
                 />
@@ -92,8 +199,8 @@ export default function LoginPengguna() {
                 <span className="mr-3 text-gray-400 material-icons">lock</span>
                 <input
                   type={showPassword ? "text" : "password"}
-                  name="password"
-                  value={formData.password}
+                  name="kata_sandi"
+                  value={formData.kata_sandi}
                   onChange={handleInputChange}
                   placeholder="Masukkan Kata Sandi..."
                   className="w-full font-medium text-gray-700 bg-transparent outline-none"
@@ -113,9 +220,12 @@ export default function LoginPengguna() {
               </div>
               <button
                 type="submit"
-                className="w-full py-3 mt-2 font-semibold text-white  bg-gradient-to-r from-[#155e63] to-[#1ca7a7] rounded-full shadow-[0_4px_24px_0_rgba(21,94,99,0.15)] hover:from-[#134e53] hover:to-[#178a8a] transition"
+                disabled={loading}
+                className={`w-full py-3 mt-2 font-semibold text-white  bg-gradient-to-r from-[#155e63] to-[#1ca7a7] rounded-full shadow-[0_4px_24px_0_rgba(21,94,99,0.15)] transition ${
+                  loading ? 'opacity-50 cursor-not-allowed' : 'hover:from-[#134e53] hover:to-[#178a8a]'
+                }`}
               >
-                Masuk
+                {loading ? 'Masuk...' : 'Masuk'}
               </button>
               <div className="flex items-center my-2">
                 <div className="flex-1 h-px bg-gray-200" />
@@ -124,6 +234,7 @@ export default function LoginPengguna() {
               </div>
               <button
                 type="button"
+                onClick={handleGoogleLogin}
                 className="w-full flex items-center justify-center gap-3 py-3 mt-2 font-semibold text-white bg-gradient-to-r from-[#155e63] to-[#1ca7a7] rounded-full shadow-[0_4px_24px_0_rgba(21,94,99,0.15)] hover:from-[#134e53] hover:to-[#178a8a] transition"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">

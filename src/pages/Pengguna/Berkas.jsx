@@ -1,7 +1,16 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import PenggunaSidebar from "../../components/PenggunaSidebar";
 
 export default function Berkas() {
+  const [santriData, setSantriData] = useState(null);
+
+  useEffect(() => {
+    // Ambil data santri dari localStorage
+    const data = localStorage.getItem('santriData');
+    if (data) {
+      setSantriData(JSON.parse(data));
+    }
+  }, []);
 
   // Labels for each required file (keeps order predictable)
   const labels = [
@@ -91,9 +100,9 @@ export default function Berkas() {
           <img src="/assets/logo3.png" alt="Logo" className="h-8" />
         </div>
         <div className="flex items-center gap-3">
-          <span className="font-semibold">Halo, Casantri</span>
+          <span className="font-semibold">Halo, {santriData?.nama || "Santri"}</span>
           <img
-            src="/assets/teachers/Drs.-K.H.-Mudrik-Qori-MA-Mudir 1.png"
+            src={santriData?.foto || "/assets/teachers/Drs.-K.H.-Mudrik-Qori-MA-Mudir 1.png"}
             alt="Profile"
             className="object-cover w-8 h-8 border-2 border-white rounded-full"
           />

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   FaHome,
   FaFolder,
@@ -7,12 +7,24 @@ import {
   FaCalendarAlt,
   FaRegCalendarCheck,
 } from "react-icons/fa";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import PenggunaSidebar from "../../components/PenggunaSidebar";
+import Swal from "sweetalert2";
 
 export default function Beranda() {
+  const [santriData, setSantriData] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Ambil data santri dari localStorage
+    const data = localStorage.getItem('santriData');
+    if (data) {
+      setSantriData(JSON.parse(data));
+    }
+  }, []);
+
   // Dummy data for demonstration
-  const namaLogin = "Casantri";
+  const namaLogin = santriData?.nama || "Santri";
   const santriBaru = [
     "Bilal Abdurrahman",
     "Dhiyaurrahman Hamizan",
@@ -41,7 +53,7 @@ export default function Beranda() {
         <div className="flex items-center gap-3">
           <span className="font-semibold">Halo, {namaLogin}</span>
           <img
-            src="/assets/teachers/Drs.-K.H.-Mudrik-Qori-MA-Mudir 1.png"
+            src={santriData?.foto || "/assets/teachers/Drs.-K.H.-Mudrik-Qori-MA-Mudir 1.png"}
             alt="Profile"
             className="object-cover w-8 h-8 border-2 border-white rounded-full"
           />

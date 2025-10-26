@@ -10,6 +10,7 @@ import { BrowserRouter, Routes, Route, Link, Navigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ProtectedRoutePengguna from "./components/ProtectedRoutePengguna";
 import Home from "./pages/CompanyProfile/Home";
 import About from "./pages/CompanyProfile/About";
 import Teachers from "./pages/CompanyProfile/Teachers";
@@ -132,11 +133,19 @@ export default function App() {
                     {/* Pengguna routes */}
                     <Route
                       path="/pengguna/beranda"
-                      element={<BerandaPengguna />}
+                      element={
+                        <ProtectedRoutePengguna>
+                          <BerandaPengguna />
+                        </ProtectedRoutePengguna>
+                      }
                     />
                     <Route
                       path="/pengguna/berkas"
-                      element={<BerkasPengguna />}
+                      element={
+                        <ProtectedRoutePengguna>
+                          <BerkasPengguna />
+                        </ProtectedRoutePengguna>
+                      }
                     />
                     <Route path="*" element={<Home />} />
                   </Routes>
