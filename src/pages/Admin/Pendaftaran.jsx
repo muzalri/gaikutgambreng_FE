@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import AdminSidebar from "../../components/AdminSidebar";
 import AdminHeader from "../../components/AdminHeader";
 import AdminService from "../../services/AdminService";
+import PendaftaranService from "../../services/PendaftaranService";
 import Swal from "sweetalert2";
 
 export default function Pendaftaran() {
@@ -17,6 +18,55 @@ export default function Pendaftaran() {
     angkatan: "",
   });
 
+  // Helper function to check if pendaftaran is currently active
+  const isPendaftaranActive = (pendaftaran) => {
+    try {
+      const now = new Date();
+      
+      // Validasi data pendaftaran
+      if (!pendaftaran.tanggal_buka || !pendaftaran.jam_buka || 
+          !pendaftaran.tanggal_tutup || !pendaftaran.jam_tutup) {
+        console.warn('Data pendaftaran tidak lengkap:', pendaftaran);
+        return false;
+      }
+
+      // Parse tanggal dan waktu dari pendaftaran
+      // Format backend: YYYY-MM-DD dan HH:MM:SS, kita ambil HH:MM saja
+      const jamBuka = pendaftaran.jam_buka.substring(0, 5); // "17:35:00" -> "17:35"
+      const jamTutup = pendaftaran.jam_tutup.substring(0, 5);
+      
+      const tanggalBukaStr = `${pendaftaran.tanggal_buka}T${jamBuka}:00`;
+      const tanggalTutupStr = `${pendaftaran.tanggal_tutup}T${jamTutup}:00`;
+      
+      const waktuBuka = new Date(tanggalBukaStr);
+      const waktuTutup = new Date(tanggalTutupStr);
+
+      // Validasi apakah Date valid
+      if (isNaN(waktuBuka.getTime()) || isNaN(waktuTutup.getTime())) {
+        console.error('Invalid date format:', {
+          tanggalBukaStr,
+          tanggalTutupStr,
+          pendaftaran
+        });
+        return false;
+      }
+
+      // Debug log
+      console.log('✅ Checking pendaftaran:', {
+        now: now.toLocaleString('id-ID'),
+        waktuBuka: waktuBuka.toLocaleString('id-ID'),
+        waktuTutup: waktuTutup.toLocaleString('id-ID'),
+        isActive: now >= waktuBuka && now <= waktuTutup
+      });
+
+      // Cek apakah waktu sekarang berada di antara waktu buka dan tutup
+      return now >= waktuBuka && now <= waktuTutup;
+    } catch (error) {
+      console.error('Error checking pendaftaran active:', error, pendaftaran);
+      return false;
+    }
+  };
+
   useEffect(() => {
     // Check if admin is logged in
     if (!AdminService.isLoggedIn()) {
@@ -29,21 +79,18 @@ export default function Pendaftaran() {
   const fetchPendaftaran = async () => {
     try {
       setLoading(true);
-      // Simulasi data untuk sementara
-      const dummyData = [
-        {
-          id: 1,
-          tanggal_buka: "2025-06-10",
-          jam_buka: "00:01",
-          tanggal_tutup: "2025-06-30",
-          jam_tutup: "23:59",
-          angkatan: "Angkatan 1",
-          created_at: "2024-01-15T10:00:00Z",
-        },
-      ];
-      setPendaftaranList(dummyData);
+      const result = await PendaftaranService.getAll();
+      console.log('📥 Data pendaftaran dari backend:', result.data);
+      setPendaftaranList(result.data || []);
     } catch (error) {
-      console.warn("Backend tidak tersedia, menggunakan data dummy");
+      console.error("Error fetching pendaftaran:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Gagal",
+        text: "Tidak dapat memuat data pendaftaran",
+        timer: 2000,
+      });
+      setPendaftaranList([]);
     } finally {
       setLoading(false);
     }
@@ -76,15 +123,23 @@ export default function Pendaftaran() {
       return;
     }
 
-    try {
-      // TODO: Implement create pendaftaran API call
-      console.log("Creating pendaftaran:", formData);
+    // Validasi tanggal tutup harus setelah tanggal buka
+    if (new Date(formData.tanggal_tutup) < new Date(formData.tanggal_buka)) {
+      Swal.fire({
+        icon: "warning",
+        title: "Perhatian",
+        text: "Tanggal tutup harus setelah atau sama dengan tanggal buka!",
+      });
+      return;
+    }
 
-      // Simulasi sukses
+    try {
+      const result = await PendaftaranService.create(formData);
+
       Swal.fire({
         icon: "success",
         title: "Berhasil",
-        text: "Pendaftaran berhasil dibuat!",
+        text: result.message || "Pendaftaran berhasil dibuat!",
         timer: 1500,
       });
 
@@ -100,21 +155,12 @@ export default function Pendaftaran() {
       // Refresh data
       fetchPendaftaran();
     } catch (error) {
-      console.warn("Backend tidak tersedia, simulasi sukses");
+      console.error("Error creating pendaftaran:", error);
       Swal.fire({
-        icon: "success",
-        title: "Berhasil",
-        text: "Pendaftaran berhasil dibuat! (Simulasi)",
-        timer: 1500,
+        icon: "error",
+        title: "Gagal",
+        text: error.response?.data?.message || "Gagal membuat pendaftaran!",
       });
-      setFormData({
-        tanggal_buka: "",
-        jam_buka: "",
-        tanggal_tutup: "",
-        jam_tutup: "",
-        angkatan: "",
-      });
-      fetchPendaftaran();
     }
   };
 
@@ -248,6 +294,33 @@ export default function Pendaftaran() {
 
               {/* Daftar Pendaftaran */}
               <div className="p-8 bg-white border shadow rounded-2xl border-slate-100">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-xl font-bold text-slate-900">
+                    Daftar Jadwal Pendaftaran
+                  </h3>
+                  {/* Indikator Status Pendaftaran Aktif */}
+                  {pendaftaranList.length > 0 && (() => {
+                    const activePendaftaran = pendaftaranList.find(p => isPendaftaranActive(p));
+                    return activePendaftaran ? (
+                      <div className="flex items-center gap-3 px-4 py-2 bg-green-50 border-2 border-green-500 rounded-lg">
+                        <span className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
+                        <div className="flex flex-col">
+                          <span className="text-sm font-bold text-green-700">PENDAFTARAN DIBUKA</span>
+                          <span className="text-xs text-green-600">{activePendaftaran.angkatan}</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-3 px-4 py-2 bg-red-50 border-2 border-red-500 rounded-lg">
+                        <span className="w-3 h-3 bg-red-500 rounded-full"></span>
+                        <div className="flex flex-col">
+                          <span className="text-sm font-bold text-red-700">PENDAFTARAN DITUTUP</span>
+                          <span className="text-xs text-red-600">Tidak ada jadwal aktif</span>
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
+
                 {loading ? (
                   <div className="flex items-center justify-center h-64">
                     <div className="w-12 h-12 border-4 border-teal-600 rounded-full border-t-transparent animate-spin"></div>
