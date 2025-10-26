@@ -119,7 +119,7 @@ export default function Berkas() {
                   Pendaftaran
                 </h1>
                 <span className="block text-gray-500">
-                  Berkas > Pendaftaran
+                  Berkas {'>'} Pendaftaran
                 </span>
               </div>
             </div>
