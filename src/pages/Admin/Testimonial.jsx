@@ -3,13 +3,17 @@ import { useNavigate } from "react-router-dom";
 import AdminSidebar from "../../components/AdminSidebar";
 import AdminHeader from "../../components/AdminHeader";
 import AdminService from "../../services/AdminService";
+import TestimonialService from "../../services/TestimonialService";
 import Swal from "sweetalert2";
+import api from "../../config/api";
 
 export default function Testimonial() {
   const navigate = useNavigate();
   const [testimonials, setTestimonials] = useState([]);
+  const [allTestimonials, setAllTestimonials] = useState([]); // Untuk menyimpan semua data
   const [loading, setLoading] = useState(true);
   const [searchKeyword, setSearchKeyword] = useState("");
+  const [selectedKategori, setSelectedKategori] = useState("Semua Kategori");
   const [showModal, setShowModal] = useState(false);
   const [selectedTestimonial, setSelectedTestimonial] = useState(null);
   const [formData, setFormData] = useState({
@@ -63,12 +67,12 @@ export default function Testimonial() {
     {
       id: 4,
       nama: "Bilal Hamizan",
-      asal: "Santri Aktif",
+      asal: "Santri",
       testimonial: "Bagus banget",
       rating: 5,
       foto: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
       status: "Aktif",
-      kategori: "Santri Aktif",
+      kategori: "Santri",
       angkatan: "Angkatan 6",
     },
   ];
@@ -80,10 +84,69 @@ export default function Testimonial() {
       return;
     }
 
-    // Load dummy data
-    setTestimonials(dummyTestimonials);
-    setLoading(false);
+    // Load testimonials from API
+    loadTestimonials();
   }, [navigate]);
+
+  const loadTestimonials = async () => {
+    try {
+      setLoading(true);
+      const response = await TestimonialService.getAll();
+      if (response.success && response.data && response.data.length > 0) {
+        // Transform data untuk menyesuaikan dengan UI
+        const transformedData = response.data.map((item) => ({
+          id: item.id,
+          nama: item.nama,
+          asal: item.asal || '',
+          testimonial: item.testimonial,
+          foto: item.foto ? `${api.defaults.baseURL}/uploads/testimonial/${item.foto}` : 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
+          status: 'Aktif',
+          kategori: item.kategori,
+          angkatan: item.angkatan || ''
+        }));
+        setTestimonials(transformedData);
+        setAllTestimonials(transformedData); // Simpan semua data
+      } else {
+        // Jika response success tapi data kosong, gunakan dummy data
+        console.log('No data from backend, using dummy data');
+        setTestimonials(dummyTestimonials);
+        setAllTestimonials(dummyTestimonials); // Simpan semua data
+      }
+    } catch (error) {
+      console.error('Error loading testimonials:', error);
+      // Fallback ke dummy data jika backend tidak tersedia
+      setTestimonials(dummyTestimonials);
+      setAllTestimonials(dummyTestimonials); // Simpan semua data
+      console.log('Using dummy data as fallback');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Filter testimonials berdasarkan kategori dan search keyword
+  useEffect(() => {
+    let filtered = [...allTestimonials];
+
+    // Filter berdasarkan kategori
+    if (selectedKategori !== "Semua Kategori") {
+      filtered = filtered.filter(t => t.kategori === selectedKategori);
+    }
+
+    // Filter berdasarkan search keyword
+    if (searchKeyword) {
+      filtered = filtered.filter(t => 
+        t.nama.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+        t.testimonial.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+        t.asal.toLowerCase().includes(searchKeyword.toLowerCase())
+      );
+    }
+
+    setTestimonials(filtered);
+  }, [selectedKategori, searchKeyword, allTestimonials]);
+
+  const handleKategoriChange = (e) => {
+    setSelectedKategori(e.target.value);
+  };
 
   const openViewModal = (testimonial) => {
     setSelectedTestimonial(testimonial);
@@ -118,40 +181,54 @@ export default function Testimonial() {
     document.getElementById("fotoInput").click();
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Validasi form
-    if (!formData.nama || !formData.asal || !formData.testimonial) {
+    if (!formData.nama || !formData.kategori || !formData.testimonial) {
       Swal.fire({
         icon: "warning",
         title: "Perhatian",
-        text: "Lengkapi Data Testimonial Anda!",
+        text: "Nama, Kategori, dan Testimonial wajib diisi!",
       });
       return;
     }
 
-    // TODO: Implement create testimonial logic
-    console.log("Creating testimonial:", formData);
+    try {
+      // Call API to create testimonial
+      const response = await TestimonialService.create(formData);
+      
+      if (response.success) {
+        Swal.fire({
+          icon: "success",
+          title: "Berhasil",
+          text: "Testimonial berhasil ditambahkan!",
+          timer: 1500,
+        });
 
-    // Simulasi sukses
-    Swal.fire({
-      icon: "success",
-      title: "Berhasil",
-      text: "Testimonial berhasil ditambahkan!",
-      timer: 1500,
-    });
+        // Reset form
+        setFormData({
+          nama: "",
+          asal: "",
+          testimonial: "",
+          foto: null,
+          kategori: "",
+          angkatan: "",
+        });
+        setFotoPreview(null);
+        setShowModal(false);
 
-    setFormData({
-      nama: "",
-      asal: "",
-      testimonial: "",
-      foto: null,
-      kategori: "",
-      angkatan: "",
-    });
-    setFotoPreview(null);
-    setShowModal(false);
+        // Reload testimonials
+        loadTestimonials();
+      }
+    } catch (error) {
+      console.error('Error creating testimonial:', error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.message || "Gagal menambahkan testimonial",
+      });
+    }
   };
 
   return (
@@ -182,11 +259,15 @@ export default function Testimonial() {
                     Tambah
                   </button>
                   <div className="relative">
-                    <select className="px-6 py-2 pr-10 font-semibold text-teal-700 bg-white border border-teal-700 rounded-full shadow-sm appearance-none focus:outline-none focus:ring-2 focus:ring-teal-400">
+                    <select 
+                      value={selectedKategori}
+                      onChange={handleKategoriChange}
+                      className="px-6 py-2 pr-10 font-semibold text-teal-700 bg-white border border-teal-700 rounded-full shadow-sm appearance-none focus:outline-none focus:ring-2 focus:ring-teal-400"
+                    >
                       <option>Semua Kategori</option>
                       <option>Wali Santri</option>
                       <option>Alumni</option>
-                      <option>Santri Aktif</option>
+                      <option>Santri</option>
                       <option>Guru/Ustadz</option>
                       <option>Lainnya</option>
                     </select>
@@ -384,13 +465,33 @@ export default function Testimonial() {
                             Konfirmasi
                           </button>
                           <button
-                            onClick={() => {
-                              // TODO: Implement delete functionality
-                              console.log(
-                                "Delete testimonial:",
-                                selectedTestimonial.id
-                              );
-                              closeViewModal();
+                            onClick={async () => {
+                              try {
+                                const result = await Swal.fire({
+                                  title: 'Apakah Anda yakin?',
+                                  text: "Data tidak dapat dikembalikan!",
+                                  icon: 'warning',
+                                  showCancelButton: true,
+                                  confirmButtonColor: '#d33',
+                                  cancelButtonColor: '#3085d6',
+                                  confirmButtonText: 'Ya, hapus!',
+                                  cancelButtonText: 'Batal'
+                                });
+
+                                if (result.isConfirmed) {
+                                  await TestimonialService.delete(selectedTestimonial.id);
+                                  Swal.fire('Terhapus!', 'Testimonial berhasil dihapus.', 'success');
+                                  closeViewModal();
+                                  loadTestimonials();
+                                }
+                              } catch (error) {
+                                console.error('Error deleting testimonial:', error);
+                                Swal.fire({
+                                  icon: 'error',
+                                  title: 'Error',
+                                  text: error.message || 'Gagal menghapus testimonial'
+                                });
+                              }
                             }}
                             className="px-8 py-3 bg-red-600 text-white rounded-full font-semibold hover:bg-red-700 transition"
                           >
@@ -466,8 +567,8 @@ export default function Testimonial() {
                                 <option value="">Pilih Kategori</option>
                                 <option value="Wali Santri">Wali Santri</option>
                                 <option value="Alumni">Alumni</option>
-                                <option value="Santri Aktif">
-                                  Santri Aktif
+                                <option value="Santri">
+                                  Santri
                                 </option>
                                 <option value="Guru/Ustadz">Guru/Ustadz</option>
                                 <option value="Lainnya">Lainnya</option>
