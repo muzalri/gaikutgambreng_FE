@@ -13,19 +13,19 @@ export default function PPDB() {
 
   // Dummy fallback when API not available
   const dummySantri = [
-    { id: 101, id_santri: 1, nama: "Bilal Abdurrahman", status: "Diterima", angkatan: "Angkatan 1" },
-    { id: 102, id_santri: 2, nama: "Dhiyaurrahman Hamizan", status: "Diterima", angkatan: "Angkatan 1" },
-    { id: 103, id_santri: 3, nama: "Raffa Danendra", status: "Diterima", angkatan: "Angkatan 1" },
-    { id: 104, id_santri: 4, nama: "Zaki Algifari", status: "Diterima", angkatan: "Angkatan 1" },
-    { id: 105, id_santri: 5, nama: "Faris Fadhil", status: "Pending", angkatan: "Angkatan 1" },
-    { id: 106, id_santri: 6, nama: "Rafi Alexander", status: "Pending", angkatan: "Angkatan 1" },
-    { id: 107, id_santri: 7, nama: "Cahya Ilham", status: "Ditolak", angkatan: "Angkatan 1" },
-    { id: 108, id_santri: 8, nama: "Dzaky Ikbaar", status: "Ditolak", angkatan: "Angkatan 1" },
-    { id: 109, id_santri: 9, nama: "Frizaski Alfath", status: "Diterima", angkatan: "Angkatan 1" },
-    { id: 110, id_santri: 10, nama: "Daffa Abiyya", status: "Diterima", angkatan: "Angkatan 1" },
-    { id: 111, id_santri: 11, nama: "Hakkam Zakka", status: "Diterima", angkatan: "Angkatan 1" },
-    { id: 112, id_santri: 12, nama: "Raden Muhammad", status: "Diterima", angkatan: "Angkatan 1" },
-    { id: 113, id_santri: 13, nama: "Rafii Khairan", status: "Diterima", angkatan: "Angkatan 1" },
+    { id: 101, id_santri: 1, nama: "Bilal Abdurrahman", status: "Diterima", angkatan: "Angkatan 1", tahapan: 5 },
+    { id: 102, id_santri: 2, nama: "Dhiyaurrahman Hamizan", status: "Diterima", angkatan: "Angkatan 1", tahapan: 5 },
+    { id: 103, id_santri: 3, nama: "Raffa Danendra", status: "Diterima", angkatan: "Angkatan 1", tahapan: 5 },
+    { id: 104, id_santri: 4, nama: "Zaki Algifari", status: "Diterima", angkatan: "Angkatan 1", tahapan: 5 },
+    { id: 105, id_santri: 5, nama: "Faris Fadhil", status: "Pending", angkatan: "Angkatan 1", tahapan: 2 },
+    { id: 106, id_santri: 6, nama: "Rafi Alexander", status: "Pending", angkatan: "Angkatan 1", tahapan: 3 },
+    { id: 107, id_santri: 7, nama: "Cahya Ilham", status: "Ditolak", angkatan: "Angkatan 1", tahapan: 1 },
+    { id: 108, id_santri: 8, nama: "Dzaky Ikbaar", status: "Ditolak", angkatan: "Angkatan 1", tahapan: 1 },
+    { id: 109, id_santri: 9, nama: "Frizaski Alfath", status: "Diterima", angkatan: "Angkatan 1", tahapan: 5 },
+    { id: 110, id_santri: 10, nama: "Daffa Abiyya", status: "Diterima", angkatan: "Angkatan 1", tahapan: 5 },
+    { id: 111, id_santri: 11, nama: "Hakkam Zakka", status: "Diterima", angkatan: "Angkatan 1", tahapan: 5 },
+    { id: 112, id_santri: 12, nama: "Raden Muhammad", status: "Diterima", angkatan: "Angkatan 1", tahapan: 5 },
+    { id: 113, id_santri: 13, nama: "Rafii Khairan", status: "Diterima", angkatan: "Angkatan 1", tahapan: 5 },
   ];
 
   useEffect(() => {
@@ -49,6 +49,7 @@ export default function PPDB() {
           nama: b.nama_lengkap || "-",
           angkatan: b.angkatan || "Angkatan 1",
           status: b.status || "Pending",
+          tahapan: b.tahapan || 1,
         }));
         setSantriList(normalized);
       } else {
@@ -280,6 +281,7 @@ export default function PPDB() {
                         <th className="px-4 py-3">NO</th>
                         <th className="px-4 py-3">Nama</th>
                         <th className="px-4 py-3">Angkatan</th>
+                        <th className="px-4 py-3">Tahapan</th>
                         <th className="px-4 py-3">Status</th>
                         <th className="px-4 py-3">Aksi</th>
                       </tr>
@@ -293,6 +295,7 @@ export default function PPDB() {
                           <td className="px-4 py-3">{i + 1}</td>
                           <td className="px-4 py-3">{data.nama}</td>
                           <td className="px-4 py-3">{data.angkatan || "Angkatan 1"}</td>
+                          <td className="px-4 py-3">{data.tahapan || 1}</td>
                           <td className="px-4 py-3">{data.status}</td>
                           <td className="px-4 py-3">
                             <button
@@ -329,7 +332,7 @@ export default function PPDB() {
                           <div className="py-16 text-center">Memuat...</div>
                         ) : (
                           <div>
-                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                               <div>
                                 <label className="text-sm text-slate-600">
                                   Nama
@@ -361,6 +364,40 @@ export default function PPDB() {
                                 <div className="p-3 mt-1 bg-slate-50 rounded">
                                   {selectedBerkas?.angkatan || "Angkatan 1"}
                                 </div>
+                              </div>
+                              <div>
+                                <label className="text-sm text-slate-600">Tahapan (1 - 5)</label>
+                                <div className="flex items-center gap-3 mt-1">
+                                  <button
+                                    className="px-3 py-1 rounded bg-slate-200"
+                                    onClick={async () => {
+                                      if (!selectedBerkasId) return;
+                                      const next = Math.max(1, (selectedBerkas?.tahapan || 1) - 1);
+                                      const resp = await BerkasService.updateTahapan(selectedBerkasId, next);
+                                      // refresh selected berkas
+                                      const detail = await BerkasService.getById(selectedBerkasId);
+                                      setSelectedBerkas(detail?.data || detail);
+                                    }}
+                                  >
+                                    -
+                                  </button>
+                                  <div className="px-4 py-2 rounded bg-slate-50">
+                                    {selectedBerkas?.tahapan || 1}
+                                  </div>
+                                  <button
+                                    className="px-3 py-1 rounded bg-slate-200"
+                                    onClick={async () => {
+                                      if (!selectedBerkasId) return;
+                                      const next = Math.min(5, (selectedBerkas?.tahapan || 1) + 1);
+                                      const resp = await BerkasService.updateTahapan(selectedBerkasId, next);
+                                      const detail = await BerkasService.getById(selectedBerkasId);
+                                      setSelectedBerkas(detail?.data || detail);
+                                    }}
+                                  >
+                                    +
+                                  </button>
+                                </div>
+                                <div className="text-xs text-slate-500 mt-1">Tahapan 5 akan otomatis menjadikan status Diterima</div>
                               </div>
                             </div>
 

@@ -62,6 +62,17 @@ class BerkasService {
     }
   }
 
+  // Update tahapan (1..5) and auto-status
+  async updateTahapan(id, tahapan) {
+    try {
+      const response = await axios.patch(`${API_URL}/berkas/${id}/tahapan`, { tahapan });
+      return response.data;
+    } catch (error) {
+      console.error('Error updating tahapan:', error);
+      throw error;
+    }
+  }
+
   // Delete berkas
   async delete(id) {
     try {
