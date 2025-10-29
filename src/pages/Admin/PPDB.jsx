@@ -4,9 +4,29 @@ import AdminSidebar from "../../components/AdminSidebar";
 import AdminHeader from "../../components/AdminHeader";
 import AdminService from "../../services/AdminService";
 import SantriService from "../../services/SantriService";
+import BerkasService from "../../services/BerkasService";
 
 export default function PPDB() {
   const navigate = useNavigate();
+  const [santriList, setSantriList] = useState([]); // now holds Berkas list
+  const [loadingList, setLoadingList] = useState(false);
+
+  // Dummy fallback when API not available
+  const dummySantri = [
+    { id: 101, id_santri: 1, nama: "Bilal Abdurrahman", status: "Diterima", angkatan: "Angkatan 1" },
+    { id: 102, id_santri: 2, nama: "Dhiyaurrahman Hamizan", status: "Diterima", angkatan: "Angkatan 1" },
+    { id: 103, id_santri: 3, nama: "Raffa Danendra", status: "Diterima", angkatan: "Angkatan 1" },
+    { id: 104, id_santri: 4, nama: "Zaki Algifari", status: "Diterima", angkatan: "Angkatan 1" },
+    { id: 105, id_santri: 5, nama: "Faris Fadhil", status: "Pending", angkatan: "Angkatan 1" },
+    { id: 106, id_santri: 6, nama: "Rafi Alexander", status: "Pending", angkatan: "Angkatan 1" },
+    { id: 107, id_santri: 7, nama: "Cahya Ilham", status: "Ditolak", angkatan: "Angkatan 1" },
+    { id: 108, id_santri: 8, nama: "Dzaky Ikbaar", status: "Ditolak", angkatan: "Angkatan 1" },
+    { id: 109, id_santri: 9, nama: "Frizaski Alfath", status: "Diterima", angkatan: "Angkatan 1" },
+    { id: 110, id_santri: 10, nama: "Daffa Abiyya", status: "Diterima", angkatan: "Angkatan 1" },
+    { id: 111, id_santri: 11, nama: "Hakkam Zakka", status: "Diterima", angkatan: "Angkatan 1" },
+    { id: 112, id_santri: 12, nama: "Raden Muhammad", status: "Diterima", angkatan: "Angkatan 1" },
+    { id: 113, id_santri: 13, nama: "Rafii Khairan", status: "Diterima", angkatan: "Angkatan 1" },
+  ];
 
   useEffect(() => {
     // Check if admin is logged in
@@ -14,12 +34,39 @@ export default function PPDB() {
       navigate("/admin");
       return;
     }
+    loadBerkas();
   }, [navigate]);
+
+  const loadBerkas = async () => {
+    try {
+      setLoadingList(true);
+      const resp = await BerkasService.getAll({ limit: 100 });
+      const list = resp?.data || resp; // {success, data} or array
+      if (Array.isArray(list) && list.length > 0) {
+        const normalized = list.map((b, idx) => ({
+          id: b.id || idx + 1,
+          id_santri: b.id_santri,
+          nama: b.nama_lengkap || "-",
+          angkatan: b.angkatan || "Angkatan 1",
+          status: b.status || "Pending",
+        }));
+        setSantriList(normalized);
+      } else {
+        setSantriList(dummySantri);
+      }
+    } catch (e) {
+      setSantriList(dummySantri);
+    } finally {
+      setLoadingList(false);
+    }
+  };
 
   // Modal state for viewing applicant details
   const [showModal, setShowModal] = useState(false);
   const [selectedSantri, setSelectedSantri] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [selectedBerkasId, setSelectedBerkasId] = useState(null);
+  const [selectedBerkas, setSelectedBerkas] = useState(null);
 
   // Modal state for Pengumuman
   const [showPengumumanModal, setShowPengumumanModal] = useState(false);
@@ -28,20 +75,41 @@ export default function PPDB() {
     tahapan: "",
   });
 
-  const openModal = async (id) => {
+  const openModal = async (santriId, berkasId) => {
     setShowModal(true);
     setLoading(true);
     setSelectedSantri(null);
+    setSelectedBerkasId(null);
+    setSelectedBerkas(null);
     try {
-      const resp = await SantriService.getSantriById(id);
+      const resp = await SantriService.getSantriById(santriId);
       // API may return { data: {...} } or the object directly depending on implementation
       const data = resp?.data || resp;
       setSelectedSantri(data);
+      // Set berkas id langsung dari row table
+      if (berkasId) setSelectedBerkasId(berkasId);
+
+      // Fetch detail berkas untuk ditampilkan di modal
+      if (berkasId) {
+        try {
+          const berkasDetail = await BerkasService.getById(berkasId);
+          const b = berkasDetail?.data || berkasDetail;
+          setSelectedBerkas(b);
+        } catch (e) {
+          setSelectedBerkas({
+            id: berkasId,
+            nama_lengkap: data?.nama || '-',
+            asal_sekolah: '-',
+            alamat: '-',
+            angkatan: '-',
+          });
+        }
+      }
     } catch (err) {
       console.error("Error fetching santri:", err);
       // Fallback: create a minimal mock so modal can still render
       setSelectedSantri({
-        id,
+        id: santriId,
         nama: "-",
         asal_sekolah: "-",
         alamat: "-",
@@ -57,16 +125,22 @@ export default function PPDB() {
   const closeModal = () => {
     setShowModal(false);
     setSelectedSantri(null);
+    setSelectedBerkas(null);
   };
 
   const handleAction = async (action) => {
     if (!selectedSantri) return;
     try {
-      const payload = { status: action };
-      await SantriService.updateSantri(
-        selectedSantri.id || selectedSantri._id || 1,
-        payload
-      );
+      // Prefer updating Berkas status when available
+      if (selectedBerkasId) {
+        await BerkasService.updateStatus(selectedBerkasId, action);
+      } else {
+        // Fallback: update santri status if berkas id unknown
+        await SantriService.updateSantri(
+          selectedSantri.id || selectedSantri._id || 1,
+          { status: action }
+        );
+      }
       alert(`Berhasil mengubah status: ${action}`);
       closeModal();
     } catch (err) {
@@ -211,40 +285,18 @@ export default function PPDB() {
                       </tr>
                     </thead>
                     <tbody>
-                      {[
-                        {
-                          id: 1,
-                          nama: "Bilal Abdurrahman",
-                          status: "Diterima",
-                        },
-                        {
-                          id: 2,
-                          nama: "Dhiyaurrahman Hamizan",
-                          status: "Diterima",
-                        },
-                        { id: 3, nama: "Raffa Danendra", status: "Diterima" },
-                        { id: 4, nama: "Zaki Algifari", status: "Diterima" },
-                        { id: 5, nama: "Faris Fadhil", status: "Perbaikan" },
-                        { id: 6, nama: "Rafi Alexander", status: "Perbaikan" },
-                        { id: 7, nama: "Cahya Ilham", status: "Ditolak" },
-                        { id: 8, nama: "Dzaky Ikbaar", status: "Ditolak" },
-                        { id: 9, nama: "Frizaski Alfath", status: "Diterima" },
-                        { id: 10, nama: "Daffa Abiyya", status: "Diterima" },
-                        { id: 11, nama: "Hakkam Zakka", status: "Diterima" },
-                        { id: 12, nama: "Raden Muhammad", status: "Diterima" },
-                        { id: 13, nama: "Rafii Khairan", status: "Diterima" },
-                      ].map((data, i) => (
+                      {(loadingList ? dummySantri : santriList).map((data, i) => (
                         <tr
                           key={data.id}
                           className={i % 2 === 0 ? "bg-white" : "bg-slate-50"}
                         >
                           <td className="px-4 py-3">{i + 1}</td>
                           <td className="px-4 py-3">{data.nama}</td>
-                          <td className="px-4 py-3">Angkatan 1</td>
+                          <td className="px-4 py-3">{data.angkatan || "Angkatan 1"}</td>
                           <td className="px-4 py-3">{data.status}</td>
                           <td className="px-4 py-3">
                             <button
-                              onClick={() => openModal(data.id)}
+                              onClick={() => openModal(data.id_santri, data.id)}
                               className="px-4 py-1 font-semibold text-white bg-teal-700 rounded-full"
                             >
                               Lihat
@@ -283,7 +335,7 @@ export default function PPDB() {
                                   Nama
                                 </label>
                                 <div className="p-3 mt-1 bg-slate-50 rounded">
-                                  {selectedSantri?.nama || "-"}
+                                  {selectedBerkas?.nama_lengkap || selectedSantri?.nama || "-"}
                                 </div>
                               </div>
                               <div>
@@ -291,7 +343,7 @@ export default function PPDB() {
                                   Asal Sekolah Dasar/Madrasah Ibtidaiyah
                                 </label>
                                 <div className="p-3 mt-1 bg-slate-50 rounded">
-                                  {selectedSantri?.asal_sekolah || "-"}
+                                  {selectedBerkas?.asal_sekolah || selectedSantri?.asal_sekolah || "-"}
                                 </div>
                               </div>
                               <div>
@@ -299,7 +351,7 @@ export default function PPDB() {
                                   Alamat
                                 </label>
                                 <div className="p-3 mt-1 bg-slate-50 rounded">
-                                  {selectedSantri?.alamat || "-"}
+                                  {selectedBerkas?.alamat || selectedSantri?.alamat || "-"}
                                 </div>
                               </div>
                               <div>
@@ -307,7 +359,7 @@ export default function PPDB() {
                                   Angkatan
                                 </label>
                                 <div className="p-3 mt-1 bg-slate-50 rounded">
-                                  {selectedSantri?.angkatan || "1"}
+                                  {selectedBerkas?.angkatan || "Angkatan 1"}
                                 </div>
                               </div>
                             </div>
@@ -358,10 +410,10 @@ export default function PPDB() {
                                 Terima
                               </button>
                               <button
-                                onClick={() => handleAction("Perbaikan")}
+                                onClick={() => handleAction("Pending")}
                                 className="px-8 py-3 text-white rounded-full bg-amber-400 shadow"
                               >
-                                Revisi
+                                Pending
                               </button>
                               <button
                                 onClick={() => handleAction("Ditolak")}
