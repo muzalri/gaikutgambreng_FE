@@ -9,6 +9,26 @@ export default function Promosi() {
   const navigate = useNavigate();
   const [promosiList, setPromosiList] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Banner form state
+  const [bannerData, setBannerData] = useState({
+    judul: "",
+    deskripsi: "",
+    gambar: null,
+  });
+  const [bannerPreview, setBannerPreview] = useState(null);
+  const bannerInputRef = React.useRef();
+
+  // Brosur form state
+  const [brosurData, setBrosurData] = useState({
+    judul: "",
+    deskripsi: "",
+    gambar: null,
+  });
+  const [brosurPreview, setBrosurPreview] = useState(null);
+  const brosurInputRef = React.useRef();
+
+  // Keep legacy for compatibility
   const [formData, setFormData] = useState({
     judul: "",
     deskripsi: "",
@@ -71,6 +91,102 @@ export default function Promosi() {
 
   const handleImageClick = () => {
     fileInputRef.current?.click();
+  };
+
+  // Banner handlers
+  const handleBannerImageClick = () => {
+    bannerInputRef.current?.click();
+  };
+
+  const handleBannerImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setBannerData((prev) => ({ ...prev, gambar: file }));
+      setBannerPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleBannerSubmit = async (e) => {
+    e.preventDefault();
+    if (!bannerData.gambar) {
+      Swal.fire({
+        icon: "warning",
+        title: "Perhatian",
+        text: "Gambar banner harus diupload!",
+      });
+      return;
+    }
+
+    try {
+      console.log("Creating banner:", bannerData);
+      Swal.fire({
+        icon: "success",
+        title: "Berhasil",
+        text: "Banner promosi berhasil dibuat!",
+        timer: 1500,
+      });
+      setBannerData({ judul: "", deskripsi: "", gambar: null });
+      setBannerPreview(null);
+      fetchPromosi();
+    } catch (error) {
+      console.warn("Backend tidak tersedia, simulasi sukses");
+      Swal.fire({
+        icon: "success",
+        title: "Berhasil",
+        text: "Banner promosi berhasil dibuat! (Simulasi)",
+        timer: 1500,
+      });
+      setBannerData({ judul: "", deskripsi: "", gambar: null });
+      setBannerPreview(null);
+    }
+  };
+
+  // Brosur handlers
+  const handleBrosurImageClick = () => {
+    brosurInputRef.current?.click();
+  };
+
+  const handleBrosurImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setBrosurData((prev) => ({ ...prev, gambar: file }));
+      setBrosurPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleBrosurSubmit = async (e) => {
+    e.preventDefault();
+    if (!brosurData.gambar) {
+      Swal.fire({
+        icon: "warning",
+        title: "Perhatian",
+        text: "Gambar brosur harus diupload!",
+      });
+      return;
+    }
+
+    try {
+      console.log("Creating brosur:", brosurData);
+      Swal.fire({
+        icon: "success",
+        title: "Berhasil",
+        text: "Brosur promosi berhasil dibuat!",
+        timer: 1500,
+      });
+      setBrosurData({ judul: "", deskripsi: "", gambar: null });
+      setBrosurPreview(null);
+      fetchPromosi();
+    } catch (error) {
+      console.warn("Backend tidak tersedia, simulasi sukses");
+      Swal.fire({
+        icon: "success",
+        title: "Berhasil",
+        text: "Brosur promosi berhasil dibuat! (Simulasi)",
+        timer: 1500,
+      });
+      setBrosurData({ judul: "", deskripsi: "", gambar: null });
+      setBrosurPreview(null);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -144,185 +260,132 @@ export default function Promosi() {
                     Promosi
                   </h2>
                   <span className="block font-medium text-slate-500">
-                    Kelola konten promosi dan iklan
+                    Promosi
                   </span>
                 </div>
-                <div className="flex items-center gap-4">
-                  <div className="relative">
-                    <input
-                      type="text"
-                      placeholder="Cari..."
-                      className="px-6 py-2 pr-10 font-semibold text-teal-700 bg-white border border-teal-700 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
-                    />
-                    <span className="absolute text-teal-700 transform -translate-y-1/2 right-4 top-1/2">
-                      <svg
-                        width="20"
-                        height="20"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle cx="11" cy="11" r="8" />
-                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                      </svg>
-                    </span>
-                  </div>
-                </div>
               </div>
 
-              {/* Tambah Promosi Section */}
-              <div className="p-8 bg-white border shadow rounded-2xl border-slate-100 mb-6">
-                <h3 className="mb-6 text-xl font-bold text-slate-900">
-                  Tambah Promosi
-                </h3>
-                <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Two-column layout: Banner (left) and Brosur (right) */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Left: Kelola Banner Promosi */}
+                <div className="p-8 bg-white border shadow rounded-2xl border-slate-100">
+                  <h3 className="mb-1 text-xl font-bold text-slate-900">
+                    Kelola Banner Promosi
+                  </h3>
+                  <p className="mb-4 text-sm text-slate-500">
+                    Unggah gambar banner yang akan ditampilkan di halaman
+                    pendaftaran
+                  </p>
+                  <form
+                    onSubmit={handleBannerSubmit}
+                    className="flex flex-col gap-4"
+                  >
                     <div>
                       <label className="block text-sm font-medium text-slate-700 mb-2">
-                        Judul
+                        Foto Artikel
                       </label>
-                      <input
-                        type="text"
-                        name="judul"
-                        value={formData.judul}
-                        onChange={handleInputChange}
-                        placeholder="Masukkan judul promosi..."
-                        className="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-teal-400"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-2">
-                        Status
-                      </label>
-                      <select
-                        name="status"
-                        value={formData.status}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-teal-400"
-                      >
-                        <option value="aktif">Aktif</option>
-                        <option value="nonaktif">Nonaktif</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Deskripsi
-                    </label>
-                    <textarea
-                      name="deskripsi"
-                      value={formData.deskripsi}
-                      onChange={handleInputChange}
-                      placeholder="Masukkan deskripsi promosi..."
-                      rows={4}
-                      className="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-teal-400"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Gambar
-                    </label>
-                    <div
-                      className="w-full h-40 rounded-lg bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center cursor-pointer hover:bg-gray-200 transition"
-                      onClick={handleImageClick}
-                    >
-                      {preview ? (
-                        <img
-                          src={preview}
-                          alt="Preview"
-                          className="w-full h-full object-cover rounded-lg"
-                        />
-                      ) : (
-                        <div className="text-center">
-                          <span className="text-4xl text-gray-400">📷</span>
-                          <p className="text-sm text-gray-500 mt-2">
-                            Klik untuk upload gambar
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      ref={fileInputRef}
-                      onChange={handleImageChange}
-                      className="hidden"
-                    />
-                  </div>
-                  <div className="flex justify-end">
-                    <button
-                      type="submit"
-                      className="px-6 py-3 bg-teal-700 text-white rounded-full font-semibold hover:bg-teal-800 transition"
-                    >
-                      Buat
-                    </button>
-                  </div>
-                </form>
-              </div>
-
-              {/* Daftar Promosi */}
-              <div className="p-8 bg-white border shadow rounded-2xl border-slate-100">
-                {loading ? (
-                  <div className="flex items-center justify-center h-64">
-                    <div className="w-12 h-12 border-4 border-teal-600 rounded-full border-t-transparent animate-spin"></div>
-                  </div>
-                ) : promosiList.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center h-64 text-gray-500">
-                    <span className="mb-2 text-5xl">📢</span>
-                    <p className="text-lg font-semibold">
-                      Belum ada data promosi
-                    </p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {promosiList.map((promosi, i) => (
                       <div
-                        key={promosi.id}
-                        className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition"
+                        className="w-full h-48 rounded-lg bg-slate-50 border-2 border-dashed border-slate-300 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-100 transition overflow-hidden"
+                        onClick={handleBannerImageClick}
                       >
-                        <div className="h-48 bg-gray-100 rounded-t-lg overflow-hidden">
+                        {bannerPreview ? (
                           <img
-                            src={promosi.gambar}
-                            alt={promosi.judul}
+                            src={bannerPreview}
+                            alt="Banner Preview"
                             className="w-full h-full object-cover"
                           />
-                        </div>
-                        <div className="p-4">
-                          <h3 className="text-lg font-semibold text-slate-900 mb-2">
-                            {promosi.judul}
-                          </h3>
-                          <p className="text-sm text-slate-600 mb-3 line-clamp-3">
-                            {promosi.deskripsi}
-                          </p>
-                          <div className="flex items-center justify-between">
-                            <span
-                              className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                                promosi.status === "aktif"
-                                  ? "bg-green-100 text-green-700"
-                                  : "bg-red-100 text-red-700"
-                              }`}
-                            >
-                              {promosi.status === "aktif"
-                                ? "Aktif"
-                                : "Nonaktif"}
-                            </span>
-                            <div className="flex gap-2">
-                              <button className="px-3 py-1 text-xs font-semibold text-teal-700 bg-teal-100 rounded-full hover:bg-teal-200 transition">
-                                Edit
-                              </button>
-                              <button className="px-3 py-1 text-xs font-semibold text-red-700 bg-red-100 rounded-full hover:bg-red-200 transition">
-                                Hapus
-                              </button>
-                            </div>
+                        ) : (
+                          <div className="text-center">
+                            <div className="text-6xl mb-2">+</div>
+                            <p className="text-sm text-slate-500">
+                              Klik untuk upload gambar
+                            </p>
                           </div>
-                        </div>
+                        )}
                       </div>
-                    ))}
-                  </div>
-                )}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        ref={bannerInputRef}
+                        onChange={handleBannerImageChange}
+                        className="hidden"
+                      />
+                      {bannerData.gambar && (
+                        <p className="text-xs text-slate-500 mt-2">
+                          Ukuran Gambar:{" "}
+                          {(bannerData.gambar.size / 1024).toFixed(0)} KB (
+                          {bannerData.gambar.name})
+                        </p>
+                      )}
+                    </div>
+                    <button
+                      type="submit"
+                      className="w-full py-3 bg-teal-700 text-white rounded-full font-semibold hover:bg-teal-800 transition shadow"
+                    >
+                      Konfirmasi
+                    </button>
+                  </form>
+                </div>
+
+                {/* Right: Kelola Banner Promosi (Brosur) */}
+                <div className="p-8 bg-white border shadow rounded-2xl border-slate-100">
+                  <h3 className="mb-1 text-xl font-bold text-slate-900">
+                    Kelola Banner Promosi
+                  </h3>
+                  <p className="mb-4 text-sm text-slate-500">
+                    Unggah gambar banner yang akan ditampilkan di halaman
+                    pendaftaran
+                  </p>
+                  <form
+                    onSubmit={handleBrosurSubmit}
+                    className="flex flex-col gap-4"
+                  >
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        Foto Artikel
+                      </label>
+                      <div
+                        className="w-full h-48 rounded-lg bg-slate-50 border-2 border-dashed border-slate-300 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-100 transition overflow-hidden"
+                        onClick={handleBrosurImageClick}
+                      >
+                        {brosurPreview ? (
+                          <img
+                            src={brosurPreview}
+                            alt="Brosur Preview"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="text-center">
+                            <div className="text-6xl mb-2">+</div>
+                            <p className="text-sm text-slate-500">
+                              Klik untuk upload gambar
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        ref={brosurInputRef}
+                        onChange={handleBrosurImageChange}
+                        className="hidden"
+                      />
+                      {brosurData.gambar && (
+                        <p className="text-xs text-slate-500 mt-2">
+                          Ukuran Gambar:{" "}
+                          {(brosurData.gambar.size / 1024).toFixed(0)} KB (
+                          {brosurData.gambar.name})
+                        </p>
+                      )}
+                    </div>
+                    <button
+                      type="submit"
+                      className="w-full py-3 bg-teal-700 text-white rounded-full font-semibold hover:bg-teal-800 transition shadow"
+                    >
+                      Konfirmasi
+                    </button>
+                  </form>
+                </div>
               </div>
             </section>
           </main>

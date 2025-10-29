@@ -13,11 +13,12 @@ import Swal from "sweetalert2";
 
 export default function Beranda() {
   const [santriData, setSantriData] = useState(null);
+  const [showProfileModal, setShowProfileModal] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     // Ambil data santri dari localStorage
-    const data = localStorage.getItem('santriData');
+    const data = localStorage.getItem("santriData");
     if (data) {
       setSantriData(JSON.parse(data));
     }
@@ -50,10 +51,16 @@ export default function Beranda() {
         <div className="flex items-center gap-3">
           <img src="/assets/logo3.png" alt="Logo" className="h-8" />
         </div>
-        <div className="flex items-center gap-3">
+        <div
+          className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition"
+          onClick={() => setShowProfileModal(true)}
+        >
           <span className="font-semibold">Halo, {namaLogin}</span>
           <img
-            src={santriData?.foto || "/assets/teachers/Drs.-K.H.-Mudrik-Qori-MA-Mudir 1.png"}
+            src={
+              santriData?.foto ||
+              "/assets/teachers/Drs.-K.H.-Mudrik-Qori-MA-Mudir 1.png"
+            }
             alt="Profile"
             className="object-cover w-8 h-8 border-2 border-white rounded-full"
           />
@@ -121,6 +128,90 @@ export default function Beranda() {
           </main>
         </div>
       </div>
+
+      {/* Profile Modal */}
+      {showProfileModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40"
+          onClick={() => setShowProfileModal(false)}
+        >
+          <div
+            className="relative w-full max-w-4xl mx-4 bg-white rounded-3xl shadow-2xl p-8"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close button */}
+            <button
+              className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 text-2xl"
+              onClick={() => setShowProfileModal(false)}
+            >
+              ✕
+            </button>
+
+            {/* Profile Header */}
+            <div className="flex items-center gap-6 mb-8">
+              <img
+                src={
+                  santriData?.foto ||
+                  "/assets/teachers/Drs.-K.H.-Mudrik-Qori-MA-Mudir 1.png"
+                }
+                alt="Profile"
+                className="object-cover w-24 h-24 border-4 border-white rounded-full shadow-lg"
+              />
+              <div className="flex-1">
+                <h2 className="text-2xl font-bold text-gray-900">
+                  {santriData?.nama || "Bilal Abdurrahman"}
+                </h2>
+              </div>
+              <button className="px-6 py-2 bg-teal-700 text-white rounded-full font-semibold hover:bg-teal-800 transition shadow">
+                Ganti Kata Sandi
+              </button>
+            </div>
+
+            {/* Profile Fields - 2 column grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Nama
+                </label>
+                <div className="px-4 py-3 bg-gray-50 rounded-lg text-gray-600">
+                  {santriData?.nama || "Bilal Abdurrahman Wahid Putra"}
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email
+                </label>
+                <div className="px-4 py-3 bg-gray-50 rounded-lg text-gray-600">
+                  {santriData?.email || "Email@gmail.com"}
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  No. Telepon
+                </label>
+                <div className="px-4 py-3 bg-gray-50 rounded-lg text-gray-600">
+                  {santriData?.no_telp || "08123456789"}
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Alamat
+                </label>
+                <div className="px-4 py-3 bg-gray-50 rounded-lg text-gray-600">
+                  {santriData?.alamat || "Bogor"}
+                </div>
+              </div>
+            </div>
+
+            {/* Sunting Button */}
+            <div className="flex justify-start">
+              <button className="px-8 py-3 bg-teal-700 text-white rounded-full font-semibold hover:bg-teal-800 transition shadow">
+                Sunting
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

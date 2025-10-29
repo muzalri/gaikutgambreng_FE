@@ -360,7 +360,7 @@ export default function Berkas() {
           <main className="px-10 py-8">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h1 className="text-2xl font-bold text-black mb-2">
+                <h1 className="mb-2 text-2xl font-bold text-black">
                   Pendaftaran
                 </h1>
                 <span className="block text-gray-500">
@@ -379,7 +379,7 @@ export default function Berkas() {
               <div className="mb-6">
                 <button
                   onClick={() => setShowSubmittedBerkas(!showSubmittedBerkas)}
-                  className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition"
+                  className="flex items-center gap-2 px-6 py-3 font-semibold text-white transition bg-blue-600 rounded-lg hover:bg-blue-700"
                 >
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -391,7 +391,7 @@ export default function Berkas() {
 
             {/* View Berkas yang Sudah Dikirim */}
             {showSubmittedBerkas && submittedBerkas && (
-              <div className="mb-8 bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
+              <div className="p-6 mb-8 bg-white border-l-4 border-blue-500 rounded-lg shadow-md">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-xl font-bold text-gray-800">Berkas Pendaftaran Anda</h3>
                   <span className={`px-4 py-2 rounded-full text-sm font-semibold ${
@@ -403,7 +403,7 @@ export default function Berkas() {
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div className="grid grid-cols-1 gap-4 mb-6 md:grid-cols-2">
                   <div>
                     <p className="text-sm text-gray-600">Nama Lengkap</p>
                     <p className="font-semibold">{submittedBerkas.nama_lengkap}</p>
@@ -430,11 +430,11 @@ export default function Berkas() {
                   </div>
                 </div>
 
-                <div className="border-t pt-4">
-                  <h4 className="font-semibold text-gray-800 mb-3">Dokumen yang Dikirim:</h4>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="pt-4 border-t">
+                  <h4 className="mb-3 font-semibold text-gray-800">Dokumen yang Dikirim:</h4>
+                  <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
                     {submittedBerkas.surat_pernyataan && (
-                      <a href={`http://localhost:5000/${submittedBerkas.surat_pernyataan}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 bg-red-50 rounded text-sm hover:bg-red-100 transition">
+                      <a href={`http://localhost:5000/${submittedBerkas.surat_pernyataan}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 text-sm transition rounded bg-red-50 hover:bg-red-100">
                         <svg className="w-4 h-4 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
@@ -442,7 +442,7 @@ export default function Berkas() {
                       </a>
                     )}
                     {submittedBerkas.rapor && (
-                      <a href={`http://localhost:5000/${submittedBerkas.rapor}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 bg-indigo-50 rounded text-sm hover:bg-indigo-100 transition">
+                      <a href={`http://localhost:5000/${submittedBerkas.rapor}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 text-sm transition rounded bg-indigo-50 hover:bg-indigo-100">
                         <svg className="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                         </svg>
@@ -450,7 +450,7 @@ export default function Berkas() {
                       </a>
                     )}
                     {submittedBerkas.ijazah && (
-                      <a href={`http://localhost:5000/${submittedBerkas.ijazah}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 bg-green-50 rounded text-sm hover:bg-green-100 transition">
+                      <a href={`http://localhost:5000/${submittedBerkas.ijazah}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 text-sm transition rounded bg-green-50 hover:bg-green-100">
                         <svg className="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
@@ -458,7 +458,7 @@ export default function Berkas() {
                       </a>
                     )}
                     {submittedBerkas.ktp_orang_tua && (
-                      <a href={`http://localhost:5000/${submittedBerkas.ktp_orang_tua}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 bg-orange-50 rounded text-sm hover:bg-orange-100 transition">
+                      <a href={`http://localhost:5000/${submittedBerkas.ktp_orang_tua}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 text-sm transition rounded bg-orange-50 hover:bg-orange-100">
                         <svg className="w-4 h-4 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
                         </svg>
@@ -466,7 +466,7 @@ export default function Berkas() {
                       </a>
                     )}
                     {submittedBerkas.kartu_keluarga && (
-                      <a href={`http://localhost:5000/${submittedBerkas.kartu_keluarga}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 bg-purple-50 rounded text-sm hover:bg-purple-100 transition">
+                      <a href={`http://localhost:5000/${submittedBerkas.kartu_keluarga}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 text-sm transition rounded bg-purple-50 hover:bg-purple-100">
                         <svg className="w-4 h-4 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                         </svg>
@@ -474,7 +474,7 @@ export default function Berkas() {
                       </a>
                     )}
                     {submittedBerkas.akta_kelahiran && (
-                      <a href={`http://localhost:5000/${submittedBerkas.akta_kelahiran}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 bg-yellow-50 rounded text-sm hover:bg-yellow-100 transition">
+                      <a href={`http://localhost:5000/${submittedBerkas.akta_kelahiran}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 text-sm transition rounded bg-yellow-50 hover:bg-yellow-100">
                         <svg className="w-4 h-4 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                         </svg>
@@ -482,7 +482,7 @@ export default function Berkas() {
                       </a>
                     )}
                     {submittedBerkas.foto_santri && (
-                      <a href={`http://localhost:5000/${submittedBerkas.foto_santri}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 bg-blue-50 rounded text-sm hover:bg-blue-100 transition">
+                      <a href={`http://localhost:5000/${submittedBerkas.foto_santri}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 text-sm transition rounded bg-blue-50 hover:bg-blue-100">
                         <svg className="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
@@ -490,7 +490,7 @@ export default function Berkas() {
                       </a>
                     )}
                     {submittedBerkas.surat_sehat && (
-                      <a href={`http://localhost:5000/${submittedBerkas.surat_sehat}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 bg-teal-50 rounded text-sm hover:bg-teal-100 transition">
+                      <a href={`http://localhost:5000/${submittedBerkas.surat_sehat}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 text-sm transition rounded bg-teal-50 hover:bg-teal-100">
                         <svg className="w-4 h-4 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                         </svg>
@@ -501,7 +501,7 @@ export default function Berkas() {
                 </div>
 
                 {submittedBerkas.status === 'Pending' && (
-                  <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <div className="p-3 mt-4 border border-yellow-200 rounded-lg bg-yellow-50">
                     <p className="text-sm text-yellow-800">
                       ⏳ Berkas Anda sedang dalam proses verifikasi oleh admin. Mohon tunggu konfirmasi.
                     </p>
@@ -509,7 +509,7 @@ export default function Berkas() {
                 )}
                 
                 {submittedBerkas.status === 'Ditolak' && (
-                  <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <div className="p-3 mt-4 border border-red-200 rounded-lg bg-red-50">
                     <p className="text-sm text-red-800">
                       ❌ Berkas Anda ditolak. Silakan hubungi admin untuk informasi lebih lanjut.
                     </p>
@@ -520,17 +520,17 @@ export default function Berkas() {
 
             {/* Loading State */}
             {loading && (
-              <div className="flex justify-center items-center py-20">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-700"></div>
+              <div className="flex items-center justify-center py-20">
+                <div className="w-12 h-12 border-b-2 border-teal-700 rounded-full animate-spin"></div>
               </div>
             )}
 
             {/* Pendaftaran Ditutup - Tampilkan Pesan */}
             {!loading && !isPendaftaranActive && (
-              <div className="bg-white rounded-lg shadow-md p-8 text-center">
+              <div className="p-8 text-center bg-white rounded-lg shadow-md">
                 <div className="mb-6">
                   <svg
-                    className="mx-auto h-24 w-24 text-red-500"
+                    className="w-24 h-24 mx-auto text-red-500"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -543,26 +543,26 @@ export default function Berkas() {
                     />
                   </svg>
                 </div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-3">
+                <h2 className="mb-3 text-2xl font-bold text-gray-800">
                   Pendaftaran Ditutup
                 </h2>
-                <p className="text-gray-600 mb-6">
+                <p className="mb-6 text-gray-600">
                   {pendaftaranInfo?.message || 'Saat ini tidak ada pendaftaran yang sedang dibuka. Silakan hubungi admin untuk informasi lebih lanjut.'}
                 </p>
                 
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
-                  <h3 className="font-semibold text-gray-800 mb-3">
+                <div className="p-6 mb-6 border border-blue-200 rounded-lg bg-blue-50">
+                  <h3 className="mb-3 font-semibold text-gray-800">
                     Butuh Bantuan?
                   </h3>
-                  <p className="text-gray-600 mb-4">
+                  <p className="mb-4 text-gray-600">
                     Hubungi admin untuk informasi jadwal pendaftaran berikutnya
                   </p>
-                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <div className="flex flex-col justify-center gap-3 sm:flex-row">
                     <a
                       href="https://wa.me/6281234567890?text=Halo%20admin,%20saya%20ingin%20menanyakan%20jadwal%20pendaftaran"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center px-6 py-3 bg-green-600 text-white rounded-full font-semibold hover:bg-green-700 transition"
+                      className="inline-flex items-center justify-center px-6 py-3 font-semibold text-white transition bg-green-600 rounded-full hover:bg-green-700"
                     >
                       <svg
                         className="w-5 h-5 mr-2"
@@ -575,7 +575,7 @@ export default function Berkas() {
                     </a>
                     <a
                       href="mailto:admin@alihsan.ac.id?subject=Informasi Pendaftaran"
-                      className="inline-flex items-center justify-center px-6 py-3 bg-teal-700 text-white rounded-full font-semibold hover:bg-teal-800 transition"
+                      className="inline-flex items-center justify-center px-6 py-3 font-semibold text-white transition bg-teal-700 rounded-full hover:bg-teal-800"
                     >
                       <svg
                         className="w-5 h-5 mr-2"
@@ -605,11 +605,11 @@ export default function Berkas() {
             {!loading && isPendaftaranActive && (
               <>
                 {/* Status Badge */}
-                <div className="mb-6 p-4 bg-green-50 border-l-4 border-green-500 rounded-lg">
+                <div className="p-4 mb-6 border-l-4 border-green-500 rounded-lg bg-green-50">
                   <div className="flex items-center">
                     <div className="flex-shrink-0">
                       <svg
-                        className="h-6 w-6 text-green-500"
+                        className="w-6 h-6 text-green-500"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -626,7 +626,7 @@ export default function Berkas() {
                       <p className="text-sm font-medium text-green-800">
                         Pendaftaran Sedang Dibuka untuk {pendaftaranInfo?.angkatan}
                       </p>
-                      <p className="text-xs text-green-700 mt-1">
+                      <p className="mt-1 text-xs text-green-700">
                         {submittedBerkas 
                           ? 'Anda sudah mengirim berkas pendaftaran' 
                           : 'Silakan lengkapi formulir pendaftaran di bawah ini'
@@ -638,7 +638,7 @@ export default function Berkas() {
 
                 {/* Pesan jika sudah submit berkas */}
                 {submittedBerkas && (
-                  <div className="mb-6 p-4 bg-blue-50 border-l-4 border-blue-500 rounded-lg">
+                  <div className="p-4 mb-6 border-l-4 border-blue-500 rounded-lg bg-blue-50">
                     <p className="text-sm text-blue-800">
                       ℹ️ Anda sudah mengirimkan berkas pendaftaran untuk <strong>{submittedBerkas.angkatan}</strong>. 
                       Silakan klik tombol "Lihat Berkas yang Sudah Dikirim" di atas untuk melihat detail.
@@ -650,7 +650,7 @@ export default function Berkas() {
                 {!submittedBerkas && (
                 <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block mb-2 text-sm font-medium text-gray-700">
                   Nama
                 </label>
                 <input
@@ -658,15 +658,15 @@ export default function Berkas() {
                   name="nama"
                   value={formData.nama}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 rounded-lg bg-white border border-gray-300"
+                  className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg"
                   placeholder="Masukkan Nama Lengkap..."
                   required
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block mb-2 text-sm font-medium text-gray-700">
                     Tempat Lahir
                   </label>
                   <input
@@ -674,13 +674,13 @@ export default function Berkas() {
                     name="tempat_lahir"
                     value={formData.tempat_lahir || ''}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 rounded-lg bg-white border border-gray-300"
+                    className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg"
                     placeholder="Contoh: Jakarta"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block mb-2 text-sm font-medium text-gray-700">
                     Tanggal Lahir
                   </label>
                   <input
@@ -688,13 +688,13 @@ export default function Berkas() {
                     name="tanggal_lahir"
                     value={formData.tanggal_lahir || ''}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 rounded-lg bg-white border border-gray-300"
+                    className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block mb-2 text-sm font-medium text-gray-700">
                   Asal Sekolah Dasar/Madrasah Ibtidaiyah
                 </label>
                 <input
@@ -702,14 +702,14 @@ export default function Berkas() {
                   name="asal_sekolah"
                   value={formData.asal_sekolah}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 rounded-lg bg-white border border-gray-300"
+                  className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg"
                   placeholder="Masukkan Asal Sekolah..."
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block mb-2 text-sm font-medium text-gray-700">
                   Alamat
                 </label>
                 <input
@@ -717,20 +717,20 @@ export default function Berkas() {
                   name="alamat"
                   value={formData.alamat}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 rounded-lg bg-white border border-gray-300"
+                  className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg"
                   placeholder="Masukkan Alamat Lengkap..."
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block mb-2 text-sm font-medium text-gray-700">
                   Jenis Kelamin <span className="text-red-500">*</span>
                 </label>
                 <select
                   name="jenis_kelamin"
                   value={formData.jenis_kelamin || 'Laki-laki'}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 rounded-lg bg-white border border-gray-300"
+                  className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg"
                   required
                 >
                   <option value="Laki-laki">Laki-laki</option>
@@ -739,7 +739,7 @@ export default function Berkas() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block mb-2 text-sm font-medium text-gray-700">
                   Angkatan
                   <span className="ml-2 text-xs text-green-600">(Otomatis terisi)</span>
                 </label>
@@ -748,22 +748,22 @@ export default function Berkas() {
                   name="angkatan"
                   value={formData.angkatan}
                   readOnly
-                  className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-300 cursor-not-allowed"
+                  className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg cursor-not-allowed"
                   placeholder="Angkatan akan terisi otomatis..."
                   required
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 {labels.map((label, idx) => (
                   <div key={label}>
-                    <div className="text-sm font-medium text-gray-700 mb-2">{label}</div>
-                    <div className="bg-white border border-gray-300 rounded-lg p-3">
+                    <div className="mb-2 text-sm font-medium text-gray-700">{label}</div>
+                    <div className="p-3 bg-white border border-gray-300 rounded-lg">
                       <div className="flex items-center gap-2 mb-2">
                         <button
                           type="button"
                           onClick={() => handleFileClick(idx)}
-                          className="px-4 py-2 rounded-lg bg-teal-600 text-white text-sm font-medium hover:bg-teal-700 transition flex items-center gap-2"
+                          className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white transition bg-teal-600 rounded-lg hover:bg-teal-700"
                         >
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
@@ -775,7 +775,7 @@ export default function Berkas() {
                           <button
                             type="button"
                             onClick={() => previewFile(uploadedFiles[label])}
-                            className="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition flex items-center gap-2"
+                            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white transition bg-blue-600 rounded-lg hover:bg-blue-700"
                           >
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -786,9 +786,9 @@ export default function Berkas() {
                         )}
                       </div>
                       
-                      <div className="text-xs text-gray-500 italic">
+                      <div className="text-xs italic text-gray-500">
                         {files[idx] ? (
-                          <span className="text-green-600 font-medium">✓ {files[idx]}</span>
+                          <span className="font-medium text-green-600">✓ {files[idx]}</span>
                         ) : (
                           <span>{placeholders[idx]}</span>
                         )}
@@ -817,7 +817,7 @@ export default function Berkas() {
                   } text-white flex items-center gap-2`}
                 >
                   {isSubmitting && (
-                    <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 animate-spin" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                     </svg>
