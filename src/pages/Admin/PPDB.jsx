@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import AdminSidebar from "../../components/AdminSidebar";
 import AdminHeader from "../../components/AdminHeader";
 import AdminService from "../../services/AdminService";
 import SantriService from "../../services/SantriService";
 import BerkasService from "../../services/BerkasService";
+import PendaftaranService from "../../services/PendaftaranService";
 
 export default function PPDB() {
   const navigate = useNavigate();
   const [santriList, setSantriList] = useState([]); // now holds Berkas list
   const [loadingList, setLoadingList] = useState(false);
+  const location = useLocation();
+  const [selectedAngkatan, setSelectedAngkatan] = useState("");
 
   // Dummy fallback when API not available
   const dummySantri = [
@@ -37,6 +40,13 @@ export default function PPDB() {
     loadBerkas();
   }, [navigate]);
 
+  // Sync selectedAngkatan from query param
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const angkatan = params.get("angkatan") || "";
+    setSelectedAngkatan(angkatan);
+  }, [location.search]);
+
   const loadBerkas = async () => {
     try {
       setLoadingList(true);
@@ -61,6 +71,8 @@ export default function PPDB() {
       setLoadingList(false);
     }
   };
+
+  // removed: angkatan dropdown handled in sidebar
 
   // Modal state for viewing applicant details
   const [showModal, setShowModal] = useState(false);
@@ -208,6 +220,7 @@ export default function PPDB() {
                   >
                     Pengumuman
                   </button>
+                  {/* Angkatan filter moved to sidebar */}
                   <div className="relative">
                     <select className="px-6 py-2 pr-10 font-semibold text-teal-700 bg-white border border-teal-700 rounded-full shadow-sm appearance-none focus:outline-none focus:ring-2 focus:ring-teal-400">
                       <option>Status</option>
@@ -287,7 +300,18 @@ export default function PPDB() {
                       </tr>
                     </thead>
                     <tbody>
-                      {(loadingList ? dummySantri : santriList).map((data, i) => (
+                      {(loadingList ? dummySantri : santriList)
+                        .filter((row) => {
+                          if (!selectedAngkatan) return true;
+                          const val = String(selectedAngkatan);
+                          const ra = String(row.angkatan || "").toLowerCase();
+                          return (
+                            ra === val.toLowerCase() ||
+                            ra.includes(val.toLowerCase()) ||
+                            ra.includes(`angkatan ${val}`.toLowerCase())
+                          );
+                        })
+                        .map((data, i) => (
                         <tr
                           key={data.id}
                           className={i % 2 === 0 ? "bg-white" : "bg-slate-50"}
