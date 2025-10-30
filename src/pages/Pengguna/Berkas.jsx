@@ -624,7 +624,7 @@ export default function Berkas() {
                     </div>
                     <div className="ml-3">
                       <p className="text-sm font-medium text-green-800">
-                        Pendaftaran Sedang Dibuka untuk {pendaftaranInfo?.angkatan}
+                        Pendaftaran Sedang Dibuka untuk <strong>Angkatan {pendaftaranInfo?.angkatan}</strong>
                       </p>
                       <p className="mt-1 text-xs text-green-700">
                         {submittedBerkas 
@@ -640,7 +640,7 @@ export default function Berkas() {
                 {submittedBerkas && (
                   <div className="p-4 mb-6 border-l-4 border-blue-500 rounded-lg bg-blue-50">
                     <p className="text-sm text-blue-800">
-                      ℹ️ Anda sudah mengirimkan berkas pendaftaran untuk <strong>{submittedBerkas.angkatan}</strong>. 
+                      ℹ️ Anda sudah mengirimkan berkas pendaftaran untuk <strong>Angkatan {submittedBerkas.angkatan}</strong>. 
                       Silakan klik tombol "Lihat Berkas yang Sudah Dikirim" di atas untuk melihat detail.
                     </p>
                   </div>

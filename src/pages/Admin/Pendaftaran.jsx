@@ -306,7 +306,7 @@ export default function Pendaftaran() {
                         <span className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
                         <div className="flex flex-col">
                           <span className="text-sm font-bold text-green-700">PENDAFTARAN DIBUKA</span>
-                          <span className="text-xs text-green-600">{activePendaftaran.angkatan}</span>
+                          <span className="text-xs text-green-600">Angkatan {activePendaftaran.angkatan}</span>
                         </div>
                       </div>
                     ) : (

@@ -4,6 +4,7 @@ import AdminSidebar from "../../components/AdminSidebar";
 import AdminHeader from "../../components/AdminHeader";
 import AdminService from "../../services/AdminService";
 import SantriService from "../../services/SantriService";
+import BerkasService from "../../services/BerkasService";
 
 export default function Santri() {
   const navigate = useNavigate();
@@ -37,7 +38,41 @@ export default function Santri() {
     setModalLoading(true);
     setSelectedSantri(null);
     try {
-      // If you want to refetch details, do it here (e.g., await SantriService.getSantriById(santri.id))
+      // Ambil data berkas milik santri untuk diisi ke modal
+      const berkasResp = await BerkasService.getAll({ id_santri: santri.id, limit: 1000 });
+      const berkasList = berkasResp?.data || [];
+
+      // Pilih berkas dengan prioritas: Diterima > tahapan tertinggi > terbaru
+      const sorted = [...berkasList].sort((a, b) => {
+        const statusScore = (x) => (x?.status === 'Diterima' ? 2 : 0) + (x?.tahapan || 0);
+        const byStatusTahap = statusScore(b) - statusScore(a);
+        if (byStatusTahap !== 0) return byStatusTahap;
+        const aTime = new Date(a?.created_at || 0).getTime();
+        const bTime = new Date(b?.created_at || 0).getTime();
+        return bTime - aTime;
+      });
+      const chosen = sorted[0] || null;
+
+      if (chosen) {
+        const enriched = {
+          ...santri,
+          // Override dengan data dari berkas yang disubmit
+          nama_lengkap: chosen.nama_lengkap || santri.nama_lengkap || santri.nama,
+          asal_sekolah: chosen.asal_sekolah ?? santri.asal_sekolah,
+          alamat: chosen.alamat ?? santri.alamat,
+          no_telp: chosen.no_telp ?? santri.no_telp,
+          angkatan: chosen.angkatan || santri.angkatan,
+          jenis_kelamin: chosen.jenis_kelamin,
+          tempat_lahir: chosen.tempat_lahir,
+          tanggal_lahir: chosen.tanggal_lahir,
+          // Simpan ringkasan berkas yang penting
+          berkas_detail: chosen,
+        };
+        setSelectedSantri(enriched);
+      } else {
+        setSelectedSantri(santri);
+      }
+    } catch (e) {
       setSelectedSantri(santri);
     } finally {
       setModalLoading(false);
@@ -157,9 +192,34 @@ export default function Santri() {
   const fetchSantri = async () => {
     try {
       setLoading(true);
+      // Ambil semua berkas lalu filter yang diterima atau tahapan >= 5
+      const berkasResp = await BerkasService.getAll({ limit: 1000 });
+      const berkasList = berkasResp?.data || [];
+      const acceptedBySantri = new Map();
+      for (const b of berkasList) {
+        const eligible = (b?.status === 'Diterima') || ((b?.tahapan || 0) >= 5);
+        if (eligible && b?.id_santri) {
+          // Simpan angkatan dan nama_lengkap dari Berkas untuk santri terkait
+          if (!acceptedBySantri.has(b.id_santri)) {
+            acceptedBySantri.set(b.id_santri, {
+              angkatan: b.angkatan || '-',
+              nama_lengkap: b.nama_lengkap || null,
+            });
+          }
+        }
+      }
+
+      // Ambil semua santri, lalu filter hanya yang ada di acceptedBySantri
       const response = await SantriService.getAllSantri();
       if (response.success) {
-        setSantriList(response.data);
+        const all = response.data || [];
+        const filtered = all
+          .filter((s) => acceptedBySantri.has(s.id))
+          .map((s) => {
+            const info = acceptedBySantri.get(s.id) || {};
+            return { ...s, angkatan: info.angkatan, nama_lengkap: info.nama_lengkap };
+          });
+        setSantriList(filtered);
       }
     } catch (error) {
       console.error("Error fetching santri:", error);
@@ -179,10 +239,33 @@ export default function Santri() {
 
     try {
       setLoading(true);
+      // Lakukan pencarian santri terlebih dahulu
       const response = await SantriService.searchSantri(searchKeyword);
-      if (response.success) {
-        setSantriList(response.data);
+      const searched = response.success ? (response.data || []) : [];
+
+      // Ambil berkas untuk menentukan siapa yang diterima/tahapan 5
+      const berkasResp = await BerkasService.getAll({ limit: 1000 });
+      const berkasList = berkasResp?.data || [];
+      const acceptedBySantri = new Map();
+      for (const b of berkasList) {
+        const eligible = (b?.status === 'Diterima') || ((b?.tahapan || 0) >= 5);
+        if (eligible && b?.id_santri) {
+          if (!acceptedBySantri.has(b.id_santri)) {
+            acceptedBySantri.set(b.id_santri, {
+              angkatan: b.angkatan || '-',
+              nama_lengkap: b.nama_lengkap || null,
+            });
+          }
+        }
       }
+
+      const filtered = searched
+        .filter((s) => acceptedBySantri.has(s.id))
+        .map((s) => {
+          const info = acceptedBySantri.get(s.id) || {};
+          return { ...s, angkatan: info.angkatan, nama_lengkap: info.nama_lengkap };
+        });
+      setSantriList(filtered);
     } catch (error) {
       // Jika backend tidak tersedia, gunakan data dummy dengan filter
       console.warn("Backend tidak tersedia, menggunakan data dummy");
@@ -328,7 +411,7 @@ export default function Santri() {
                             className={i % 2 === 0 ? "bg-white" : "bg-slate-50"}
                           >
                             <td className="py-3 px-4">{i + 1}</td>
-                            <td className="py-3 px-4">{santri.nama}</td>
+                            <td className="py-3 px-4">{santri.nama_lengkap}</td>
                             <td className="py-3 px-4">
                               {santri.angkatan || "-"}
                             </td>
@@ -439,7 +522,7 @@ export default function Santri() {
                               Nama
                             </label>
                             <div className="p-3 mt-1 bg-slate-50 rounded">
-                              {selectedSantri?.nama || "-"}
+                              {selectedSantri?.nama_lengkap || "-"}
                             </div>
                           </div>
                           <div>
