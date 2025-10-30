@@ -11,6 +11,8 @@ export default function Santri() {
   const [santriList, setSantriList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchKeyword, setSearchKeyword] = useState("");
+  const [yearOptions, setYearOptions] = useState([]);
+  const [selectedYear, setSelectedYear] = useState("");
 
   // Modal state
   const [viewModal, setViewModal] = useState(false);
@@ -195,19 +197,38 @@ export default function Santri() {
       // Ambil semua berkas lalu filter yang diterima atau tahapan >= 5
       const berkasResp = await BerkasService.getAll({ limit: 1000 });
       const berkasList = berkasResp?.data || [];
+      // Kumpulkan opsi tahun/angkatan dari field angkatan pada berkas
+      const yearSet = new Set();
       const acceptedBySantri = new Map();
       for (const b of berkasList) {
         const eligible = (b?.status === 'Diterima') || ((b?.tahapan || 0) >= 5);
         if (eligible && b?.id_santri) {
+          const angkatanValue = b?.angkatan ? String(b.angkatan) : null;
+          if (angkatanValue) yearSet.add(angkatanValue);
           // Simpan angkatan dan nama_lengkap dari Berkas untuk santri terkait
           if (!acceptedBySantri.has(b.id_santri)) {
             acceptedBySantri.set(b.id_santri, {
               angkatan: b.angkatan || '-',
               nama_lengkap: b.nama_lengkap || null,
+              tahun_masuk: angkatanValue || null,
             });
           }
         }
       }
+      // Set opsi tahun/angkatan (urut desc berdasarkan angka yang terdeteksi)
+      const extractYearNum = (val) => {
+        const m = String(val).match(/\d{4}/);
+        return m ? parseInt(m[0], 10) : null;
+      };
+      const sortedOptions = Array.from(yearSet).sort((a, b) => {
+        const na = extractYearNum(a);
+        const nb = extractYearNum(b);
+        if (na && nb) return nb - na;
+        if (na && !nb) return -1;
+        if (!na && nb) return 1;
+        return String(b).localeCompare(String(a));
+      });
+      setYearOptions(sortedOptions);
 
       // Ambil semua santri, lalu filter hanya yang ada di acceptedBySantri
       const response = await SantriService.getAllSantri();
@@ -217,7 +238,7 @@ export default function Santri() {
           .filter((s) => acceptedBySantri.has(s.id))
           .map((s) => {
             const info = acceptedBySantri.get(s.id) || {};
-            return { ...s, angkatan: info.angkatan, nama_lengkap: info.nama_lengkap };
+            return { ...s, angkatan: info.angkatan, nama_lengkap: info.nama_lengkap, tahun_masuk: info.tahun_masuk };
           });
         setSantriList(filtered);
       }
@@ -329,8 +350,11 @@ export default function Santri() {
                     Tambah
                   </button>
                   <div className="relative">
-                    <select className="px-6 py-2 pr-10 font-semibold text-teal-700 bg-white border border-teal-700 rounded-full shadow-sm appearance-none focus:outline-none focus:ring-2 focus:ring-teal-400">
-                      <option>Semua</option>
+                    <select className="px-6 py-2 pr-10 font-semibold text-teal-700 bg-white border border-teal-700 rounded-full shadow-sm appearance-none focus:outline-none focus:ring-2 focus:ring-teal-400" value={selectedYear} onChange={(e) => setSelectedYear(e.target.value)}>
+                      <option value="">Semua</option>
+                      {yearOptions.map((y) => (
+                        <option key={y} value={String(y)}>{y}</option>
+                      ))}
                     </select>
                     <span className="absolute text-teal-700 transform -translate-y-1/2 pointer-events-none right-4 top-1/2">
                       <svg
@@ -395,7 +419,7 @@ export default function Santri() {
                             Loading...
                           </td>
                         </tr>
-                      ) : santriList.length === 0 ? (
+                      ) : (selectedYear ? santriList.filter(s => String(s.tahun_masuk || '') === String(selectedYear)) : santriList).length === 0 ? (
                         <tr>
                           <td
                             colSpan="4"
@@ -405,7 +429,7 @@ export default function Santri() {
                           </td>
                         </tr>
                       ) : (
-                        santriList.map((santri, i) => (
+                        (selectedYear ? santriList.filter(s => String(s.tahun_masuk || '') === String(selectedYear)) : santriList).map((santri, i) => (
                           <tr
                             key={santri.id}
                             className={i % 2 === 0 ? "bg-white" : "bg-slate-50"}
