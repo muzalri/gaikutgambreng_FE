@@ -16,9 +16,7 @@ export const getImageUrl = (path) => {
 // Create axios instance
 const api = axios.create({
   baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  // Jangan set Content-Type default agar FormData bisa set sendiri
   withCredentials: true,
 });
 
