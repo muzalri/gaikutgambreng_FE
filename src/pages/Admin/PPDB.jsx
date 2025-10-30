@@ -13,6 +13,21 @@ export default function PPDB() {
   const [loadingList, setLoadingList] = useState(false);
   const location = useLocation();
   const [selectedAngkatan, setSelectedAngkatan] = useState("");
+  const [selectedTahapan, setSelectedTahapan] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("");
+
+  const TAHAPAN_LABELS = {
+    1: "Seleksi Berkas",
+    2: "Tes Psikolog",
+    3: "Tes Baca Al-Qur'an",
+    4: "Wawancara Casantri",
+    5: "Karantina Casantri",
+  };
+
+  const getTahapanLabel = (value) => {
+    const num = parseInt(value || 1, 10);
+    return TAHAPAN_LABELS[num] || `Tahap ${num}`;
+  };
 
   // Dummy fallback when API not available
   const dummySantri = [
@@ -222,11 +237,11 @@ export default function PPDB() {
                   </button>
                   {/* Angkatan filter moved to sidebar */}
                   <div className="relative">
-                    <select className="px-6 py-2 pr-10 font-semibold text-teal-700 bg-white border border-teal-700 rounded-full shadow-sm appearance-none focus:outline-none focus:ring-2 focus:ring-teal-400">
-                      <option>Status</option>
-                      <option>Diterima</option>
-                      <option>Proses</option>
-                      <option>Ditolak</option>
+                    <select className="px-6 py-2 pr-10 font-semibold text-teal-700 bg-white border border-teal-700 rounded-full shadow-sm appearance-none focus:outline-none focus:ring-2 focus:ring-teal-400" value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value)}>
+                      <option value="">Status</option>
+                      <option value="Diterima">Diterima</option>
+                      <option value="Proses">Proses</option>
+                      <option value="Ditolak">Ditolak</option>
                     </select>
                     <span className="absolute text-teal-700 transform -translate-y-1/2 pointer-events-none right-4 top-1/2">
                       <svg
@@ -242,13 +257,13 @@ export default function PPDB() {
                     </span>
                   </div>
                   <div className="relative">
-                    <select className="px-6 py-2 pr-10 font-semibold text-teal-700 bg-white border border-teal-700 rounded-full shadow-sm appearance-none focus:outline-none focus:ring-2 focus:ring-teal-400">
-                      <option>Tahapan</option>
-                      <option>Seleksi Berkas</option>
-                      <option>Tes Psikolog</option>
-                      <option>Tes Baca Al-Qur'an</option>
-                      <option>Wawancara Casantri</option>
-                      <option>Karantina Casantri</option>
+                    <select className="px-6 py-2 pr-10 font-semibold text-teal-700 bg-white border border-teal-700 rounded-full shadow-sm appearance-none focus:outline-none focus:ring-2 focus:ring-teal-400" value={selectedTahapan} onChange={(e) => setSelectedTahapan(e.target.value)}>
+                      <option value="">Tahapan</option>
+                      <option value="1">Seleksi Berkas</option>
+                      <option value="2">Tes Psikolog</option>
+                      <option value="3">Tes Baca Al-Qur'an</option>
+                      <option value="4">Wawancara Casantri</option>
+                      <option value="5">Karantina Casantri</option>
                     </select>
                     <span className="absolute text-teal-700 transform -translate-y-1/2 pointer-events-none right-4 top-1/2">
                       <svg
@@ -311,6 +326,16 @@ export default function PPDB() {
                             ra.includes(`angkatan ${val}`.toLowerCase())
                           );
                         })
+                        .filter((row) => {
+                          if (!selectedTahapan) return true;
+                          const tahap = parseInt(row?.tahapan || 1, 10);
+                          return tahap === parseInt(selectedTahapan, 10);
+                        })
+                        .filter((row) => {
+                          if (!selectedStatus) return true;
+                          const target = selectedStatus === 'Proses' ? 'Pending' : selectedStatus;
+                          return String(row?.status || '').toLowerCase() === String(target).toLowerCase();
+                        })
                         .map((data, i) => (
                         <tr
                           key={data.id}
@@ -319,7 +344,7 @@ export default function PPDB() {
                           <td className="px-4 py-3">{i + 1}</td>
                           <td className="px-4 py-3">{data.nama}</td>
                           <td className="px-4 py-3">{data.angkatan || "Angkatan 1"}</td>
-                          <td className="px-4 py-3">{data.tahapan || 1}</td>
+                          <td className="px-4 py-3">{getTahapanLabel(data.tahapan)}</td>
                           <td className="px-4 py-3">{data.status}</td>
                           <td className="px-4 py-3">
                             <button
@@ -390,7 +415,7 @@ export default function PPDB() {
                                 </div>
                               </div>
                               <div>
-                                <label className="text-sm text-slate-600">Tahapan (1 - 5)</label>
+                                <label className="text-sm text-slate-600">Tahapan</label>
                                 <div className="flex items-center gap-3 mt-1">
                                   <button
                                     className="px-3 py-1 rounded bg-slate-200"
@@ -406,7 +431,7 @@ export default function PPDB() {
                                     -
                                   </button>
                                   <div className="px-4 py-2 rounded bg-slate-50">
-                                    {selectedBerkas?.tahapan || 1}
+                                    {getTahapanLabel(selectedBerkas?.tahapan)}
                                   </div>
                                   <button
                                     className="px-3 py-1 rounded bg-slate-200"
@@ -421,7 +446,7 @@ export default function PPDB() {
                                     +
                                   </button>
                                 </div>
-                                <div className="text-xs text-slate-500 mt-1">Tahapan 5 akan otomatis menjadikan status Diterima</div>
+                                <div className="text-xs text-slate-500 mt-1"><strong>Tahapan Karantina Casantri</strong> akan otomatis menjadikan status Diterima</div>
                               </div>
                             </div>
 
