@@ -43,7 +43,15 @@ const AdminService = {
   // Update profile admin
   updateProfile: async (id, data) => {
     try {
-      const response = await api.put(`/admin/profile/${id}`, data);
+      // Check if data is FormData (for file uploads)
+      // JANGAN set Content-Type untuk FormData, biarkan browser set otomatis dengan boundary
+      const config = data instanceof FormData ? {} : {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      };
+      
+      const response = await api.put(`/admin/profile/${id}`, data, config);
       
       if (response.data.success && response.data.data) {
         // Update data admin di localStorage
