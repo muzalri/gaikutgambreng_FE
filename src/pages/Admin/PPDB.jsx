@@ -3,9 +3,11 @@ import { useNavigate, useLocation } from "react-router-dom";
 import AdminSidebar from "../../components/AdminSidebar";
 import AdminHeader from "../../components/AdminHeader";
 import AdminService from "../../services/AdminService";
+import Swal from "sweetalert2";
 import SantriService from "../../services/SantriService";
 import BerkasService from "../../services/BerkasService";
 import PendaftaranService from "../../services/PendaftaranService";
+import PengumumanService from "../../services/PengumumanService";
 
 export default function PPDB() {
   const navigate = useNavigate();
@@ -102,6 +104,8 @@ export default function PPDB() {
     angkatan: "",
     tahapan: "",
   });
+  const [angkatanOptions, setAngkatanOptions] = useState([]);
+  const [tahapanOptions, setTahapanOptions] = useState([]);
 
   const openModal = async (santriId, berkasId) => {
     setShowModal(true);
@@ -159,21 +163,70 @@ export default function PPDB() {
   const handleAction = async (action) => {
     if (!selectedSantri) return;
     try {
-      // Prefer updating Berkas status when available
-      if (selectedBerkasId) {
-        await BerkasService.updateStatus(selectedBerkasId, action);
-      } else {
-        // Fallback: update santri status if berkas id unknown
-        await SantriService.updateSantri(
-          selectedSantri.id || selectedSantri._id || 1,
-          { status: action }
-        );
+      if (action === "Diterima") {
+        if (selectedBerkasId) {
+          const currentTahap = parseInt(selectedBerkas?.tahapan || 1, 10);
+          const next = Math.min(5, currentTahap + 1);
+          if (next === currentTahap) {
+            await Swal.fire({
+              title: "Info",
+              text: "Tahapan sudah berada pada level tertinggi.",
+              icon: "info",
+            });
+            return;
+          }
+          const nextLabel = getTahapanLabel(next);
+          const { isConfirmed } = await Swal.fire({
+            title: "Majukan tahapan?",
+            text: `Ke ${nextLabel}`,
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonText: "Ya, majukan",
+            cancelButtonText: "Batal",
+          });
+          if (!isConfirmed) return;
+          await BerkasService.updateTahapan(selectedBerkasId, next);
+          // Refresh list and selected berkas
+          await loadBerkas();
+          const detail = await BerkasService.getById(selectedBerkasId);
+          setSelectedBerkas(detail?.data || detail);
+          await Swal.fire({
+            title: "Berhasil",
+            text: `Tahapan berhasil dimajukan ke ${nextLabel}`,
+            icon: "success",
+          });
+        }
+        closeModal();
+        return;
+      } else if (action === "Ditolak") {
+        if (selectedBerkasId) {
+          const { isConfirmed } = await Swal.fire({
+            title: "Tolak berkas?",
+            text: `Status akan diubah menjadi Ditolak`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Ya, tolak",
+            cancelButtonText: "Batal",
+          });
+          if (!isConfirmed) return;
+          await BerkasService.updateStatus(selectedBerkasId, "Ditolak");
+          await loadBerkas();
+          await Swal.fire({
+            title: "Berhasil",
+            text: "Status berkas diubah menjadi Ditolak",
+            icon: "success",
+          });
+        }
+        closeModal();
+        return;
       }
-      alert(`Berhasil mengubah status: ${action}`);
-      closeModal();
     } catch (err) {
       console.error("Error updating status:", err);
-      alert("Gagal mengubah status");
+      await Swal.fire({
+        title: "Gagal",
+        text: "Gagal memproses aksi",
+        icon: "error",
+      });
     }
   };
 
@@ -197,18 +250,82 @@ export default function PPDB() {
     }));
   };
 
-  const handlePengumumanSubmit = (e) => {
+  // Load angkatan options when modal opens
+  useEffect(() => {
+    const loadAngkatanOptions = async () => {
+      try {
+        const resp = await PendaftaranService.getAll({ limit: 100 });
+        const rows = resp?.data || resp || [];
+        const unique = Array.from(new Set((rows || []).map((r) => r.angkatan).filter(Boolean)));
+        setAngkatanOptions(unique);
+      } catch (_) {
+        setAngkatanOptions([]);
+      }
+    };
+    if (showPengumumanModal) {
+      loadAngkatanOptions();
+    }
+  }, [showPengumumanModal]);
+
+  // Load tahapan options when angkatan changes in pengumuman form
+  useEffect(() => {
+    const loadTahapanOptions = async () => {
+      if (!pengumumanData.angkatan) {
+        setTahapanOptions([]);
+        return;
+      }
+      try {
+        const resp = await BerkasService.getTahapanDropdown(pengumumanData.angkatan);
+        const data = resp?.data || resp || [];
+        setTahapanOptions(Array.isArray(data) ? data : []);
+      } catch (_) {
+        setTahapanOptions([]);
+      }
+    };
+    loadTahapanOptions();
+  }, [pengumumanData.angkatan]);
+
+  const handlePengumumanSubmit = async (e) => {
     e.preventDefault();
 
     if (!pengumumanData.angkatan || !pengumumanData.tahapan) {
-      alert("Angkatan dan Tahapan harus diisi!");
+      await Swal.fire({
+        title: "Validasi",
+        text: "Angkatan dan Tahapan harus diisi!",
+        icon: "warning",
+      });
       return;
     }
 
-    // TODO: Implement pengumuman API call
-    console.log("Creating pengumuman:", pengumumanData);
-    alert("Pengumuman berhasil dibuat!");
-    closePengumumanModal();
+    try {
+      const tahapLabel = getTahapanLabel(pengumumanData.tahapan);
+      const { isConfirmed } = await Swal.fire({
+        title: "Publikasikan pengumuman?",
+        html: `Angkatan: <b>${pengumumanData.angkatan}</b><br/>Tahapan: <b>${tahapLabel}</b>`,
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Ya, publikasikan",
+        cancelButtonText: "Batal",
+      });
+      if (!isConfirmed) return;
+      await PengumumanService.publish({
+        angkatan: pengumumanData.angkatan,
+        tahapan: pengumumanData.tahapan,
+      });
+      await Swal.fire({
+        title: "Berhasil",
+        text: "Pengumuman berhasil dipublikasikan!",
+        icon: "success",
+      });
+      closePengumumanModal();
+    } catch (err) {
+      console.error(err);
+      await Swal.fire({
+        title: "Gagal",
+        text: "Gagal mempublikasikan pengumuman",
+        icon: "error",
+      });
+    }
   };
 
   return (
@@ -416,35 +533,8 @@ export default function PPDB() {
                               </div>
                               <div>
                                 <label className="text-sm text-slate-600">Tahapan</label>
-                                <div className="flex items-center gap-3 mt-1">
-                                  <button
-                                    className="px-3 py-1 rounded bg-slate-200"
-                                    onClick={async () => {
-                                      if (!selectedBerkasId) return;
-                                      const next = Math.max(1, (selectedBerkas?.tahapan || 1) - 1);
-                                      const resp = await BerkasService.updateTahapan(selectedBerkasId, next);
-                                      // refresh selected berkas
-                                      const detail = await BerkasService.getById(selectedBerkasId);
-                                      setSelectedBerkas(detail?.data || detail);
-                                    }}
-                                  >
-                                    -
-                                  </button>
-                                  <div className="px-4 py-2 rounded bg-slate-50">
-                                    {getTahapanLabel(selectedBerkas?.tahapan)}
-                                  </div>
-                                  <button
-                                    className="px-3 py-1 rounded bg-slate-200"
-                                    onClick={async () => {
-                                      if (!selectedBerkasId) return;
-                                      const next = Math.min(5, (selectedBerkas?.tahapan || 1) + 1);
-                                      const resp = await BerkasService.updateTahapan(selectedBerkasId, next);
-                                      const detail = await BerkasService.getById(selectedBerkasId);
-                                      setSelectedBerkas(detail?.data || detail);
-                                    }}
-                                  >
-                                    +
-                                  </button>
+                                <div className="mt-1 px-4 py-2 rounded bg-slate-50 inline-block">
+                                  {getTahapanLabel(selectedBerkas?.tahapan)}
                                 </div>
                                 <div className="text-xs text-slate-500 mt-1"><strong>Tahapan Karantina Casantri</strong> akan otomatis menjadikan status Diterima</div>
                               </div>
@@ -494,12 +584,6 @@ export default function PPDB() {
                                 className="px-8 py-3 text-white rounded-full bg-teal-700 shadow"
                               >
                                 Terima
-                              </button>
-                              <button
-                                onClick={() => handleAction("Pending")}
-                                className="px-8 py-3 text-white rounded-full bg-amber-400 shadow"
-                              >
-                                Pending
                               </button>
                               <button
                                 onClick={() => handleAction("Ditolak")}
@@ -561,9 +645,9 @@ export default function PPDB() {
                           required
                         >
                           <option value="">Pilih Angkatan</option>
-                          <option value="Angkatan 1">Angkatan 1</option>
-                          <option value="Angkatan 2">Angkatan 2</option>
-                          <option value="Angkatan 3">Angkatan 3</option>
+                          {angkatanOptions.map((opt) => (
+                            <option key={opt} value={opt}>{opt}</option>
+                          ))}
                         </select>
                       </div>
 
@@ -579,15 +663,9 @@ export default function PPDB() {
                           required
                         >
                           <option value="">Pilih Tahapan</option>
-                          <option value="Seleksi Administrasi">
-                            Seleksi Administrasi
-                          </option>
-                          <option value="Tes Psikolog">Tes Psikolog</option>
-                          <option value="Tes Baca Al-Qur'an">
-                            Tes Baca Al-Qur'an
-                          </option>
-                          <option value="Wawancara">Wawancara</option>
-                          <option value="Karantina">Karantina</option>
+                          {tahapanOptions.map((num) => (
+                            <option key={num} value={num}>{getTahapanLabel(num)}</option>
+                          ))}
                         </select>
                       </div>
 

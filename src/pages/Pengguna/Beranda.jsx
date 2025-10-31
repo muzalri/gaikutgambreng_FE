@@ -10,9 +10,12 @@ import {
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import PenggunaSidebar from "../../components/PenggunaSidebar";
 import Swal from "sweetalert2";
+import PengumumanService from "../../services/PengumumanService";
 
 export default function Beranda() {
   const [santriData, setSantriData] = useState(null);
+  const [pengumuman, setPengumuman] = useState(null);
+  const [santriAnnounced, setSantriAnnounced] = useState([]);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const navigate = useNavigate();
 
@@ -22,25 +25,32 @@ export default function Beranda() {
     if (data) {
       setSantriData(JSON.parse(data));
     }
+    // Ambil pengumuman aktif
+    (async () => {
+      try {
+        const resp = await PengumumanService.getActive();
+        const payload = resp?.data || resp;
+        setPengumuman(payload?.pengumuman || null);
+        setSantriAnnounced(payload?.santri || []);
+      } catch (e) {
+        setPengumuman(null);
+        setSantriAnnounced([]);
+      }
+    })();
   }, []);
 
   // Dummy data for demonstration
   const namaLogin = santriData?.nama || "Santri";
-  const santriBaru = [
-    "Bilal Abdurrahman",
-    "Dhiyaurrahman Hamizan",
-    "Raffa Danendra",
-    "Zaki Algifari",
-    "Faris Fadhil",
-    "Rafi Alexander",
-    "Cahya Ilham",
-    "Dzaky Ikbaar",
-    "Frizaski Alfath",
-    "Daffa Abiyya",
-    "Hakkam Zakka",
-    "Raden Muhammad",
-    "Rafii Khairan",
-  ];
+  const getTahapanLabel = (num) => {
+    const map = {
+      1: "Seleksi Berkas",
+      2: "Tes Psikolog",
+      3: "Tes Baca Al-Qur'an",
+      4: "Wawancara Casantri",
+      5: "Karantina Casantri",
+    };
+    return map[parseInt(num || 1, 10)] || `Tahap ${num}`;
+  };
 
   const location = useLocation();
 
@@ -98,9 +108,12 @@ export default function Beranda() {
             </div>
             {/* Table Section */}
             <div className="p-6 bg-white shadow rounded-2xl">
-              <h3 className="mb-4 text-lg font-bold">
-                Pengumuman Santri Baru Angkatan 1
+              <h3 className="mb-1 text-lg font-bold">
+                Pengumuman Santri Baru {pengumuman?.angkatan || "-"}
               </h3>
+              <p className="mb-4 text-sm text-gray-500">
+                Tahapan: {pengumuman ? (pengumuman.tahapan_label || getTahapanLabel(pengumuman.tahapan_num)) : "-"}
+              </p>
               <table className="w-full text-left">
                 <thead>
                   <tr className="text-gray-500">
@@ -111,15 +124,12 @@ export default function Beranda() {
                   </tr>
                 </thead>
                 <tbody>
-                  {santriBaru.map((nama, idx) => (
-                    <tr
-                      key={idx}
-                      className={idx % 2 === 0 ? "bg-gray-50" : "bg-white"}
-                    >
+                  {(santriAnnounced || []).map((row, idx) => (
+                    <tr key={row.id || idx} className={idx % 2 === 0 ? "bg-gray-50" : "bg-white"}>
                       <td className="px-2 py-2">{idx + 1}</td>
-                      <td className="px-2 py-2">{nama}</td>
-                      <td className="px-2 py-2">Angkatan 1</td>
-                      <td className="px-2 py-2">Seleksi Berkas</td>
+                      <td className="px-2 py-2">{row.nama_lengkap || '-'}</td>
+                      <td className="px-2 py-2">{row.angkatan || '-'}</td>
+                      <td className="px-2 py-2">{getTahapanLabel(row.tahapan)}</td>
                     </tr>
                   ))}
                 </tbody>

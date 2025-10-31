@@ -25,6 +25,17 @@ class BerkasService {
     }
   }
 
+  // Get distinct tahapan options by angkatan (excluding Ditolak)
+  async getTahapanDropdown(angkatan) {
+    try {
+      const response = await axios.get(`${API_URL}/berkas/tahapan-dropdown`, { params: { angkatan } });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching tahapan dropdown:', error);
+      throw error;
+    }
+  }
+
   // Get berkas by ID
   async getById(id) {
     try {
