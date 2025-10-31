@@ -3,6 +3,7 @@ import "aos/dist/aos.css";
 import AOS from "aos";
 import ArtikelService from "../../services/ArtikelService";
 import { getImageUrl } from "../../config/api";
+import TestimonialService from "../../services/TestimonialService";
 
 export default function Home() {
   const GMAPS_LINK = "https://maps.app.goo.gl/1WZnr4KbYHjEhZP96";
@@ -24,30 +25,9 @@ export default function Home() {
   const [currentPrestasiIndex, setCurrentPrestasiIndex] = useState(0);
   const [currentKegiatanIndex, setCurrentKegiatanIndex] = useState(0);
 
-  // Placeholder data testimonial (nanti diganti API)
-  const testimonials = [
-    {
-      id: 1,
-      name: "Bilal Hamizan",
-      cohort: "Angkatan 1",
-      photo: "/assets/FotoBarisSantri.png",
-      text: "Belajar di Pesantren Al Ihsan Bekasi membuat saya semakin mencintai ilmu agama. Lingkungan yang disiplin dan penuh kebersamaan membentuk karakter saya. Ilmu yang saya dapatkan menjadi bekal berharga untuk masa depan",
-    },
-    {
-      id: 2,
-      name: "Ahmad Fauzi",
-      cohort: "Angkatan 2",
-      photo: "/assets/FotoPesantren.png",
-      text: "Program tahfizh dan kajian kitab sangat membantu saya memahami agama secara mendalam dan terstruktur.",
-    },
-    {
-      id: 3,
-      name: "Muhammad Yusuf",
-      cohort: "Angkatan 3",
-      photo: "/assets/FotoBarisSantri.png",
-      text: "Para asatidz membimbing dengan sabar. Saya merasakan perubahan nyata dalam ibadah dan akhlak.",
-    },
-  ];
+  // Testimonial state
+  const [testimonials, setTestimonials] = useState([]);
+  const [loadingTestimonials, setLoadingTestimonials] = useState(true);
   const [current, setCurrent] = useState(0);
   const total = testimonials.length;
   const prev = () => setCurrent((i) => (i - 1 + total) % total);
@@ -86,6 +66,41 @@ export default function Home() {
     };
 
     fetchArticles();
+  }, []);
+
+  // Fetch testimonials
+  useEffect(() => {
+    const fetchTestimonials = async () => {
+      try {
+        setLoadingTestimonials(true);
+        const response = await TestimonialService.getAll();
+        if (response.success && Array.isArray(response.data)) {
+          const mapped = response.data.map((item) => {
+            const imagePath = item.foto
+              ? `/uploads/testimonial/${item.foto}`
+              : "/assets/FotoBarisSantri.png";
+            return {
+              id: item.id,
+              name: item.nama,
+              cohort: item.angkatan || item.kategori || "",
+              photo: getImageUrl(imagePath),
+              text: item.testimonial,
+            };
+          });
+          setTestimonials(mapped);
+          setCurrent(0);
+        } else {
+          setTestimonials([]);
+        }
+      } catch (error) {
+        console.error("Error fetching testimonials:", error);
+        setTestimonials([]);
+      } finally {
+        setLoadingTestimonials(false);
+      }
+    };
+
+    fetchTestimonials();
   }, []);
 
   // Fungsi untuk membuka modal detail artikel
@@ -502,6 +517,16 @@ export default function Home() {
           </h2>
 
           <div className="relative mt-8 min-h-[380px]">
+            {loadingTestimonials ? (
+              <div className="flex items-center justify-center h-[300px]">
+                <div className="w-10 h-10 border-4 border-amber-500 border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : total === 0 ? (
+              <div className="flex items-center justify-center h-[300px] text-slate-500">
+                Belum ada testimoni
+              </div>
+            ) : (
+            <>
             {/* Side previews positioned behind main card, consistent size */}
             <div className="hidden md:block absolute left-4 top-1/2 -translate-y-1/2 w-[220px] h-[300px] rounded-2xl overflow-hidden blur-[2px] opacity-70 pointer-events-none z-0">
               <div
@@ -562,6 +587,8 @@ export default function Home() {
             >
               ›
             </button>
+            </>
+            )}
           </div>
         </div>
       </section>

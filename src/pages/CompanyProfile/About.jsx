@@ -25,7 +25,7 @@ export default function About() {
             Bekasi
           </h2>
           <p className="mt-4 leading-7 text-slate-700 text-justify">
-            PPesantren Al Ihsan Bekasi berdiri pada bulan Juli tahun 2021 di
+            Pesantren Al Ihsan Bekasi berdiri pada bulan Juli tahun 2021 di
             bawah naungan Yayasan Al Ihsan Al Khairiyyah. Kehadirannya dilandasi
             semangat untuk ikut serta dalam mengemban estafet dakwah Islam,
             serta menjadi wadah pendidikan yang berorientasi pada pembinaan
