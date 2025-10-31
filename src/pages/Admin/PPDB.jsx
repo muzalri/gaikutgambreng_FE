@@ -166,15 +166,29 @@ export default function PPDB() {
       if (action === "Diterima") {
         if (selectedBerkasId) {
           const currentTahap = parseInt(selectedBerkas?.tahapan || 1, 10);
-          const next = Math.min(5, currentTahap + 1);
-          if (next === currentTahap) {
-            await Swal.fire({
-              title: "Info",
-              text: "Tahapan sudah berada pada level tertinggi.",
-              icon: "info",
-            });
+          const currentStatus = String(selectedBerkas?.status || 'Pending');
+          if (currentTahap >= 5) {
+            // Sudah di tahap 5: jika masih Pending atau Ditolak, bisa set status Diterima
+            if (currentStatus.toLowerCase() === 'pending' || currentStatus.toLowerCase() === 'ditolak') {
+              const { isConfirmed } = await Swal.fire({
+                title: 'Selesaikan tahapan? ',
+                text: 'Tahap saat ini Karantina Casantri. Set status menjadi Diterima?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, set Diterima',
+                cancelButtonText: 'Batal',
+              });
+              if (!isConfirmed) return;
+              await BerkasService.updateStatus(selectedBerkasId, 'Diterima');
+              await loadBerkas();
+              await Swal.fire({ title: 'Berhasil', text: 'Status diubah menjadi Diterima', icon: 'success' });
+              closeModal();
+              return;
+            }
+            await Swal.fire({ title: 'Info', text: 'Tahapan sudah di level tertinggi.', icon: 'info' });
             return;
           }
+          const next = currentTahap + 1;
           const nextLabel = getTahapanLabel(next);
           const { isConfirmed } = await Swal.fire({
             title: "Majukan tahapan?",
