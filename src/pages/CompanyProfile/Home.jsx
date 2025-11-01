@@ -82,7 +82,7 @@ export default function Home() {
             return {
               id: item.id,
               name: item.nama,
-              cohort: item.angkatan || item.kategori || "",
+              cohort: item.angkatan ? `Angkatan ${item.angkatan}` : item.kategori || "",
               photo: getImageUrl(imagePath),
               text: item.testimonial,
             };
