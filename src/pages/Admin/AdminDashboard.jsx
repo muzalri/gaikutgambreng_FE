@@ -26,6 +26,19 @@ export default function AdminDashboard() {
   const [chartData, setChartData] = useState([]);
   const [hoveredPoint, setHoveredPoint] = useState(null);
 
+  // Suppress ResizeObserver errors
+  useEffect(() => {
+    const resizeObserverErrHandler = (e) => {
+      if (e.message === 'ResizeObserver loop completed with undelivered notifications.') {
+        const resizeObserverErr = e;
+        resizeObserverErr.stopImmediatePropagation();
+        return false;
+      }
+    };
+    window.addEventListener('error', resizeObserverErrHandler);
+    return () => window.removeEventListener('error', resizeObserverErrHandler);
+  }, []);
+
   useEffect(() => {
     // Check if admin is logged in
     if (!AdminService.isLoggedIn()) {
@@ -151,96 +164,269 @@ export default function AdminDashboard() {
                   </div>
                 </div>
               </div>
-              {/* Grafik PPDB */}
+
+              {/* Summary Statistics - Dinamis dari chartData */}
+              {!loadingChart && chartData.length > 0 && (() => {
+                const total = chartData.reduce((sum, item) => sum + item.count, 0);
+                const average = Math.round(total / chartData.length);
+                const highest = chartData.reduce((max, item) => item.count > max.count ? item : max, chartData[0]);
+                
+                return (
+                  <div className="grid grid-cols-1 gap-6 mb-8 md:grid-cols-3">
+                    <div className="p-6 text-white rounded-lg shadow-lg bg-gradient-to-br from-teal-500 to-teal-600">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-teal-100">Total Pendaftar (5 Tahun)</p>
+                          <p className="mt-2 text-3xl font-bold">{total}</p>
+                        </div>
+                        <div className="p-3 rounded-full bg-white/20">
+                          <FaUserFriends className="w-8 h-8" />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-6 text-white rounded-lg shadow-lg bg-gradient-to-br from-blue-500 to-blue-600">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-blue-100">Rata-rata/Tahun</p>
+                          <p className="mt-2 text-3xl font-bold">{average}</p>
+                        </div>
+                        <div className="p-3 rounded-full bg-white/20">
+                          <FaChartLine className="w-8 h-8" />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-6 text-white rounded-lg shadow-lg bg-gradient-to-br from-amber-500 to-amber-600">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-amber-100">Tahun Tertinggi</p>
+                          <p className="mt-2 text-3xl font-bold">{highest.year}</p>
+                          <p className="mt-1 text-sm text-amber-100">{highest.count} pendaftar</p>
+                        </div>
+                        <div className="p-3 text-3xl rounded-full bg-white/20">
+                          🏆
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* Grafik PPDB - Dinamis dan Diperbesar */}
               <div className="p-8 mb-10 bg-white border shadow rounded-2xl border-slate-100">
                 <div className="flex items-center justify-between mb-6">
                   <div className="text-lg font-bold text-slate-900">
-                    Grafik PPDB
+                    Tren PPDB 5 Tahun Terakhir
                   </div>
-                  <select className="px-3 py-2 text-sm font-semibold border rounded bg-slate-100 border-slate-200">
-                    <option>5 Tahun Terakhir</option>
-                  </select>
+                  <div className="px-3 py-2 text-sm font-semibold border rounded bg-slate-100 border-slate-200">
+                    {chartData.length > 0 ? `${chartData[0].year} - ${chartData[chartData.length - 1].year}` : '5 Tahun Terakhir'}
+                  </div>
                 </div>
 
-                {/* Chart Container */}
-                <div className="relative w-full h-80 bg-white rounded-lg">
-                  <svg
-                    width="100%"
-                    height="100%"
-                    viewBox="0 0 800 300"
-                    className="overflow-visible"
-                  >
-                    {/* Horizontal Grid Lines */}
-                    {[20, 40, 60, 80, 100].map((value, i) => (
-                      <line
-                        key={value}
-                        x1="60"
-                        y1={50 + i * 40}
-                        x2="740"
-                        y2={50 + i * 40}
-                        stroke="#f1f5f9"
-                        strokeWidth="1"
-                      />
-                    ))}
+                {loadingChart ? (
+                  <div className="flex items-center justify-center min-h-[500px]">
+                    <div className="w-12 h-12 border-b-2 rounded-full animate-spin border-teal-600"></div>
+                  </div>
+                ) : chartData.length === 0 ? (
+                  <div className="flex items-center justify-center min-h-[500px] text-gray-400">
+                    <p>Tidak ada data tersedia</p>
+                  </div>
+                ) : (
+                  <div className="relative w-full min-h-[500px]">
+                    <svg 
+                      viewBox="0 0 1000 450" 
+                      className="w-full h-full" 
+                      preserveAspectRatio="xMidYMid meet"
+                      style={{ overflow: 'visible' }}
+                    >
+                      {/* Definitions for gradients and filters */}
+                      <defs>
+                        <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#0d9488" stopOpacity="0.3" />
+                          <stop offset="100%" stopColor="#0d9488" stopOpacity="0.05" />
+                        </linearGradient>
+                        
+                        <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
+                          <stop offset="0%" stopColor="#0d9488" />
+                          <stop offset="50%" stopColor="#14b8a6" />
+                          <stop offset="100%" stopColor="#0d9488" />
+                        </linearGradient>
 
-                    {/* Y-axis labels */}
-                    {[20, 40, 60, 80, 100].map((value, i) => (
-                      <text
-                        key={value}
-                        x="50"
-                        y={55 + i * 40}
-                        fontSize="12"
-                        fill="#94a3b8"
-                        textAnchor="end"
-                        dominantBaseline="middle"
-                      >
-                        {value}
-                      </text>
-                    ))}
+                        <filter id="lineShadow" x="-50%" y="-50%" width="200%" height="200%">
+                          <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+                          <feOffset dx="0" dy="2" result="offsetblur"/>
+                          <feComponentTransfer>
+                            <feFuncA type="linear" slope="0.3"/>
+                          </feComponentTransfer>
+                          <feMerge>
+                            <feMergeNode/>
+                            <feMergeNode in="SourceGraphic"/>
+                          </feMerge>
+                        </filter>
 
-                    {/* Chart Area */}
-                    <g transform="translate(60, 50)">
-                      {/* Data line */}
-                      <polyline
-                        fill="none"
-                        stroke="#0f766e"
-                        strokeWidth="3"
-                        points="0,160 120,80 240,80 360,120 480,40"
-                      />
+                        <filter id="pointGlow">
+                          <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                          <feMerge>
+                            <feMergeNode in="coloredBlur"/>
+                            <feMergeNode in="SourceGraphic"/>
+                          </feMerge>
+                        </filter>
+                      </defs>
 
-                      {/* Data points */}
-                      {[
-                        { x: 0, y: 160 },
-                        { x: 120, y: 80 },
-                        { x: 240, y: 80 },
-                        { x: 360, y: 120 },
-                        { x: 480, y: 40 },
-                      ].map((point, i) => (
-                        <circle
-                          key={i}
-                          cx={point.x}
-                          cy={point.y}
-                          r="6"
-                          fill="#0f766e"
-                        />
-                      ))}
+                      {/* Calculate dimensions and scaling */}
+                      {(() => {
+                        const padding = { left: 80, right: 80, top: 60, bottom: 80 };
+                        const chartWidth = 1000 - padding.left - padding.right;
+                        const chartHeight = 450 - padding.top - padding.bottom;
+                        const maxCount = Math.max(...chartData.map(d => d.count), 1);
+                        const yScale = chartHeight / maxCount;
+                        const xStep = chartWidth / (chartData.length - 1);
 
-                      {/* X-axis labels */}
-                      {[2021, 2022, 2023, 2024, 2025].map((year, i) => (
-                        <text
-                          key={year}
-                          x={i * 120}
-                          y={220}
-                          fontSize="12"
-                          fill="#94a3b8"
-                          textAnchor="middle"
-                        >
-                          {year}
-                        </text>
-                      ))}
-                    </g>
-                  </svg>
-                </div>
+                        const points = chartData.map((d, i) => ({
+                          x: padding.left + i * xStep,
+                          y: padding.top + chartHeight - d.count * yScale,
+                          count: d.count,
+                          year: d.year,
+                        }));
+
+                        const linePath = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x},${p.y}`).join(' ');
+                        const areaPath = linePath + ` L ${points[points.length-1].x},${padding.top + chartHeight} L ${padding.left},${padding.top + chartHeight} Z`;
+
+                        const gridLines = 5;
+                        const gridStep = Math.ceil(maxCount / gridLines);
+
+                        return (
+                          <>
+                            {/* Grid */}
+                            <g opacity="0.15">
+                              {Array.from({ length: gridLines + 1 }).map((_, i) => {
+                                const y = padding.top + chartHeight - (i * gridStep * yScale);
+                                return (
+                                  <g key={i}>
+                                    <line
+                                      x1={padding.left}
+                                      y1={y}
+                                      x2={1000 - padding.right}
+                                      y2={y}
+                                      stroke="#64748b"
+                                      strokeWidth="1"
+                                      strokeDasharray="4,4"
+                                    />
+                                    <text
+                                      x={padding.left - 15}
+                                      y={y + 5}
+                                      textAnchor="end"
+                                      className="text-xs fill-gray-500"
+                                    >
+                                      {i * gridStep}
+                                    </text>
+                                  </g>
+                                );
+                              })}
+                            </g>
+
+                            {/* Area under curve */}
+                            <path d={areaPath} fill="url(#areaGradient)" />
+
+                            {/* Main line */}
+                            <path
+                              d={linePath}
+                              fill="none"
+                              stroke="url(#lineGradient)"
+                              strokeWidth="4"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              filter="url(#lineShadow)"
+                            />
+
+                            {/* Data points with hover effects */}
+                            {points.map((point, i) => {
+                              const isHighest = point.count === Math.max(...chartData.map(d => d.count));
+                              const isHovered = hoveredPoint === i;
+                              
+                              return (
+                                <g key={i}>
+                                  {isHovered && (
+                                    <circle
+                                      cx={point.x}
+                                      cy={point.y}
+                                      r="12"
+                                      fill="#0d9488"
+                                      opacity="0.3"
+                                      className="animate-ping"
+                                    />
+                                  )}
+                                  
+                                  <circle
+                                    cx={point.x}
+                                    cy={point.y}
+                                    r={isHovered ? "8" : "6"}
+                                    fill="white"
+                                    stroke="#0d9488"
+                                    strokeWidth="3"
+                                    filter="url(#pointGlow)"
+                                    className="transition-all duration-200 cursor-pointer"
+                                    onMouseEnter={() => setHoveredPoint(i)}
+                                    onMouseLeave={() => setHoveredPoint(null)}
+                                    style={{ pointerEvents: 'all' }}
+                                  />
+
+                                  {isHighest && (
+                                    <text x={point.x} y={point.y - 25} textAnchor="middle" className="text-2xl">
+                                      🏆
+                                    </text>
+                                  )}
+
+                                  {isHovered && (
+                                    <g>
+                                      <rect
+                                        x={point.x - 40}
+                                        y={point.y - 60}
+                                        width="80"
+                                        height="35"
+                                        rx="6"
+                                        fill="#0d9488"
+                                        opacity="0.95"
+                                      />
+                                      <text x={point.x} y={point.y - 42} textAnchor="middle" className="text-xs font-semibold fill-white">
+                                        {point.year}
+                                      </text>
+                                      <text x={point.x} y={point.y - 28} textAnchor="middle" className="text-sm font-bold fill-white">
+                                        {point.count} orang
+                                      </text>
+                                    </g>
+                                  )}
+                                </g>
+                              );
+                            })}
+
+                            {/* Year labels */}
+                            {points.map((point, i) => (
+                              <text
+                                key={i}
+                                x={point.x}
+                                y={padding.top + chartHeight + 30}
+                                textAnchor="middle"
+                                className="text-sm font-medium fill-gray-700"
+                                onMouseEnter={() => setHoveredPoint(i)}
+                                onMouseLeave={() => setHoveredPoint(null)}
+                                style={{ cursor: 'pointer' }}
+                              >
+                                {point.year}
+                                {hoveredPoint === i && (
+                                  <tspan x={point.x} dy="15" className="text-xs fill-teal-600">
+                                    ▲
+                                  </tspan>
+                                )}
+                              </text>
+                            ))}
+                          </>
+                        );
+                      })()}
+                    </svg>
+                  </div>
+                )}
               </div>
             </section>
           </main>
