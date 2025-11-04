@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import AdminSidebar from "../../components/AdminSidebar";
 import AdminHeader from "../../components/AdminHeader";
+import { getImageUrl } from "../../config/api";
 import AdminService from "../../services/AdminService";
 import Swal from "sweetalert2";
 import SantriService from "../../services/SantriService";
@@ -81,6 +82,65 @@ export default function PPDB() {
   const [loading, setLoading] = useState(false);
   const [selectedBerkasId, setSelectedBerkasId] = useState(null);
   const [selectedBerkas, setSelectedBerkas] = useState(null);
+
+  const getDocumentsFromSelectedBerkas = () => {
+    const b = selectedBerkas || {};
+    const docs = [
+      { key: 'surat_pernyataan', label: 'Surat Pernyataan Taat Peraturan' },
+      { key: 'rapor', label: 'Fotokopi Rapor Kelas' },
+      { key: 'ijazah', label: 'Fotokopi Ijazah (Menyusul)' },
+      { key: 'ktp_orang_tua', label: 'Fotokopi KTP Orang Tua' },
+      { key: 'kartu_keluarga', label: 'Fotokopi Kartu Keluarga' },
+      { key: 'akta_kelahiran', label: 'Fotokopi Akta Kelahiran' },
+      { key: 'foto_santri', label: 'Pas Foto 4x6 Latar Biru (4 Lembar)' },
+      { key: 'surat_sehat', label: 'Surat Keterangan Bebas TBC & Hepatitis' },
+    ];
+    return docs.map((d) => {
+      const rawPath = b[d.key];
+      const normalized = rawPath ? `/${String(rawPath).replace(/\\\\/g, '/').replace(/^\/?/, '')}` : '';
+      return {
+        ...d,
+        path: rawPath || '',
+        url: rawPath ? getImageUrl(normalized) : '',
+        filename: rawPath ? normalized.split('/').pop() : '',
+        exists: Boolean(rawPath)
+      };
+    });
+  };
+
+  const getExt = (filename = '') => (filename.split('.').pop() || '').toLowerCase();
+  const isImageExt = (ext) => ['png','jpg','jpeg','webp','gif'].includes(ext);
+  const isPdfExt = (ext) => ext === 'pdf';
+
+  const handleViewDocument = async (doc) => {
+    if (!doc?.exists || !doc?.url) {
+      await Swal.fire({ title: 'Tidak tersedia', text: 'Dokumen belum diunggah.', icon: 'info' });
+      return;
+    }
+    const ext = getExt(doc.filename || doc.path || '');
+    if (isImageExt(ext)) {
+      await Swal.fire({
+        title: doc.label,
+        imageUrl: doc.url,
+        imageAlt: doc.filename || 'Preview',
+        width: 720,
+        confirmButtonColor: '#0f766e',
+        confirmButtonText: 'Tutup',
+      });
+      return;
+    }
+    if (isPdfExt(ext)) {
+      window.open(doc.url, '_blank', 'noopener,noreferrer');
+      return;
+    }
+    await Swal.fire({
+      icon: 'info',
+      title: 'Preview Tidak Tersedia',
+      text: 'Format file ini tidak dapat di-preview. File akan dibuka di tab baru.',
+      confirmButtonColor: '#0f766e'
+    });
+    window.open(doc.url, '_blank', 'noopener,noreferrer');
+  };
 
   // Modal state for Pengumuman
   const [showPengumumanModal, setShowPengumumanModal] = useState(false);
@@ -538,37 +598,24 @@ export default function PPDB() {
                             </div>
 
                             <div className="grid grid-cols-1 gap-4 mt-6 md:grid-cols-2">
-                              {/* Documents list - try to render selectedSantri.berkas if present */}
-                              {(selectedSantri?.berkas?.length > 0
-                                ? selectedSantri.berkas
-                                : [
-                                    "Surat Pernyataan Taat Peraturan",
-                                    "Fotokopi Rapor Kelas",
-                                    "Fotokopi Ijazah (Menyusul)",
-                                    "Fotokopi KTP Orang Tua",
-                                    "Fotokopi Kartu Keluarga",
-                                    "Fotokopi Akta Kelahiran",
-                                    "Pas Foto 4x6 Latar Biru (4 Lembar)",
-                                    "Surat Keterangan Bebas TBC & Hepatitis",
-                                  ]
-                              ).map((label, idx) => (
+                              {getDocumentsFromSelectedBerkas().map((doc, idx) => (
                                 <div
                                   key={idx}
                                   className="flex items-center justify-between p-3 bg-slate-50 rounded"
                                 >
                                   <div className="text-sm text-slate-700">
-                                    {typeof label === "string"
-                                      ? label
-                                      : label.label}
+                                    {doc.label}
                                   </div>
                                   <div className="flex items-center gap-3">
-                                    <button className="px-3 py-1 text-sm font-semibold text-emerald-700 bg-emerald-100 rounded-full">
+                                    <button
+                                      className={`px-3 py-1 text-sm font-semibold rounded-full ${doc.exists ? 'text-emerald-700 bg-emerald-100' : 'text-slate-400 bg-slate-200 cursor-not-allowed'}`}
+                                      onClick={() => handleViewDocument(doc)}
+                                      disabled={!doc.exists}
+                                    >
                                       Lihat
                                     </button>
-                                    <div className="text-sm text-slate-500">
-                                      {typeof label === "string"
-                                        ? "KTP_ORTU.PDF"
-                                        : label.filename || ""}
+                                    <div className="text-sm text-slate-500 truncate max-w-[160px]">
+                                      {doc.filename || 'Belum diunggah'}
                                     </div>
                                   </div>
                                 </div>
