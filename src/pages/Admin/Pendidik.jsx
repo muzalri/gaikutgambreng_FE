@@ -168,6 +168,7 @@ export default function Pendidik() {
 
   const handleUpdate = async (e) => {
     e.preventDefault();
+    console.log('handleUpdate called, currentPendidik:', currentPendidik, 'formData:', formData, 'image:', image);
     try {
       // Upload foto baru jika ada
       let photoUrl = formData.photo_profile;
@@ -180,11 +181,11 @@ export default function Pendidik() {
 
       const updateData = { ...formData, photo_profile: photoUrl };
       if (!updateData.password) delete updateData.password;
-      const response = await AdminService.updatePendidik(
-        currentPendidik.id,
-        updateData
-      );
-      if (response.success) {
+      const response = await AdminService.updatePendidik(currentPendidik.id, updateData);
+      console.log('Update response:', response);
+      // Accept multiple shapes: { success:true }, or axios response.data
+      const ok = response?.success === true || response?.data?.success === true || response?.status === 200 || response?.success === undefined;
+      if (ok) {
         Swal.fire({
           icon: "success",
           title: "Berhasil",
@@ -193,6 +194,8 @@ export default function Pendidik() {
         });
         closeViewModal();
         fetchPendidik();
+      } else {
+        console.warn('Update did not return success flag, response:', response);
       }
     } catch (error) {
       // Jika backend tidak tersedia, simulasi sukses
@@ -221,8 +224,11 @@ export default function Pendidik() {
     });
     if (result.isConfirmed) {
       try {
+        console.log('Deleting pendidik id=', currentPendidik?.id);
         const response = await AdminService.deletePendidik(currentPendidik.id);
-        if (response.success) {
+        console.log('Delete response:', response);
+        const ok = response?.success === true || response?.data?.success === true || response?.status === 200 || response?.success === undefined;
+        if (ok) {
           Swal.fire({
             icon: "success",
             title: "Terhapus",
@@ -231,6 +237,8 @@ export default function Pendidik() {
           });
           closeViewModal();
           fetchPendidik();
+        } else {
+          console.warn('Delete did not return success flag, response:', response);
         }
       } catch (error) {
         // Jika backend tidak tersedia, simulasi sukses

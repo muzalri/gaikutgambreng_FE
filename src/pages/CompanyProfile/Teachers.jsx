@@ -1,66 +1,42 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import AdminService from "../../services/AdminService";
 
-// Data dummy statis untuk tenaga pendidik
-const teachers = [
-  {
-    id: 1,
-    name: "Ust. Heru Kusuma",
-    role: "Penanggung Jawab",
-    photo:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=500&fit=crop&crop=face",
-  },
-  {
-    id: 2,
-    name: "Ust. Muhibbul Umam Thalib, Lc",
-    role: "Mudir Pesantren",
-    photo:
-      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=500&fit=crop&crop=face",
-  },
-  {
-    id: 3,
-    name: "Ust. Danu Sabdo, M.Pd",
-    role: "Kesantrian",
-    photo:
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=500&fit=crop&crop=face",
-  },
-  {
-    id: 4,
-    name: "Ust. Hudzaifah, BA.",
-    role: "Bag. Bahasa",
-    photo:
-      "https://images.unsplash.com/photo-1519345182560-3f2917c472ef?w=400&h=500&fit=crop&crop=face",
-  },
-  {
-    id: 5,
-    name: "Ust. Luthfi",
-    role: "Bag. Tahfidz",
-    photo:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=500&fit=crop&crop=face",
-  },
-  {
-    id: 6,
-    name: "Ust. Reza",
-    role: "Koordinator Musyrif",
-    photo:
-      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=500&fit=crop&crop=face",
-  },
-  {
-    id: 7,
-    name: "Ust. Fajar",
-    role: "Musyrif",
-    photo:
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=500&fit=crop&crop=face",
-  },
-  {
-    id: 8,
-    name: "Ust. Najib",
-    role: "Musyrif",
-    photo:
-      "https://images.unsplash.com/photo-1519345182560-3f2917c472ef?w=400&h=500&fit=crop&crop=face",
-  },
-];
+// Data akan diambil dari API (pendidik)
+// State kosong sebagai initial value
+// Jika API gagal, tetap tampilkan pesan / fallback
 
 export default function Teachers() {
+  const [teachers, setTeachers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTeachers = async () => {
+      try {
+        const response = await AdminService.getAllPendidik();
+        // AdminService returns an array in response.data; handle both shapes
+        const data = Array.isArray(response) ? response : response.data || [];
+        console.log('Fetched pendidik:', data);
+        setTeachers(data);
+      } catch (err) {
+        console.error('Gagal mengambil data pendidik', err);
+        setTeachers([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTeachers();
+  }, []);
+
+  // Render
+  if (loading) {
+    return (
+      <div className="pt-16">
+        <div className="mx-auto max-w-5xl px-4 py-20 text-center">Memuat data pendidik...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="pt-16">
       <section className="bg-white pt-6 pb-2">
@@ -85,33 +61,53 @@ export default function Teachers() {
             </p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {teachers.map((teacher) => (
-              <div
-                key={teacher.id}
-                className="bg-white rounded-2xl shadow-lg border border-slate-200 hover:shadow-xl transition-all duration-300 overflow-hidden"
-              >
-                {/* Photo Section - takes up most of the card */}
-                <div
-                  className="aspect-[4/5] bg-cover bg-center relative"
-                  style={{ backgroundImage: `url(${teacher.photo})` }}
-                >
-                  {/* Subtle overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-                </div>
+            {teachers.map((teacher) => {
+              const name = teacher.nama || teacher.name || "-";
+              const role = teacher.isi || teacher.role || "Tenaga Pendidik";
+              let photoUrl = teacher.photo_profile || teacher.photo || "";
+              if (photoUrl) {
+                if (!photoUrl.startsWith("http")) {
+                  // Normalize leading slash and encode spaces/special chars
+                  const path = photoUrl.startsWith("/") ? photoUrl : `/${photoUrl}`;
+                  try {
+                    photoUrl = new URL(path, 'http://localhost:5000').toString();
+                  } catch (e) {
+                    // Fallback if URL constructor fails
+                    photoUrl = `http://localhost:5000${encodeURI(path)}`;
+                  }
+                }
+              }
 
-                {/* Orange Label - simple rectangular at bottom */}
-                <div className="bg-amber-500 px-4 py-3">
-                  <div className="text-white text-center">
-                    <div className="text-sm font-bold leading-tight">
-                      {teacher.name}
-                    </div>
-                    <div className="text-xs font-medium opacity-95 mt-1">
-                      {teacher.role}
+              console.log('Teacher photo URL computed:', photoUrl, 'original:', teacher.photo_profile || teacher.photo);
+
+              return (
+                <div
+                  key={teacher.id}
+                  className="bg-white rounded-2xl shadow-lg border border-slate-200 hover:shadow-xl transition-all duration-300 overflow-hidden"
+                >
+                  {/* Photo Section - takes up most of the card */}
+                  <div
+                    className="aspect-[4/5] bg-cover bg-center relative"
+                    style={{ backgroundImage: `url(${photoUrl || '/assets/teachers/Drs.-K.H.-Mudrik-Qori-MA-Mudir 1.png'})` }}
+                  >
+                    {/* Subtle overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                  </div>
+
+                  {/* Orange Label - simple rectangular at bottom */}
+                  <div className="bg-amber-500 px-4 py-3">
+                    <div className="text-white text-center">
+                      <div className="text-sm font-bold leading-tight">
+                        {name}
+                      </div>
+                      <div className="text-xs font-medium opacity-95 mt-1">
+                        {role}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>

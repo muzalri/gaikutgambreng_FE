@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom";
 import AdminSidebar from "../../components/AdminSidebar";
 import AdminHeader from "../../components/AdminHeader";
 import AdminService from "../../services/AdminService";
+import SantriService from "../../services/SantriService";
+import ArtikelService from "../../services/ArtikelService";
+import BerkasService from "../../services/BerkasService";
 import {
   FaUserFriends,
   FaChalkboardTeacher,
@@ -12,6 +15,13 @@ import {
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
+  const [loadingCounts, setLoadingCounts] = React.useState(true);
+  const [stats, setStats] = React.useState({
+    totalSantriLulus: 0,
+    totalPendidik: 0,
+    totalArtikel: 0,
+    totalPendaftar: 0,
+  });
 
   useEffect(() => {
     // Check if admin is logged in
@@ -19,6 +29,33 @@ export default function AdminDashboard() {
       navigate("/admin");
       return;
     }
+    // fetch dashboard stats
+    const fetchStats = async () => {
+      setLoadingCounts(true);
+      try {
+        const [resSantri, resPendidik, resArtikel, resPendaftar, resLulus] = await Promise.all([
+          SantriService.getAllSantri(),
+          AdminService.getAllPendidik(),
+          ArtikelService.getAllArtikel(),
+          // use pagination to get total counts from BerkasController
+          BerkasService.getAll({ page: 1, limit: 1 }),
+          BerkasService.getAll({ status: 'Diterima', page: 1, limit: 1 }),
+        ]);
+
+        const totalSantriLulus = resLulus?.pagination?.total ?? (resLulus?.data ? resLulus.data.length : 0);
+        const totalPendaftar = resPendaftar?.pagination?.total ?? (resPendaftar?.data ? resPendaftar.data.length : 0);
+        const totalPendidik = resPendidik?.success && Array.isArray(resPendidik.data) ? resPendidik.data.length : 0;
+        const totalArtikel = resArtikel?.success && Array.isArray(resArtikel.data) ? resArtikel.data.length : 0;
+
+        setStats({ totalSantriLulus, totalPendidik, totalArtikel, totalPendaftar });
+      } catch (err) {
+        console.error('Error fetching dashboard stats:', err);
+      } finally {
+        setLoadingCounts(false);
+      }
+    };
+
+    fetchStats();
   }, [navigate]);
 
   return (
@@ -47,7 +84,7 @@ export default function AdminDashboard() {
                     Total Santri
                   </div>
                   <div className="mt-1 text-2xl font-extrabold text-teal-900">
-                    80 Santri
+                    {loadingCounts ? 'Memuat...' : `${stats.totalSantriLulus} Santri`}
                   </div>
                 </div>
                 <div className="flex flex-col items-center justify-center p-6 bg-white border shadow rounded-2xl border-slate-100">
@@ -56,7 +93,7 @@ export default function AdminDashboard() {
                     Pendidik
                   </div>
                   <div className="mt-1 text-2xl font-extrabold text-teal-900">
-                    13 Pendidik
+                    {loadingCounts ? 'Memuat...' : `${stats.totalPendidik} Pendidik`}
                   </div>
                 </div>
                 <div className="flex flex-col items-center justify-center p-6 bg-white border shadow rounded-2xl border-slate-100">
@@ -65,7 +102,7 @@ export default function AdminDashboard() {
                     Total Artikel
                   </div>
                   <div className="mt-1 text-2xl font-extrabold text-teal-900">
-                    30 Artikel
+                    {loadingCounts ? 'Memuat...' : `${stats.totalArtikel} Artikel`}
                   </div>
                 </div>
                 <div className="flex flex-col items-center justify-center p-6 bg-white border shadow rounded-2xl border-slate-100">
@@ -74,7 +111,7 @@ export default function AdminDashboard() {
                     Pendaftar
                   </div>
                   <div className="mt-1 text-2xl font-extrabold text-teal-900">
-                    120 Pendaftar
+                    {loadingCounts ? 'Memuat...' : `${stats.totalPendaftar} Pendaftar`}
                   </div>
                 </div>
               </div>

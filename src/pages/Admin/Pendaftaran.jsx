@@ -16,6 +16,7 @@ export default function Pendaftaran() {
     tanggal_tutup: "",
     jam_tutup: "",
     angkatan: "",
+    nama: "",
   });
 
   // Helper function to check if pendaftaran is currently active
@@ -113,7 +114,8 @@ export default function Pendaftaran() {
       !formData.jam_buka ||
       !formData.tanggal_tutup ||
       !formData.jam_tutup ||
-      !formData.angkatan
+      !formData.angkatan ||
+      !formData.nama
     ) {
       Swal.fire({
         icon: "warning",
@@ -150,6 +152,7 @@ export default function Pendaftaran() {
         tanggal_tutup: "",
         jam_tutup: "",
         angkatan: "",
+        nama: "",
       });
 
       // Refresh data
@@ -160,6 +163,39 @@ export default function Pendaftaran() {
         icon: "error",
         title: "Gagal",
         text: error.response?.data?.message || "Gagal membuat pendaftaran!",
+      });
+    }
+  };
+
+  // Hapus pendaftaran
+  const handleDelete = async (id) => {
+    try {
+      const confirm = await Swal.fire({
+        title: 'Hapus Jadwal?',
+        text: 'Anda akan menghapus jadwal pendaftaran ini. Tindakan ini tidak dapat dibatalkan.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Ya, hapus',
+        cancelButtonText: 'Batal'
+      });
+
+      if (confirm.isConfirmed) {
+        console.log('🗑️ Deleting pendaftaran id:', id);
+        await PendaftaranService.delete(id);
+        Swal.fire({
+          icon: 'success',
+          title: 'Dihapus',
+          text: 'Jadwal pendaftaran berhasil dihapus.',
+          timer: 1300
+        });
+        fetchPendaftaran();
+      }
+    } catch (error) {
+      console.error('Error deleting pendaftaran:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Gagal',
+        text: error.response?.data?.message || 'Gagal menghapus data pendaftaran.'
       });
     }
   };
@@ -213,6 +249,20 @@ export default function Pendaftaran() {
                   Buka Pendaftaran
                 </h3>
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                  <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        Nama
+                      </label>
+                      <input
+                        type="text"
+                        name="nama"
+                        value={formData.nama}
+                        onChange={handleInputChange}
+                        placeholder="Nama penanggung jawab..."
+                        className="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-teal-400"
+                        required
+                      />
+                    </div>
                   <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-slate-700 mb-2">
@@ -343,6 +393,8 @@ export default function Pendaftaran() {
                           <th className="px-4 py-3">Tanggal Tutup</th>
                           <th className="px-4 py-3">Jam Tutup</th>
                           <th className="px-4 py-3">Angkatan</th>
+                          <th className="px-4 py-3">Nama</th>
+                          <th className="px-4 py-3">Aksi</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -378,6 +430,19 @@ export default function Pendaftaran() {
                             </td>
                             <td className="px-4 py-3">
                               {pendaftaran.angkatan}
+                            </td>
+                            <td className="px-4 py-3">
+                              {pendaftaran.nama || '-'}
+                            </td>
+                            <td className="px-4 py-3">
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={() => handleDelete(pendaftaran.id)}
+                                  className="px-3 py-1 text-sm font-medium text-white bg-red-600 rounded-full hover:bg-red-700 transition"
+                                >
+                                  Hapus
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         ))}

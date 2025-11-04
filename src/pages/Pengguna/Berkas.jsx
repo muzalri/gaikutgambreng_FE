@@ -14,8 +14,31 @@ export default function Berkas() {
   useEffect(() => {
     // Ambil data santri dari localStorage
     const data = localStorage.getItem('santriData');
+    
+    console.log('='.repeat(50));
+    console.log('🔍 DEBUGGING FOTO SANTRI');
+    console.log('='.repeat(50));
+    
     if (data) {
-      setSantriData(JSON.parse(data));
+      const parsedData = JSON.parse(data);
+      console.log('📸 Santri Data from localStorage:', parsedData);
+      console.log('📸 Foto URL:', parsedData?.foto);
+      console.log('📸 Is HTTP URL?', parsedData?.foto?.startsWith('http'));
+      
+      // Log final URL yang akan digunakan
+      const finalUrl = parsedData?.foto 
+        ? (parsedData.foto.startsWith('http') 
+            ? parsedData.foto 
+            : `http://localhost:5000/${parsedData.foto}`)
+        : "/assets/teachers/Drs.-K.H.-Mudrik-Qori-MA-Mudir 1.png";
+      
+      console.log('📸 Final URL untuk foto:', finalUrl);
+      console.log('='.repeat(50));
+      
+      setSantriData(parsedData);
+    } else {
+      console.log('❌ No santriData in localStorage!');
+      console.log('='.repeat(50));
     }
 
     // Cek status pendaftaran
@@ -347,9 +370,18 @@ export default function Berkas() {
         <div className="flex items-center gap-3">
           <span className="font-semibold">Halo, {santriData?.nama || "Santri"}</span>
           <img
-            src={santriData?.foto || "/assets/teachers/Drs.-K.H.-Mudrik-Qori-MA-Mudir 1.png"}
+            src={
+              santriData?.foto 
+                ? (santriData.foto.startsWith('http') 
+                    ? santriData.foto 
+                    : `http://localhost:5000/${santriData.foto}`)
+                : "/assets/teachers/Drs.-K.H.-Mudrik-Qori-MA-Mudir 1.png"
+            }
             alt="Profile"
             className="object-cover w-8 h-8 border-2 border-white rounded-full"
+            onError={(e) => {
+              e.target.src = "/assets/teachers/Drs.-K.H.-Mudrik-Qori-MA-Mudir 1.png";
+            }}
           />
         </div>
       </header>
