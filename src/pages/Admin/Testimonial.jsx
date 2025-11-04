@@ -26,57 +26,6 @@ export default function Testimonial() {
   });
   const [fotoPreview, setFotoPreview] = useState(null);
 
-  // Dummy data untuk testimonial
-  const dummyTestimonials = [
-    {
-      id: 1,
-      nama: "Ahmad Rizki",
-      asal: "Orang Tua Santri",
-      testimonial:
-        "Pesantren Al Ihsan Bekasi memberikan pendidikan yang sangat berkualitas. Anak saya berkembang dengan baik di sini.",
-      rating: 5,
-      foto: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
-      status: "Aktif",
-      kategori: "Wali Santri",
-      angkatan: "Angkatan 1",
-    },
-    {
-      id: 2,
-      nama: "Siti Nurhaliza",
-      asal: "Alumni",
-      testimonial:
-        "Saya sangat berterima kasih kepada Pesantren Al Ihsan Bekasi yang telah membentuk karakter saya menjadi lebih baik.",
-      rating: 5,
-      foto: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
-      status: "Aktif",
-      kategori: "Alumni",
-      angkatan: "Angkatan 2",
-    },
-    {
-      id: 3,
-      nama: "Budi Santoso",
-      asal: "Orang Tua Santri",
-      testimonial:
-        "Pendidikan agama dan akademik yang seimbang membuat anak saya tumbuh dengan baik di Pesantren Al Ihsan.",
-      rating: 4,
-      foto: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
-      status: "Aktif",
-      kategori: "Wali Santri",
-      angkatan: "Angkatan 3",
-    },
-    {
-      id: 4,
-      nama: "Bilal Hamizan",
-      asal: "Santri",
-      testimonial: "Bagus banget",
-      rating: 5,
-      foto: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
-      status: "Aktif",
-      kategori: "Santri",
-      angkatan: "Angkatan 6",
-    },
-  ];
-
   useEffect(() => {
     // Check if admin is logged in
     if (!AdminService.isLoggedIn()) {
@@ -107,17 +56,15 @@ export default function Testimonial() {
         setTestimonials(transformedData);
         setAllTestimonials(transformedData); // Simpan semua data
       } else {
-        // Jika response success tapi data kosong, gunakan dummy data
-        console.log('No data from backend, using dummy data');
-        setTestimonials(dummyTestimonials);
-        setAllTestimonials(dummyTestimonials); // Simpan semua data
+        // Jika response success tapi data kosong, set empty array
+        setTestimonials([]);
+        setAllTestimonials([]);
       }
     } catch (error) {
       console.error('Error loading testimonials:', error);
-      // Fallback ke dummy data jika backend tidak tersedia
-      setTestimonials(dummyTestimonials);
-      setAllTestimonials(dummyTestimonials); // Simpan semua data
-      console.log('Using dummy data as fallback');
+      // Set empty array jika terjadi error
+      setTestimonials([]);
+      setAllTestimonials([]);
     } finally {
       setLoading(false);
     }

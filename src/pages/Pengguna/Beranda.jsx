@@ -29,10 +29,17 @@ export default function Beranda() {
     (async () => {
       try {
         const resp = await PengumumanService.getActive();
+        // PengumumanService.getActive sudah return resp.data?.data || resp.data
+        // Jadi struktur data sudah: { pengumuman: {...}, santri: [...] }
+        console.log('Pengumuman response:', resp);
         const payload = resp?.data || resp;
+        console.log('Payload:', payload);
         setPengumuman(payload?.pengumuman || null);
-        setSantriAnnounced(payload?.santri || []);
+        const santriList = payload?.santri || payload?.berkas || [];
+        console.log('Santri list:', santriList);
+        setSantriAnnounced(Array.isArray(santriList) ? santriList : []);
       } catch (e) {
+        console.error('Error fetching pengumuman:', e);
         setPengumuman(null);
         setSantriAnnounced([]);
       }
@@ -43,13 +50,22 @@ export default function Beranda() {
   const namaLogin = santriData?.nama || "Santri";
   const getTahapanLabel = (num) => {
     const map = {
-      1: "Seleksi Berkas",
-      2: "Tes Psikolog",
-      3: "Tes Baca Al-Qur'an",
-      4: "Wawancara Casantri",
-      5: "Karantina Casantri",
+      2: "Seleksi Berkas",
+      3: "Tes Psikolog",
+      4: "Tes Baca Al-Qur'an",
+      5: "Wawancara Casantri",
+      6: "Diterima",
     };
     return map[parseInt(num || 1, 10)] || `Tahap ${num}`;
+  };
+
+  const getDisplayedTahapan = (row) => {
+    const isPengumumanTahap5 = parseInt(pengumuman?.tahapan_num || 0, 10) === 5;
+    const statusRow = String(row?.status || '').toLowerCase();
+    if (isPengumumanTahap5 && statusRow === 'diterima') {
+      return 'Diterima';
+    }
+    return getTahapanLabel(row?.tahapan || row?.tahapan_num);
   };
 
   const location = useLocation();
@@ -112,7 +128,7 @@ export default function Beranda() {
                 Pengumuman Santri Baru {pengumuman?.angkatan || "-"}
               </h3>
               <p className="mb-4 text-sm text-gray-500">
-                Tahapan: {pengumuman ? (pengumuman.tahapan_label || getTahapanLabel(pengumuman.tahapan_num)) : "-"}
+                Pengumuman Lolos: {pengumuman ? (pengumuman.tahapan_label || getTahapanLabel(pengumuman.tahapan_num)) : "-"} 
               </p>
               <table className="w-full text-left">
                 <thead>
@@ -124,14 +140,22 @@ export default function Beranda() {
                   </tr>
                 </thead>
                 <tbody>
-                  {(santriAnnounced || []).map((row, idx) => (
-                    <tr key={row.id || idx} className={idx % 2 === 0 ? "bg-gray-50" : "bg-white"}>
-                      <td className="px-2 py-2">{idx + 1}</td>
-                      <td className="px-2 py-2">{row.nama_lengkap || '-'}</td>
-                      <td className="px-2 py-2">{row.angkatan || '-'}</td>
-                      <td className="px-2 py-2">{getTahapanLabel(row.tahapan)}</td>
+                  {santriAnnounced && santriAnnounced.length > 0 ? (
+                    santriAnnounced.map((berkas, idx) => (
+                      <tr key={berkas.id || idx} className={idx % 2 === 0 ? "bg-gray-50" : "bg-white"}>
+                        <td className="px-2 py-2">{idx + 1}</td>
+                        <td className="px-2 py-2">{berkas.nama_lengkap || berkas.nama || '-'}</td>
+                        <td className="px-2 py-2">{berkas.angkatan || '-'}</td>
+                        <td className="px-2 py-2">{getDisplayedTahapan(berkas)}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="4" className="px-2 py-4 text-center text-gray-500">
+                        {pengumuman ? "Tidak ada data berkas yang berhasil ke tahapan ini" : "Belum ada pengumuman aktif"}
+                      </td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>

@@ -31,23 +31,6 @@ export default function PPDB() {
     return TAHAPAN_LABELS[num] || `Tahap ${num}`;
   };
 
-  // Dummy fallback when API not available
-  const dummySantri = [
-    { id: 101, id_santri: 1, nama: "Bilal Abdurrahman", status: "Diterima", angkatan: "Angkatan 1", tahapan: 5 },
-    { id: 102, id_santri: 2, nama: "Dhiyaurrahman Hamizan", status: "Diterima", angkatan: "Angkatan 1", tahapan: 5 },
-    { id: 103, id_santri: 3, nama: "Raffa Danendra", status: "Diterima", angkatan: "Angkatan 1", tahapan: 5 },
-    { id: 104, id_santri: 4, nama: "Zaki Algifari", status: "Diterima", angkatan: "Angkatan 1", tahapan: 5 },
-    { id: 105, id_santri: 5, nama: "Faris Fadhil", status: "Pending", angkatan: "Angkatan 1", tahapan: 2 },
-    { id: 106, id_santri: 6, nama: "Rafi Alexander", status: "Pending", angkatan: "Angkatan 1", tahapan: 3 },
-    { id: 107, id_santri: 7, nama: "Cahya Ilham", status: "Ditolak", angkatan: "Angkatan 1", tahapan: 1 },
-    { id: 108, id_santri: 8, nama: "Dzaky Ikbaar", status: "Ditolak", angkatan: "Angkatan 1", tahapan: 1 },
-    { id: 109, id_santri: 9, nama: "Frizaski Alfath", status: "Diterima", angkatan: "Angkatan 1", tahapan: 5 },
-    { id: 110, id_santri: 10, nama: "Daffa Abiyya", status: "Diterima", angkatan: "Angkatan 1", tahapan: 5 },
-    { id: 111, id_santri: 11, nama: "Hakkam Zakka", status: "Diterima", angkatan: "Angkatan 1", tahapan: 5 },
-    { id: 112, id_santri: 12, nama: "Raden Muhammad", status: "Diterima", angkatan: "Angkatan 1", tahapan: 5 },
-    { id: 113, id_santri: 13, nama: "Rafii Khairan", status: "Diterima", angkatan: "Angkatan 1", tahapan: 5 },
-  ];
-
   useEffect(() => {
     // Check if admin is logged in
     if (!AdminService.isLoggedIn()) {
@@ -80,10 +63,11 @@ export default function PPDB() {
         }));
         setSantriList(normalized);
       } else {
-        setSantriList(dummySantri);
+        setSantriList([]);
       }
     } catch (e) {
-      setSantriList(dummySantri);
+      console.error('Error loading berkas:', e);
+      setSantriList([]);
     } finally {
       setLoadingList(false);
     }
@@ -281,22 +265,14 @@ export default function PPDB() {
     }
   }, [showPengumumanModal]);
 
-  // Load tahapan options when angkatan changes in pengumuman form
+  // Set tahapan options to always show 5 tahapan (1-5)
   useEffect(() => {
-    const loadTahapanOptions = async () => {
-      if (!pengumumanData.angkatan) {
-        setTahapanOptions([]);
-        return;
-      }
-      try {
-        const resp = await BerkasService.getTahapanDropdown(pengumumanData.angkatan);
-        const data = resp?.data || resp || [];
-        setTahapanOptions(Array.isArray(data) ? data : []);
-      } catch (_) {
-        setTahapanOptions([]);
-      }
-    };
-    loadTahapanOptions();
+    if (pengumumanData.angkatan) {
+      // Always show all 5 tahapan options
+      setTahapanOptions([1, 2, 3, 4, 5]);
+    } else {
+      setTahapanOptions([]);
+    }
   }, [pengumumanData.angkatan]);
 
   const handlePengumumanSubmit = async (e) => {
@@ -312,7 +288,9 @@ export default function PPDB() {
     }
 
     try {
-      const tahapLabel = getTahapanLabel(pengumumanData.tahapan);
+      const selectedTahapan = parseInt(pengumumanData.tahapan, 10);
+      const tahapLabel = getTahapanLabel(selectedTahapan);
+      
       const { isConfirmed } = await Swal.fire({
         title: "Publikasikan pengumuman?",
         html: `Angkatan: <b>${pengumumanData.angkatan}</b><br/>Tahapan: <b>${tahapLabel}</b>`,
@@ -321,22 +299,27 @@ export default function PPDB() {
         confirmButtonText: "Ya, publikasikan",
         cancelButtonText: "Batal",
       });
+      
       if (!isConfirmed) return;
+
+      // Publish pengumuman dengan tahapan yang dipilih
       await PengumumanService.publish({
         angkatan: pengumumanData.angkatan,
-        tahapan: pengumumanData.tahapan,
+        tahapan: selectedTahapan.toString(),
       });
+
       await Swal.fire({
         title: "Berhasil",
         text: "Pengumuman berhasil dipublikasikan!",
         icon: "success",
       });
+      
       closePengumumanModal();
     } catch (err) {
       console.error(err);
       await Swal.fire({
         title: "Gagal",
-        text: "Gagal mempublikasikan pengumuman",
+        text: err.message || "Gagal mempublikasikan pengumuman",
         icon: "error",
       });
     }
@@ -446,7 +429,7 @@ export default function PPDB() {
                       </tr>
                     </thead>
                     <tbody>
-                      {(loadingList ? dummySantri : santriList)
+                      {santriList
                         .filter((row) => {
                           if (!selectedAngkatan) return true;
                           const val = String(selectedAngkatan);
@@ -550,7 +533,7 @@ export default function PPDB() {
                                 <div className="mt-1 px-4 py-2 rounded bg-slate-50 inline-block">
                                   {getTahapanLabel(selectedBerkas?.tahapan)}
                                 </div>
-                                <div className="text-xs text-slate-500 mt-1"><strong>Tahapan Karantina Casantri</strong> akan otomatis menjadikan status Diterima</div>
+                                <div className="text-xs text-slate-500 mt-1"></div>
                               </div>
                             </div>
 
