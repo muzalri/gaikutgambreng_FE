@@ -15,13 +15,16 @@ import {
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
-  const [loadingCounts, setLoadingCounts] = React.useState(true);
-  const [stats, setStats] = React.useState({
+  const [loadingCounts, setLoadingCounts] = useState(true);
+  const [loadingChart, setLoadingChart] = useState(true);
+  const [stats, setStats] = useState({
     totalSantriLulus: 0,
     totalPendidik: 0,
     totalArtikel: 0,
     totalPendaftar: 0,
   });
+  const [chartData, setChartData] = useState([]);
+  const [hoveredPoint, setHoveredPoint] = useState(null);
 
   useEffect(() => {
     // Check if admin is logged in
@@ -29,6 +32,7 @@ export default function AdminDashboard() {
       navigate("/admin");
       return;
     }
+    
     // fetch dashboard stats
     const fetchStats = async () => {
       setLoadingCounts(true);
@@ -55,7 +59,39 @@ export default function AdminDashboard() {
       }
     };
 
+    // fetch chart data - ambil data per angkatan 5 tahun terakhir
+    const fetchChartData = async () => {
+      setLoadingChart(true);
+      try {
+        const currentYear = new Date().getFullYear();
+        const years = Array.from({ length: 5 }, (_, i) => currentYear - 4 + i);
+        
+        // Fetch data untuk setiap tahun
+        const yearlyData = await Promise.all(
+          years.map(async (year) => {
+            try {
+              const angkatan = `PPDB ${year}`;
+              const res = await BerkasService.getAll({ angkatan, page: 1, limit: 1 });
+              const count = res?.pagination?.total ?? 0;
+              return { year, count };
+            } catch (err) {
+              console.warn(`Error fetching data for year ${year}:`, err);
+              return { year, count: 0 };
+            }
+          })
+        );
+
+        setChartData(yearlyData);
+      } catch (err) {
+        console.error('Error fetching chart data:', err);
+        setChartData([]);
+      } finally {
+        setLoadingChart(false);
+      }
+    };
+
     fetchStats();
+    fetchChartData();
   }, [navigate]);
 
   return (
@@ -204,35 +240,6 @@ export default function AdminDashboard() {
                       ))}
                     </g>
                   </svg>
-                </div>
-              </div>
-              {/* Aktivitas Terbaru */}
-              <div className="p-8 bg-white border shadow rounded-2xl border-slate-100">
-                <div className="mb-4 text-lg font-bold text-slate-900">
-                  Aktivitas Terbaru
-                </div>
-                <div className="flex gap-6 overflow-x-auto">
-                  {[1, 2, 3, 4].map((i) => (
-                    <div
-                      key={i}
-                      className="min-w-[220px] bg-slate-50 rounded-xl p-5 flex flex-col gap-2 shadow border border-slate-100"
-                    >
-                      <div className="flex items-center gap-2 mb-1">
-                        <img
-                          src="/assets/teachers/Drs.-K.H.-Mudrik-Qori-MA-Mudir 1.png"
-                          alt="Admin"
-                          className="object-cover w-8 h-8 border-2 border-white rounded-full"
-                        />
-                        <span className="font-bold text-slate-900">
-                          Hamizan
-                        </span>
-                      </div>
-                      <div className="text-xs text-slate-700">
-                        Hamizan baru saja menambahkan Artikel baru berjudul
-                        "Pengumuman Hasil PPDB 2025"
-                      </div>
-                    </div>
-                  ))}
                 </div>
               </div>
             </section>
