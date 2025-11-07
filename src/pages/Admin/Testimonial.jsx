@@ -48,11 +48,12 @@ export default function Testimonial() {
           nama: item.nama,
           asal: item.asal || '',
           testimonial: item.testimonial,
-          foto: item.foto ? `${api.defaults.baseURL}/uploads/testimonial/${item.foto}` : 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
+          foto: item.foto ? `http://localhost:5000/uploads/testimonial/${encodeURIComponent(item.foto)}` : 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
           status: 'Aktif',
           kategori: item.kategori,
           angkatan: item.angkatan || ''
         }));
+        console.log('Loaded testimonials with encoded URLs:', transformedData);
         setTestimonials(transformedData);
         setAllTestimonials(transformedData); // Simpan semua data
       } else {
@@ -278,6 +279,10 @@ export default function Testimonial() {
                           src={testimonial.foto}
                           alt={testimonial.nama}
                           className="w-12 h-12 rounded-full object-cover"
+                          onError={(e) => {
+                            e.target.onerror = null; // Prevent infinite loop
+                            e.target.src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face';
+                          }}
                         />
                         <div>
                           <h3 className="font-bold text-slate-900">
