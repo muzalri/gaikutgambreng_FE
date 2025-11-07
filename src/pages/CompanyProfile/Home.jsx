@@ -504,19 +504,22 @@ export default function Home() {
         data-aos="fade-up"
         data-aos-delay="150"
       >
-        {/* Background image like design */}
+        {/* Background image with blur */}
         <div
-          className="absolute inset-0 -z-10 bg-cover bg-center filter blur-[2px]"
-          style={{ backgroundImage: "url(/assets/FotoPesantren.png)" }}
+          className="absolute inset-0 -z-10 bg-cover bg-center"
+          style={{ 
+            backgroundImage: "url(/assets/FotoPesantren.png)",
+            filter: "blur(3px)"
+          }}
         />
-        <div className="absolute inset-0 -z-10 bg-white/80" />
+        <div className="absolute inset-0 -z-10 bg-white/70" />
 
         <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-          <h2 className="text-2xl font-extrabold text-center">
+          <h2 className="text-2xl font-extrabold text-center mb-12">
             Testimoni <span className="text-amber-500">Alumni</span>
           </h2>
 
-          <div className="relative mt-8 min-h-[380px]">
+          <div className="relative min-h-[450px] flex items-center justify-center">
             {loadingTestimonials ? (
               <div className="flex items-center justify-center h-[300px]">
                 <div className="w-10 h-10 border-4 border-amber-500 border-t-transparent rounded-full animate-spin" />
@@ -527,63 +530,58 @@ export default function Home() {
               </div>
             ) : (
             <>
-            {/* Side previews positioned behind main card, consistent size */}
-            <div className="hidden md:block absolute left-4 top-1/2 -translate-y-1/2 w-[220px] h-[300px] rounded-2xl overflow-hidden blur-[2px] opacity-70 pointer-events-none z-0">
-              <div
-                className="w-full h-full bg-center bg-cover"
-                style={{
-                  backgroundImage: `url(${
-                    testimonials[(current - 1 + total) % total].photo
-                  })`,
-                }}
+            {/* Side previews - blurred background cards */}
+            <div className="hidden lg:block absolute left-8 top-1/2 -translate-y-1/2 w-[200px] h-[280px] rounded-2xl overflow-hidden shadow-lg z-0" style={{ filter: "blur(2px)", opacity: 0.6 }}>
+              <img
+                src={testimonials[(current - 1 + total) % total].photo}
+                alt="Previous"
+                className="w-full h-full object-cover"
               />
             </div>
-            <div className="hidden md:block absolute right-4 top-1/2 -translate-y-1/2 w-[220px] h-[300px] rounded-2xl overflow-hidden blur-[2px] opacity-70 pointer-events-none z-0">
-              <div
-                className="w-full h-full bg-center bg-cover"
-                style={{
-                  backgroundImage: `url(${
-                    testimonials[(current + 1) % total].photo
-                  })`,
-                }}
+            <div className="hidden lg:block absolute right-8 top-1/2 -translate-y-1/2 w-[200px] h-[280px] rounded-2xl overflow-hidden shadow-lg z-0" style={{ filter: "blur(2px)", opacity: 0.6 }}>
+              <img
+                src={testimonials[(current + 1) % total].photo}
+                alt="Next"
+                className="w-full h-full object-cover"
               />
             </div>
 
-            {/* Main card fixed size */}
-            <div className="relative z-10 max-w-5xl mx-auto">
-              <div className="bg-white rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.12)] absolute mt-10 ring-1 ring-slate-100 grid md:grid-cols-[360px_1fr] overflow-hidden h-[300px]">
-                <div
-                  className="h-full bg-center bg-cover"
-                  style={{
-                    backgroundImage: `url(${testimonials[current].photo})`,
-                  }}
-                />
-                <div className="p-6 md:p-8">
-                  <p className="text-lg font-semibold text-slate-900 md:text-xl">
-                    {testimonials[current].name} -{" "}
-                    <span className="text-amber-500">
-                      {testimonials[current].cohort}
-                    </span>
-                  </p>
-                  <p className="mt-3 text-sm leading-7 text-slate-700 md:text-base">
+            {/* Main testimonial card */}
+            <div className="relative z-10 w-full max-w-4xl mx-auto px-4">
+              <div className="bg-white rounded-2xl shadow-xl overflow-hidden grid md:grid-cols-[320px_1fr] gap-6 p-6">
+                {/* Photo on the left */}
+                <div className="flex items-center justify-center">
+                  <img
+                    src={testimonials[current].photo}
+                    alt={testimonials[current].name}
+                    className="w-full max-w-[280px] h-auto rounded-xl object-cover shadow-md"
+                  />
+                </div>
+
+                {/* Text content on the right */}
+                <div className="flex flex-col justify-center py-4">
+                  <h3 className="text-xl font-bold text-slate-900 mb-1">
+                    {testimonials[current].name} - <span className="text-amber-500">{testimonials[current].cohort}</span>
+                  </h3>
+                  <p className="text-slate-700 leading-relaxed text-justify mt-4">
                     {testimonials[current].text}
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* Arrows - fixed position */}
+            {/* Navigation arrows */}
             <button
               onClick={prev}
               aria-label="Sebelumnya"
-              className="absolute left-0 z-20 inline-flex items-center justify-center w-12 h-12 text-white -translate-y-1/2 rounded-full shadow md:left-6 top-1/2 bg-amber-500 hover:bg-amber-600"
+              className="absolute left-2 lg:left-4 z-20 inline-flex items-center justify-center w-12 h-12 text-3xl text-white -translate-y-1/2 rounded-full shadow-lg top-1/2 bg-amber-500 hover:bg-amber-600 transition-colors"
             >
               ‹
             </button>
             <button
               onClick={next}
               aria-label="Selanjutnya"
-              className="absolute right-0 z-20 inline-flex items-center justify-center w-12 h-12 text-4xl text-white -translate-y-1/2 rounded-full shadow md:right-6 top-1/2 bg-amber-500 hover:bg-amber-600"
+              className="absolute right-2 lg:right-4 z-20 inline-flex items-center justify-center w-12 h-12 text-3xl text-white -translate-y-1/2 rounded-full shadow-lg top-1/2 bg-amber-500 hover:bg-amber-600 transition-colors"
             >
               ›
             </button>

@@ -11,12 +11,15 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import PenggunaSidebar from "../../components/PenggunaSidebar";
 import Swal from "sweetalert2";
 import PengumumanService from "../../services/PengumumanService";
+import PromosiService from "../../services/PromosiService";
 
 export default function Beranda() {
   const [santriData, setSantriData] = useState(null);
   const [pengumuman, setPengumuman] = useState(null);
   const [santriAnnounced, setSantriAnnounced] = useState([]);
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [banner, setBanner] = useState(null);
+  const [bannerLoading, setBannerLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -25,6 +28,10 @@ export default function Beranda() {
     if (data) {
       setSantriData(JSON.parse(data));
     }
+    
+    // Ambil banner dari promosi
+    fetchBanner();
+    
     // Ambil pengumuman aktif
     (async () => {
       try {
@@ -45,6 +52,21 @@ export default function Beranda() {
       }
     })();
   }, []);
+
+  const fetchBanner = async () => {
+    try {
+      setBannerLoading(true);
+      const response = await PromosiService.getBanner();
+      console.log('✅ Banner loaded:', response.data);
+      console.log('📸 Banner URL:', `http://localhost:5000/uploads/promosi/${encodeURIComponent(response.data.gambar)}`);
+      setBanner(response.data);
+    } catch (error) {
+      console.log('ℹ️ No banner found, using default');
+      setBanner(null);
+    } finally {
+      setBannerLoading(false);
+    }
+  };
 
   // Dummy data for demonstration
   const namaLogin = santriData?.nama || "Santri";
@@ -104,12 +126,24 @@ export default function Beranda() {
             {/* Hero/Banner Full Width */}
             <div className="mb-8">
               <div className="relative w-full h-[320px] rounded-2xl overflow-hidden shadow bg-white">
-                <img
-                  src="/assets/FotoPesantren.png"
-                  alt="Hero"
-                  className="object-cover w-full h-full"
-                />
-                <div className="absolute inset-0 flex flex-col justify-center px-8 bg-black bg-opacity-30">
+                {banner ? (
+                  <img
+                    src={`http://localhost:5000/uploads/promosi/${encodeURIComponent(banner.gambar)}`}
+                    alt="Hero Banner"
+                    className="object-cover w-full h-full"
+                    onError={(e) => {
+                      console.log('❌ Banner failed to load, using default');
+                      e.target.src = '/assets/FotoPesantren.png';
+                    }}
+                  />
+                ) : (
+                  <img
+                    src="/assets/FotoPesantren.png"
+                    alt="Hero"
+                    className="object-cover w-full h-full"
+                  />
+                )}
+                {/* <div className="absolute inset-0 flex flex-col justify-center px-8 bg-black bg-opacity-30">
                   <h2 className="mb-2 text-2xl font-bold text-white">
                     Penerimaan <span className="text-yellow-400">Santri</span>{" "}
                     Baru Tahun Ajaran 2025
@@ -119,7 +153,7 @@ export default function Beranda() {
                     pendidikan yang berkualitas, berakhlak mulia, dan berbasis
                     keilmuan.
                   </p>
-                </div>
+                </div> */}
               </div>
             </div>
             {/* Table Section */}
