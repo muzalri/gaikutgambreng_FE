@@ -279,7 +279,9 @@ export default function Testimonial() {
                           src={testimonial.foto}
                           alt={testimonial.nama}
                           className="w-12 h-12 rounded-full object-cover"
+                          onLoad={() => console.log('✅ Image loaded:', testimonial.foto)}
                           onError={(e) => {
+                            console.log('❌ Image failed to load:', testimonial.foto);
                             e.target.onerror = null; // Prevent infinite loop
                             e.target.src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face';
                           }}
@@ -365,6 +367,12 @@ export default function Testimonial() {
                               src={selectedTestimonial.foto}
                               alt={selectedTestimonial.nama}
                               className="w-full h-full object-cover"
+                              onLoad={() => console.log('✅ Modal image loaded:', selectedTestimonial.foto)}
+                              onError={(e) => {
+                                console.log('❌ Modal image failed to load:', selectedTestimonial.foto);
+                                e.target.onerror = null;
+                                e.target.src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face';
+                              }}
                             />
                           </div>
                         </div>
