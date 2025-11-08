@@ -125,25 +125,25 @@ export default function Berkas() {
 
   // Labels for each required file (keeps order predictable)
   const labels = [
-    "Surat Pernyataan Taat Peraturan",
-    "Fotokopi Rapor Kelas",
-    "Fotokopi Ijazah (Menyusul)",
-    "Fotokopi KTP Orang Tua",
-    "Fotokopi Kartu Keluarga",
-    "Fotokopi Akta Kelahiran",
-    "Pas Foto 4x6 Latar Biru (4 Lembar)",
-    "Surat Keterangan Bebas TBC & Hepatitis",
+    "Kartu Keluarga",
+    "Akta Kelahiran",
+    "Rapor Kelas 5",
+    "Surat Kematian Orang Tua (Yatim)",
+    "Pas Foto 4x6 Latar Biru",
+    "Sertifikat Hafalan (Jika Ada)",
+    "Sertifikat Penghargaan (Jika Ada)",
+    "Rekaman VN Surat Yunus 71-78",
   ];
   
   const placeholders = [
-    "Upload surat pernyataan yang telah ditandatangani",
-    "Upload rapor semester terakhir (format PDF/gambar)",
-    "Upload ijazah SD/MI (bisa menyusul setelah lulus)",
-    "Upload KTP kedua orang tua",
-    "Upload Kartu Keluarga",
-    "Upload Akta Kelahiran santri",
-    "Upload pas foto 4x6 background biru",
-    "Upload surat keterangan dari dokter/puskesmas",
+    "Upload Kartu Keluarga (PDF/gambar)",
+    "Upload Akta Kelahiran calon santri (PDF/gambar)",
+    "Upload Rapor Kelas 5 (PDF/gambar)",
+    "Upload Surat Kematian jika Yatim/Piatu (PDF/gambar)",
+    "Upload Pas foto 4x6 latar belakang biru (gambar)",
+    "Upload Sertifikat Hafalan jika ada (PDF/gambar)",
+    "Upload Sertifikat Penghargaan jika ada (PDF/gambar)",
+    "Upload rekaman bacaan Surat Yunus 71-78 (audio: mp3, wav, m4a)",
   ];
   
   const initialFiles = Array(labels.length).fill(null);
@@ -154,9 +154,23 @@ export default function Berkas() {
     tempat_lahir: "",
     tanggal_lahir: "",
     asal_sekolah: "",
+    hafalan_quran: "",
     alamat: "",
+    no_telp: "",
     angkatan: "",
     jenis_kelamin: "Laki-laki",
+    nama_ayah: "",
+    pekerjaan_ayah: "",
+    penghasilan_ayah: "",
+    nama_ibu: "",
+    pekerjaan_ibu: "",
+    penghasilan_ibu: "",
+    status_anak: "Orangtua Lengkap",
+    jumlah_tanggungan: "",
+    status_kepemilikan_rumah: "",
+    luas_tanah_bangunan: "",
+    kepemilikan_kendaraan: "",
+    kesediaan_sekolah_ortu: "Bersedia",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   // create refs for each hidden input
@@ -206,22 +220,58 @@ export default function Berkas() {
       return;
     }
 
-    // Validasi form
-    if (!formData.nama || !formData.asal_sekolah || !formData.alamat || !formData.angkatan) {
+    // Validasi semua field data wajib diisi
+    const requiredFields = [
+      { field: formData.nama, label: 'Nama Lengkap' },
+      { field: formData.asal_sekolah, label: 'Asal Sekolah' },
+      { field: formData.hafalan_quran, label: 'Hafalan Al-Qur\'an' },
+      { field: formData.alamat, label: 'Alamat' },
+      { field: formData.no_telp, label: 'Nomor WhatsApp' },
+      { field: formData.angkatan, label: 'Angkatan' },
+      { field: formData.nama_ayah, label: 'Nama Ayah' },
+      { field: formData.pekerjaan_ayah, label: 'Pekerjaan Ayah' },
+      { field: formData.penghasilan_ayah, label: 'Penghasilan Ayah' },
+      { field: formData.nama_ibu, label: 'Nama Ibu' },
+      { field: formData.penghasilan_ibu, label: 'Penghasilan Ibu' },
+      { field: formData.status_anak, label: 'Status Anak' },
+      { field: formData.jumlah_tanggungan, label: 'Jumlah Tanggungan' },
+      { field: formData.status_kepemilikan_rumah, label: 'Status Kepemilikan Rumah' },
+      { field: formData.luas_tanah_bangunan, label: 'Luas Tanah dan Bangunan' },
+      { field: formData.kepemilikan_kendaraan, label: 'Kepemilikan Kendaraan' },
+      { field: formData.kesediaan_sekolah_ortu, label: 'Kesediaan Sekolah Orangtua' },
+    ];
+
+    const emptyFields = requiredFields.filter(item => !item.field || item.field.trim() === '');
+    
+    if (emptyFields.length > 0) {
+      const fieldList = emptyFields.map(item => `• ${item.label}`).join('\n');
       Swal.fire({
         icon: 'warning',
         title: 'Data Tidak Lengkap',
-        text: 'Silakan lengkapi semua field yang wajib diisi!',
+        html: `<div class="text-left"><p class="mb-2">Field berikut wajib diisi:</p><pre class="text-sm">${fieldList}</pre></div>`,
+        confirmButtonColor: '#dc2626',
       });
       return;
     }
 
-    // Validasi file upload (minimal 1 file harus diupload)
-    if (Object.keys(uploadedFiles).length === 0) {
+    // Validasi file upload wajib (kecuali Surat Kematian, Sertifikat Hafalan, dan Sertifikat Penghargaan)
+    const requiredFiles = [
+      'Kartu Keluarga',
+      'Akta Kelahiran',
+      'Rapor Kelas 5',
+      'Pas Foto 4x6 Latar Biru',
+      'Rekaman VN Surat Yunus 71-78',
+    ];
+
+    const missingFiles = requiredFiles.filter(label => !uploadedFiles[label]);
+    
+    if (missingFiles.length > 0) {
+      const fileList = missingFiles.map(label => `• ${label}`).join('\n');
       Swal.fire({
         icon: 'warning',
-        title: 'File Belum Diupload',
-        text: 'Silakan upload minimal 1 berkas pendaftaran!',
+        title: 'Berkas Belum Lengkap',
+        html: `<div class="text-left"><p class="mb-2">Berkas berikut wajib diupload:</p><pre class="text-sm">${fileList}</pre><p class="mt-3 text-xs text-gray-600">Catatan: Surat Kematian (untuk Yatim), Sertifikat Hafalan, dan Sertifikat Penghargaan bersifat opsional.</p></div>`,
+        confirmButtonColor: '#dc2626',
       });
       return;
     }
@@ -276,28 +326,42 @@ export default function Berkas() {
       submitData.append('nama_lengkap', formData.nama);
       submitData.append('asal_sekolah', formData.asal_sekolah);
       submitData.append('alamat', formData.alamat);
+      submitData.append('angkatan', formData.angkatan);
       
-      // Field opsional (bisa diisi nanti jika ada)
+      // Data pribadi
       submitData.append('tempat_lahir', formData.tempat_lahir || '');
       submitData.append('tanggal_lahir', formData.tanggal_lahir || '');
-      submitData.append('jenis_kelamin', formData.jenis_kelamin || 'L');
+      submitData.append('jenis_kelamin', formData.jenis_kelamin || 'Laki-laki');
+      submitData.append('hafalan_quran', formData.hafalan_quran || '');
       submitData.append('no_telp', formData.no_telp || '');
+      
+      // Data orang tua
       submitData.append('nama_ayah', formData.nama_ayah || '');
-      submitData.append('nama_ibu', formData.nama_ibu || '');
       submitData.append('pekerjaan_ayah', formData.pekerjaan_ayah || '');
+      submitData.append('penghasilan_ayah', formData.penghasilan_ayah || '');
+      submitData.append('nama_ibu', formData.nama_ibu || '');
       submitData.append('pekerjaan_ibu', formData.pekerjaan_ibu || '');
+      submitData.append('penghasilan_ibu', formData.penghasilan_ibu || '');
       submitData.append('no_telp_ortu', formData.no_telp_ortu || '');
+      
+      // Data keluarga dan ekonomi
+      submitData.append('status_anak', formData.status_anak || 'Orangtua Lengkap');
+      submitData.append('jumlah_tanggungan', formData.jumlah_tanggungan || '');
+      submitData.append('status_kepemilikan_rumah', formData.status_kepemilikan_rumah || '');
+      submitData.append('luas_tanah_bangunan', formData.luas_tanah_bangunan || '');
+      submitData.append('kepemilikan_kendaraan', formData.kepemilikan_kendaraan || '');
+      submitData.append('kesediaan_sekolah_ortu', formData.kesediaan_sekolah_ortu || 'Bersedia');
 
       // Tambahkan files - Mapping labels ke field names yang diharapkan backend
       const fileMapping = {
-        'Surat Pernyataan Taat Peraturan': 'surat_pernyataan',
-        'Fotokopi Rapor Kelas': 'rapor',
-        'Fotokopi Ijazah (Menyusul)': 'ijazah',
-        'Fotokopi KTP Orang Tua': 'ktp_orang_tua',
-        'Fotokopi Kartu Keluarga': 'kartu_keluarga',
-        'Fotokopi Akta Kelahiran': 'akta_kelahiran',
-        'Pas Foto 4x6 Latar Biru (4 Lembar)': 'foto_santri',
-        'Surat Keterangan Bebas TBC & Hepatitis': 'surat_sehat'
+        'Kartu Keluarga': 'kartu_keluarga',
+        'Akta Kelahiran': 'akta_kelahiran',
+        'Rapor Kelas 5': 'rapor',
+        'Surat Kematian Orang Tua (Yatim)': 'surat_kematian',
+        'Pas Foto 4x6 Latar Biru': 'foto_santri',
+        'Sertifikat Hafalan (Jika Ada)': 'sertifikat_hafalan',
+        'Sertifikat Penghargaan (Jika Ada)': 'sertifikat_penghargaan',
+        'Rekaman VN Surat Yunus 71-78': 'voice_note'
       };
 
       Object.keys(uploadedFiles).forEach(label => {
@@ -334,9 +398,23 @@ export default function Berkas() {
         tempat_lahir: "",
         tanggal_lahir: "",
         asal_sekolah: "",
+        hafalan_quran: "",
         alamat: "",
+        no_telp: "",
         angkatan: pendaftaranInfo?.angkatan || "", // Keep angkatan
         jenis_kelamin: "Laki-laki",
+        nama_ayah: "",
+        pekerjaan_ayah: "",
+        penghasilan_ayah: "",
+        nama_ibu: "",
+        pekerjaan_ibu: "",
+        penghasilan_ibu: "",
+        status_anak: "Orangtua Lengkap",
+        jumlah_tanggungan: "",
+        status_kepemilikan_rumah: "",
+        luas_tanah_bangunan: "",
+        kepemilikan_kendaraan: "",
+        kesediaan_sekolah_ortu: "Bersedia",
       });
       setFiles(Array(labels.length).fill(null));
       setUploadedFiles({});
@@ -424,8 +502,8 @@ export default function Berkas() {
             {/* View Berkas yang Sudah Dikirim */}
             {showSubmittedBerkas && submittedBerkas && (
               <div className="p-6 mb-8 bg-white border-l-4 border-blue-500 rounded-lg shadow-md">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-bold text-gray-800">Berkas Pendaftaran Anda</h3>
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-xl font-bold text-gray-800">📋 Berkas Pendaftaran Anda</h3>
                   <span className={`px-4 py-2 rounded-full text-sm font-semibold ${
                     submittedBerkas.status === 'Diterima' ? 'bg-green-100 text-green-800' :
                     submittedBerkas.status === 'Ditolak' ? 'bg-red-100 text-red-800' :
@@ -435,98 +513,197 @@ export default function Berkas() {
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 gap-4 mb-6 md:grid-cols-2">
-                  <div>
-                    <p className="text-sm text-gray-600">Nama Lengkap</p>
-                    <p className="font-semibold">{submittedBerkas.nama_lengkap}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Angkatan</p>
-                    <p className="font-semibold">{submittedBerkas.angkatan}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Tempat Lahir</p>
-                    <p className="font-semibold">{submittedBerkas.tempat_lahir || '-'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Tanggal Lahir</p>
-                    <p className="font-semibold">{submittedBerkas.tanggal_lahir || '-'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Jenis Kelamin</p>
-                    <p className="font-semibold">{submittedBerkas.jenis_kelamin}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Alamat</p>
-                    <p className="font-semibold">{submittedBerkas.alamat || '-'}</p>
+                {/* DATA PRIBADI */}
+                <div className="mb-6">
+                  <h4 className="flex items-center gap-2 mb-4 text-lg font-bold text-teal-700">
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    Data Pribadi Santri
+                  </h4>
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    <div>
+                      <p className="text-xs text-gray-500">Nama Lengkap</p>
+                      <p className="font-semibold text-gray-800">{submittedBerkas.nama_lengkap}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">Tempat Lahir</p>
+                      <p className="font-semibold text-gray-800">{submittedBerkas.tempat_lahir || '-'}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">Tanggal Lahir</p>
+                      <p className="font-semibold text-gray-800">{submittedBerkas.tanggal_lahir || '-'}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">Jenis Kelamin</p>
+                      <p className="font-semibold text-gray-800">{submittedBerkas.jenis_kelamin}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">Asal Sekolah</p>
+                      <p className="font-semibold text-gray-800">{submittedBerkas.asal_sekolah || '-'}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">Hafalan Al-Qur'an</p>
+                      <p className="font-semibold text-gray-800">{submittedBerkas.hafalan_quran || '-'}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">No. WhatsApp</p>
+                      <p className="font-semibold text-gray-800">{submittedBerkas.no_telp || '-'}</p>
+                    </div>
+                    <div className="md:col-span-2">
+                      <p className="text-xs text-gray-500">Alamat</p>
+                      <p className="font-semibold text-gray-800">{submittedBerkas.alamat || '-'}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">Angkatan</p>
+                      <p className="font-semibold text-gray-800">{submittedBerkas.angkatan}</p>
+                    </div>
                   </div>
                 </div>
 
-                <div className="pt-4 border-t">
-                  <h4 className="mb-3 font-semibold text-gray-800">Dokumen yang Dikirim:</h4>
-                  <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-                    {submittedBerkas.surat_pernyataan && (
-                      <a href={`http://localhost:5000/${submittedBerkas.surat_pernyataan}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 text-sm transition rounded bg-red-50 hover:bg-red-100">
-                        <svg className="w-4 h-4 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                        Surat Pernyataan
-                      </a>
-                    )}
-                    {submittedBerkas.rapor && (
-                      <a href={`http://localhost:5000/${submittedBerkas.rapor}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 text-sm transition rounded bg-indigo-50 hover:bg-indigo-100">
-                        <svg className="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                        </svg>
-                        Rapor
-                      </a>
-                    )}
-                    {submittedBerkas.ijazah && (
-                      <a href={`http://localhost:5000/${submittedBerkas.ijazah}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 text-sm transition rounded bg-green-50 hover:bg-green-100">
-                        <svg className="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                        Ijazah
-                      </a>
-                    )}
-                    {submittedBerkas.ktp_orang_tua && (
-                      <a href={`http://localhost:5000/${submittedBerkas.ktp_orang_tua}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 text-sm transition rounded bg-orange-50 hover:bg-orange-100">
-                        <svg className="w-4 h-4 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
-                        </svg>
-                        KTP Ortu
-                      </a>
-                    )}
+                {/* DATA ORANG TUA */}
+                <div className="pt-6 mb-6 border-t">
+                  <h4 className="flex items-center gap-2 mb-4 text-lg font-bold text-teal-700">
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    Data Orang Tua
+                  </h4>
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    <div>
+                      <p className="text-xs text-gray-500">Nama Ayah</p>
+                      <p className="font-semibold text-gray-800">{submittedBerkas.nama_ayah || '-'}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">Pekerjaan Ayah</p>
+                      <p className="font-semibold text-gray-800">{submittedBerkas.pekerjaan_ayah || '-'}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">Penghasilan Ayah</p>
+                      <p className="font-semibold text-gray-800">{submittedBerkas.penghasilan_ayah || '-'}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">Nama Ibu</p>
+                      <p className="font-semibold text-gray-800">{submittedBerkas.nama_ibu || '-'}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">Pekerjaan Ibu</p>
+                      <p className="font-semibold text-gray-800">{submittedBerkas.pekerjaan_ibu || '-'}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">Penghasilan Ibu</p>
+                      <p className="font-semibold text-gray-800">{submittedBerkas.penghasilan_ibu || '-'}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* DATA KELUARGA */}
+                <div className="pt-6 mb-6 border-t">
+                  <h4 className="flex items-center gap-2 mb-4 text-lg font-bold text-teal-700">
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                    Data Keluarga & Ekonomi
+                  </h4>
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    <div>
+                      <p className="text-xs text-gray-500">Status Anak</p>
+                      <p className="font-semibold text-gray-800">{submittedBerkas.status_anak || '-'}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">Jumlah Tanggungan</p>
+                      <p className="font-semibold text-gray-800">{submittedBerkas.jumlah_tanggungan || '-'} orang</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">Status Kepemilikan Rumah</p>
+                      <p className="font-semibold text-gray-800">{submittedBerkas.status_kepemilikan_rumah || '-'}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">Luas Tanah & Bangunan</p>
+                      <p className="font-semibold text-gray-800">{submittedBerkas.luas_tanah_bangunan || '-'}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">Kepemilikan Kendaraan</p>
+                      <p className="font-semibold text-gray-800">{submittedBerkas.kepemilikan_kendaraan || '-'}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">Kesediaan Sekolah Orangtua</p>
+                      <p className="font-semibold text-gray-800">{submittedBerkas.kesediaan_sekolah_ortu || '-'}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* DOKUMEN YANG DIKIRIM */}
+                <div className="pt-6 border-t">
+                  <h4 className="flex items-center gap-2 mb-4 text-lg font-bold text-teal-700">
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Dokumen yang Dikirim
+                  </h4>
+                  <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
                     {submittedBerkas.kartu_keluarga && (
-                      <a href={`http://localhost:5000/${submittedBerkas.kartu_keluarga}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 text-sm transition rounded bg-purple-50 hover:bg-purple-100">
-                        <svg className="w-4 h-4 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                      <a href={`http://localhost:5000/${submittedBerkas.kartu_keluarga}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-purple-700 transition rounded-lg bg-purple-50 hover:bg-purple-100 hover:shadow">
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
-                        KK
+                        Kartu Keluarga
                       </a>
                     )}
                     {submittedBerkas.akta_kelahiran && (
-                      <a href={`http://localhost:5000/${submittedBerkas.akta_kelahiran}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 text-sm transition rounded bg-yellow-50 hover:bg-yellow-100">
-                        <svg className="w-4 h-4 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <a href={`http://localhost:5000/${submittedBerkas.akta_kelahiran}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-yellow-700 transition rounded-lg bg-yellow-50 hover:bg-yellow-100 hover:shadow">
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                         </svg>
-                        Akta
+                        Akta Kelahiran
+                      </a>
+                    )}
+                    {submittedBerkas.rapor && (
+                      <a href={`http://localhost:5000/${submittedBerkas.rapor}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-indigo-700 transition rounded-lg bg-indigo-50 hover:bg-indigo-100 hover:shadow">
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                        </svg>
+                        Rapor Kelas 5
+                      </a>
+                    )}
+                    {submittedBerkas.surat_kematian && (
+                      <a href={`http://localhost:5000/${submittedBerkas.surat_kematian}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 transition rounded-lg bg-gray-50 hover:bg-gray-100 hover:shadow">
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Surat Kematian
                       </a>
                     )}
                     {submittedBerkas.foto_santri && (
-                      <a href={`http://localhost:5000/${submittedBerkas.foto_santri}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 text-sm transition rounded bg-blue-50 hover:bg-blue-100">
-                        <svg className="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <a href={`http://localhost:5000/${submittedBerkas.foto_santri}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-blue-700 transition rounded-lg bg-blue-50 hover:bg-blue-100 hover:shadow">
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
-                        Pas Foto
+                        Pas Foto 4x6
                       </a>
                     )}
-                    {submittedBerkas.surat_sehat && (
-                      <a href={`http://localhost:5000/${submittedBerkas.surat_sehat}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 text-sm transition rounded bg-teal-50 hover:bg-teal-100">
-                        <svg className="w-4 h-4 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    {submittedBerkas.sertifikat_hafalan && (
+                      <a href={`http://localhost:5000/${submittedBerkas.sertifikat_hafalan}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-green-700 transition rounded-lg bg-green-50 hover:bg-green-100 hover:shadow">
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
                         </svg>
-                        Surat Sehat
+                        Sertifikat Hafalan
+                      </a>
+                    )}
+                    {submittedBerkas.sertifikat_penghargaan && (
+                      <a href={`http://localhost:5000/${submittedBerkas.sertifikat_penghargaan}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-pink-700 transition rounded-lg bg-pink-50 hover:bg-pink-100 hover:shadow">
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+                        </svg>
+                        Sertifikat Penghargaan
+                      </a>
+                    )}
+                    {submittedBerkas.voice_note && (
+                      <a href={`http://localhost:5000/${submittedBerkas.voice_note}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-teal-700 transition rounded-lg bg-teal-50 hover:bg-teal-100 hover:shadow">
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                        </svg>
+                        Rekaman VN Quran
                       </a>
                     )}
                   </div>
@@ -727,7 +904,7 @@ export default function Berkas() {
 
               <div>
                 <label className="block mb-2 text-sm font-medium text-gray-700">
-                  Asal Sekolah Dasar/Madrasah Ibtidaiyah
+                  Asal Sekolah Dasar/Madrasah Ibtidaiyah <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -742,16 +919,49 @@ export default function Berkas() {
 
               <div>
                 <label className="block mb-2 text-sm font-medium text-gray-700">
-                  Alamat
+                  Hafalan Al-Qur'an Yang Dimiliki <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
+                  name="hafalan_quran"
+                  value={formData.hafalan_quran}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg"
+                  placeholder="Contoh: 1 Juz dan Juz 30 lengkap"
+                  required
+                />
+                <p className="mt-1 text-xs text-gray-500">* Jawaban dengan jumlah juz dan surat!</p>
+              </div>
+
+              <div>
+                <label className="block mb-2 text-sm font-medium text-gray-700">
+                  Alamat <span className="text-red-500">*</span>
+                </label>
+                <textarea
                   name="alamat"
                   value={formData.alamat}
                   onChange={handleInputChange}
                   className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg"
                   placeholder="Masukkan Alamat Lengkap..."
+                  rows="3"
+                  required
                 />
+              </div>
+
+              <div>
+                <label className="block mb-2 text-sm font-medium text-gray-700">
+                  Nomor WhatsApp Aktif <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="tel"
+                  name="no_telp"
+                  value={formData.no_telp}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg"
+                  placeholder="Contoh: 085774786881"
+                  required
+                />
+                <p className="mt-1 text-xs text-gray-500">* Tidak boleh dengan (+62), (-) dan spasi, cukup satu nomor</p>
               </div>
 
               <div>
@@ -768,6 +978,220 @@ export default function Berkas() {
                   <option value="Laki-laki">Laki-laki</option>
                   <option value="Perempuan">Perempuan</option>
                 </select>
+              </div>
+
+              {/* DATA ORANG TUA */}
+              <div className="pt-6 mt-6 border-t-2 border-gray-200">
+                <h3 className="mb-4 text-lg font-bold text-gray-800">Data Orang Tua</h3>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div>
+                  <label className="block mb-2 text-sm font-medium text-gray-700">
+                    Nama Ayah <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="nama_ayah"
+                    value={formData.nama_ayah}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg"
+                    placeholder="Nama lengkap ayah"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block mb-2 text-sm font-medium text-gray-700">
+                    Pekerjaan Ayah <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="pekerjaan_ayah"
+                    value={formData.pekerjaan_ayah}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg"
+                    placeholder="Contoh: Wiraswasta, PNS, dll"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block mb-2 text-sm font-medium text-gray-700">
+                  Penghasilan Ayah Per Bulan Rata-rata <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="penghasilan_ayah"
+                  value={formData.penghasilan_ayah}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg"
+                  placeholder="Contoh: Rp 5.000.000"
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div>
+                  <label className="block mb-2 text-sm font-medium text-gray-700">
+                    Nama Ibu <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="nama_ibu"
+                    value={formData.nama_ibu}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg"
+                    placeholder="Nama lengkap ibu"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block mb-2 text-sm font-medium text-gray-700">
+                    Pekerjaan Ibu
+                  </label>
+                  <input
+                    type="text"
+                    name="pekerjaan_ibu"
+                    value={formData.pekerjaan_ibu}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg"
+                    placeholder="Contoh: Ibu Rumah Tangga, Guru, dll"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block mb-2 text-sm font-medium text-gray-700">
+                  Penghasilan Ibu Per Bulan Rata-rata <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="penghasilan_ibu"
+                  value={formData.penghasilan_ibu}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg"
+                  placeholder="Contoh: Rp 3.000.000 atau Rp 0 jika tidak bekerja"
+                  required
+                />
+              </div>
+
+              {/* DATA KELUARGA */}
+              <div className="pt-6 mt-6 border-t-2 border-gray-200">
+                <h3 className="mb-4 text-lg font-bold text-gray-800">Data Keluarga</h3>
+              </div>
+
+              <div>
+                <label className="block mb-2 text-sm font-medium text-gray-700">
+                  Status Anak <span className="text-red-500">*</span>
+                </label>
+                <select
+                  name="status_anak"
+                  value={formData.status_anak}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg"
+                  required
+                >
+                  <option value="Orangtua Lengkap">Orangtua Lengkap</option>
+                  <option value="Yatim/Piatu">Yatim/Piatu (Melampirkan Surat Kematian)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block mb-2 text-sm font-medium text-gray-700">
+                  Jumlah Tanggungan (Istri dan Anak) <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  name="jumlah_tanggungan"
+                  value={formData.jumlah_tanggungan}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg"
+                  placeholder="Contoh: 4"
+                  min="0"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block mb-2 text-sm font-medium text-gray-700">
+                  Status Kepemilikan Rumah (Milik/Kontrak/Menumpang) <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="status_kepemilikan_rumah"
+                  value={formData.status_kepemilikan_rumah}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg"
+                  placeholder="Contoh: Milik Sendiri, Kontrak, atau Menumpang"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block mb-2 text-sm font-medium text-gray-700">
+                  Luas Tanah Dan Bangunan <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="luas_tanah_bangunan"
+                  value={formData.luas_tanah_bangunan}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg"
+                  placeholder="Contoh: Milik Sendiri LT 100 / LB 70"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block mb-2 text-sm font-medium text-gray-700">
+                  Kepemilikan Kendaraan Bermotor Roda Empat (Merk, Type, Dan Tahun) <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="kepemilikan_kendaraan"
+                  value={formData.kepemilikan_kendaraan}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg"
+                  placeholder="Contoh: Toyota Avanza 2010 atau Tidak Ada"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block mb-2 text-sm font-medium text-gray-700">
+                  Bersedia Mengikuti Sekolah Orangtua Dua Bulan Sekali (Kajian Rutin) <span className="text-red-500">*</span>
+                </label>
+                <select
+                  name="kesediaan_sekolah_ortu"
+                  value={formData.kesediaan_sekolah_ortu}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg"
+                  required
+                >
+                  <option value="Bersedia">Bersedia</option>
+                  <option value="Tidak">Tidak</option>
+                </select>
+              </div>
+
+              {/* UPLOAD BERKAS */}
+              <div className="pt-6 mt-6 border-t-2 border-gray-200">
+                <h3 className="mb-2 text-lg font-bold text-gray-800">Upload Berkas (Foto/Scan Terbaca dengan Jelas)</h3>
+                <div className="p-4 mb-4 border border-blue-200 rounded-lg bg-blue-50">
+                  <p className="text-sm text-blue-800">
+                    <strong>Dokumen yang wajib diupload:</strong><br/>
+                    1. Kartu Keluarga<br/>
+                    2. Akta Kelahiran<br/>
+                    3. Rapor Kelas 5<br/>
+                    4. Surat Kematian Orang Tua bagi Yatim<br/>
+                    5. Pas Foto 4x6 latar belakang biru
+                  </p>
+                  <p className="mt-2 text-xs text-blue-700">
+                    * Dokumen ijazah dan Surat Keterangan Bebas TBC & Hepatitis bisa menyusul saat calon santri dinyatakan diterima.
+                  </p>
+                </div>
               </div>
 
               <div>

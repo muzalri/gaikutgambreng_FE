@@ -554,25 +554,17 @@ export default function Testimonial() {
                               <label className="block text-sm font-medium text-slate-700 mb-2">
                                 Angkatan
                               </label>
-                              <select
+                              <input
+                                type="text"
                                 name="angkatan"
                                 value={formData.angkatan}
                                 onChange={handleInputChange}
+                                placeholder="Contoh: 1, 2025, atau kosongkan"
                                 className="w-full px-4 py-3 rounded-lg bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-400"
-                                required
-                              >
-                                <option value="">Pilih Angkatan</option>
-                                <option value="Angkatan 1">Angkatan 1</option>
-                                <option value="Angkatan 2">Angkatan 2</option>
-                                <option value="Angkatan 3">Angkatan 3</option>
-                                <option value="Angkatan 4">Angkatan 4</option>
-                                <option value="Angkatan 5">Angkatan 5</option>
-                                <option value="Angkatan 6">Angkatan 6</option>
-                                <option value="Angkatan 7">Angkatan 7</option>
-                                <option value="Angkatan 8">Angkatan 8</option>
-                                <option value="Angkatan 9">Angkatan 9</option>
-                                <option value="Angkatan 10">Angkatan 10</option>
-                              </select>
+                              />
+                              <p className="mt-1 text-xs text-slate-500">
+                                Opsional - Isi dengan angka angkatan (misal: 1, 2, 2025) atau kosongkan
+                              </p>
                             </div>
                           </div>
                           <div>

@@ -258,7 +258,7 @@ export default function Pendaftaran() {
                         name="nama"
                         value={formData.nama}
                         onChange={handleInputChange}
-                        placeholder="Nama penanggung jawab..."
+                        placeholder="Nama Pendaftaran..."
                         className="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-teal-400"
                         required
                       />
