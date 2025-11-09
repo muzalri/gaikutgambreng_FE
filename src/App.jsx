@@ -5,6 +5,7 @@ import RegisterPengguna from "./pages/Pengguna/RegisterPengguna";
 import Testimonial from "./pages/Admin/Testimonial";
 import Pendaftaran from "./pages/Admin/Pendaftaran";
 import Promosi from "./pages/Admin/Promosi";
+import VoiceNote from "./pages/Admin/VoiceNote";
 import React from "react";
 import { BrowserRouter, Routes, Route, Link, Navigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
@@ -101,6 +102,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Promosi />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/voicenote"
+            element={
+              <ProtectedRoute>
+                <VoiceNote />
               </ProtectedRoute>
             }
           />

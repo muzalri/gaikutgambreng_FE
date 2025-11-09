@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import PenggunaSidebar from "../../components/PenggunaSidebar";
 import BerkasService from "../../services/BerkasService";
+import VoiceNoteService from "../../services/VoiceNoteService";
 import Swal from "sweetalert2";
 
 export default function Berkas() {
@@ -9,6 +10,7 @@ export default function Berkas() {
   const [pendaftaranInfo, setPendaftaranInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submittedBerkas, setSubmittedBerkas] = useState(null); // Berkas yang sudah dikirim
+  const [submittedVoiceNote, setSubmittedVoiceNote] = useState(null); // Voice note yang sudah diupload
   const [showSubmittedBerkas, setShowSubmittedBerkas] = useState(false); // Toggle view
 
   useEffect(() => {
@@ -89,9 +91,49 @@ export default function Berkas() {
       if (result.data && result.data.length > 0) {
         setSubmittedBerkas(result.data[0]); // Ambil berkas pertama
         console.log('📄 Berkas yang sudah dikirim:', result.data[0]);
+        
+        // Fetch voice note yang sudah diupload
+        fetchSubmittedVoiceNote(santri.id, result.data[0].angkatan);
       }
     } catch (error) {
       console.error('Error fetching submitted berkas:', error);
+    }
+  };
+
+  const fetchSubmittedVoiceNote = async (idSantri, angkatan) => {
+    try {
+      console.log('🔍 Fetching voice note for:', { idSantri, angkatan });
+      
+      const vnResult = await VoiceNoteService.getAll({ 
+        id_santri: idSantri,
+        angkatan: angkatan 
+      });
+      
+      console.log('📦 Voice Note API Response:', vnResult);
+      
+      // Cek berbagai kemungkinan struktur response
+      let voiceNoteData = null;
+      
+      if (vnResult.data && Array.isArray(vnResult.data) && vnResult.data.length > 0) {
+        voiceNoteData = vnResult.data[0];
+      } else if (vnResult.data && vnResult.data.data && Array.isArray(vnResult.data.data) && vnResult.data.data.length > 0) {
+        voiceNoteData = vnResult.data.data[0];
+      } else if (vnResult.data && vnResult.data.rows && Array.isArray(vnResult.data.rows) && vnResult.data.rows.length > 0) {
+        voiceNoteData = vnResult.data.rows[0];
+      }
+      
+      if (voiceNoteData) {
+        setSubmittedVoiceNote(voiceNoteData);
+        console.log('✅ Voice Note berhasil dimuat:', voiceNoteData);
+        console.log('🎵 File path:', voiceNoteData.file_path);
+      } else {
+        setSubmittedVoiceNote(null);
+        console.log('ℹ️ Tidak ada voice note yang ditemukan');
+      }
+    } catch (vnError) {
+      console.error('❌ Error fetching voice note:', vnError);
+      console.error('Response:', vnError.response?.data);
+      setSubmittedVoiceNote(null);
     }
   };
 
@@ -114,6 +156,27 @@ export default function Berkas() {
     } else if (fileType === 'application/pdf') {
       // Open PDF in new tab
       window.open(fileURL, '_blank');
+    } else if (fileType.startsWith('audio/')) {
+      // Preview audio with audio player
+      Swal.fire({
+        title: file.name,
+        html: `
+          <div class="flex flex-col items-center justify-center p-4">
+            <div class="mb-4">
+              <svg class="w-20 h-20 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+              </svg>
+            </div>
+            <audio controls class="w-full max-w-md">
+              <source src="${fileURL}" type="${fileType}">
+              Browser Anda tidak mendukung audio player.
+            </audio>
+          </div>
+        `,
+        width: 600,
+        confirmButtonColor: '#0f766e',
+        confirmButtonText: 'Tutup',
+      });
     } else {
       Swal.fire({
         icon: 'info',
@@ -318,7 +381,27 @@ export default function Berkas() {
     try {
       setIsSubmitting(true);
 
-      // Buat FormData untuk file upload
+      // STEP 1: Upload Voice Note terlebih dahulu jika ada
+      const voiceNoteFile = uploadedFiles['Rekaman VN Surat Yunus 71-78'];
+      if (voiceNoteFile) {
+        try {
+          console.log('🎤 Uploading voice note...');
+          const vnFormData = new FormData();
+          vnFormData.append('voice_note', voiceNoteFile);
+          vnFormData.append('id_santri', santriData.id);
+          vnFormData.append('nama_lengkap', formData.nama);
+          vnFormData.append('asal_sekolah', formData.asal_sekolah);
+          vnFormData.append('angkatan', formData.angkatan);
+
+          await VoiceNoteService.create(vnFormData);
+          console.log('✅ Voice note berhasil diupload');
+        } catch (vnError) {
+          console.error('❌ Error uploading voice note:', vnError);
+          throw new Error('Gagal mengupload rekaman voice note. ' + (vnError.response?.data?.message || vnError.message));
+        }
+      }
+
+      // STEP 2: Upload Berkas (tanpa voice note)
       const submitData = new FormData();
       
       // Tambahkan data santri
@@ -352,7 +435,7 @@ export default function Berkas() {
       submitData.append('kepemilikan_kendaraan', formData.kepemilikan_kendaraan || '');
       submitData.append('kesediaan_sekolah_ortu', formData.kesediaan_sekolah_ortu || 'Bersedia');
 
-      // Tambahkan files - Mapping labels ke field names yang diharapkan backend
+      // Tambahkan files - TANPA voice_note (sudah diupload terpisah)
       const fileMapping = {
         'Kartu Keluarga': 'kartu_keluarga',
         'Akta Kelahiran': 'akta_kelahiran',
@@ -360,8 +443,8 @@ export default function Berkas() {
         'Surat Kematian Orang Tua (Yatim)': 'surat_kematian',
         'Pas Foto 4x6 Latar Biru': 'foto_santri',
         'Sertifikat Hafalan (Jika Ada)': 'sertifikat_hafalan',
-        'Sertifikat Penghargaan (Jika Ada)': 'sertifikat_penghargaan',
-        'Rekaman VN Surat Yunus 71-78': 'voice_note'
+        'Sertifikat Penghargaan (Jika Ada)': 'sertifikat_penghargaan'
+        // 'Rekaman VN Surat Yunus 71-78' - DIHAPUS, sudah diupload terpisah
       };
 
       Object.keys(uploadedFiles).forEach(label => {
@@ -488,7 +571,17 @@ export default function Berkas() {
             {submittedBerkas && (
               <div className="mb-6">
                 <button
-                  onClick={() => setShowSubmittedBerkas(!showSubmittedBerkas)}
+                  onClick={() => {
+                    setShowSubmittedBerkas(!showSubmittedBerkas);
+                    // Fetch voice note ketika membuka detail berkas
+                    if (!showSubmittedBerkas && !submittedVoiceNote) {
+                      const data = localStorage.getItem('santriData');
+                      if (data) {
+                        const santri = JSON.parse(data);
+                        fetchSubmittedVoiceNote(santri.id, submittedBerkas.angkatan);
+                      }
+                    }
+                  }}
                   className="flex items-center gap-2 px-6 py-3 font-semibold text-white transition bg-blue-600 rounded-lg hover:bg-blue-700"
                 >
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -641,6 +734,16 @@ export default function Berkas() {
                     </svg>
                     Dokumen yang Dikirim
                   </h4>
+                  
+                  {/* Info jika sedang loading voice note */}
+                  {showSubmittedBerkas && !submittedVoiceNote && (
+                    <div className="p-3 mb-4 border border-blue-200 rounded-lg bg-blue-50">
+                      <p className="text-sm text-blue-800">
+                        ⏳ Sedang memuat data voice note...
+                      </p>
+                    </div>
+                  )}
+                  
                   <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
                     {submittedBerkas.kartu_keluarga && (
                       <a href={`http://localhost:5000/${submittedBerkas.kartu_keluarga}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-purple-700 transition rounded-lg bg-purple-50 hover:bg-purple-100 hover:shadow">
@@ -698,13 +801,105 @@ export default function Berkas() {
                         Sertifikat Penghargaan
                       </a>
                     )}
-                    {submittedBerkas.voice_note && (
-                      <a href={`http://localhost:5000/${submittedBerkas.voice_note}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-teal-700 transition rounded-lg bg-teal-50 hover:bg-teal-100 hover:shadow">
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-                        </svg>
-                        Rekaman VN Quran
-                      </a>
+                  </div>
+                  
+                  {/* VOICE NOTE SECTION - Terpisah dari dokumen lain */}
+                  <div className="pt-6 mt-6 border-t">
+                    <h4 className="flex items-center gap-2 mb-4 text-lg font-bold text-teal-700">
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                      </svg>
+                      Rekaman Voice Note
+                    </h4>
+                    
+                    {submittedVoiceNote && submittedVoiceNote.file_path ? (
+                      <div className="p-4 transition border-2 border-teal-200 rounded-lg bg-teal-50">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            <svg className="w-5 h-5 text-teal-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                            </svg>
+                            <span className="font-semibold text-teal-800">Surat Yunus 71-78</span>
+                          </div>
+                          {submittedVoiceNote.status_penilaian && (
+                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                              submittedVoiceNote.status_penilaian === 'Sudah Dinilai' 
+                                ? 'bg-green-100 text-green-800' 
+                                : 'bg-yellow-100 text-yellow-800'
+                            }`}>
+                              {submittedVoiceNote.status_penilaian}
+                            </span>
+                          )}
+                        </div>
+                        {(() => {
+                          // Normalize path: replace backslashes with forward slashes
+                          let normalizedPath = submittedVoiceNote.file_path.replace(/\\/g, '/');
+                          
+                          // Jika path masih absolute (dimulai dengan drive letter atau path lengkap)
+                          // Ambil hanya bagian setelah "uploads/"
+                          if (normalizedPath.includes('uploads/')) {
+                            const uploadsIndex = normalizedPath.indexOf('uploads/');
+                            normalizedPath = normalizedPath.substring(uploadsIndex);
+                          }
+                          
+                          const audioUrl = `http://localhost:5000/${encodeURI(normalizedPath)}`;
+                          
+                          console.log('🎵 Original path:', submittedVoiceNote.file_path);
+                          console.log('🎵 Normalized path:', normalizedPath);
+                          console.log('🎵 Final URL:', audioUrl);
+                          
+                          return (
+                            <>
+                              <audio 
+                                controls 
+                                className="w-full mb-3"
+                                onError={(e) => {
+                                  console.error('❌ Audio load error:', e);
+                                  console.error('Failed URL:', e.target.src);
+                                }}
+                                onLoadedData={() => {
+                                  console.log('✅ Audio loaded successfully');
+                                }}
+                              >
+                                <source src={audioUrl} type="audio/mpeg" />
+                                <source src={audioUrl} type="audio/wav" />
+                                <source src={audioUrl} type="audio/ogg" />
+                                <source src={audioUrl} type="audio/mp4" />
+                                <source src={audioUrl} type="audio/x-m4a" />
+                                Browser Anda tidak mendukung audio player.
+                              </audio>
+                              <p className="text-xs text-gray-500 mb-2">
+                                📁 File: {normalizedPath.split('/').pop()}
+                              </p>
+                            </>
+                          );
+                        })()}
+                        {submittedVoiceNote.nilai && (
+                          <div className="p-3 mb-2 border border-green-200 rounded-lg bg-green-50">
+                            <p className="text-sm font-semibold text-green-800">
+                              📊 Nilai: {submittedVoiceNote.nilai}/100
+                            </p>
+                          </div>
+                        )}
+                        {submittedVoiceNote.catatan_penilaian && (
+                          <div className="p-3 border border-blue-200 rounded-lg bg-blue-50">
+                            <p className="mb-1 text-xs font-semibold text-blue-800">💬 Catatan Penilaian:</p>
+                            <p className="text-sm text-blue-700">{submittedVoiceNote.catatan_penilaian}</p>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="p-4 border-2 border-gray-200 border-dashed rounded-lg bg-gray-50">
+                        <div className="flex items-center gap-3 text-gray-500">
+                          <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                          </svg>
+                          <div>
+                            <p className="font-semibold text-gray-700">Belum ada rekaman voice note</p>
+                            <p className="text-sm text-gray-500">Anda belum mengupload rekaman bacaan Surat Yunus 71-78</p>
+                          </div>
+                        </div>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -1211,7 +1406,11 @@ export default function Berkas() {
               </div>
 
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                {labels.map((label, idx) => (
+                {labels.map((label, idx) => {
+                  const isVoiceNote = label === "Rekaman VN Surat Yunus 71-78";
+                  const acceptTypes = isVoiceNote ? "audio/*,.mp3,.wav,.m4a,.ogg,.aac" : "image/*,.pdf,.jpg,.jpeg,.png";
+                  
+                  return (
                   <div key={label}>
                     <div className="mb-2 text-sm font-medium text-gray-700">{label}</div>
                     <div className="p-3 bg-white border border-gray-300 rounded-lg">
@@ -1255,11 +1454,12 @@ export default function Berkas() {
                         type="file"
                         className="hidden"
                         onChange={(e) => handleFileChange(idx, e)}
-                        accept="image/*,.pdf,.jpg,.jpeg,.png"
+                        accept={acceptTypes}
                       />
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
 
               <div className="flex justify-end pt-6">

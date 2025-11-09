@@ -8,6 +8,7 @@ import {
   FaQuoteLeft,
   FaCalendarAlt,
   FaBullhorn,
+  FaMicrophone,
 } from "react-icons/fa";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import AdminService from "../services/AdminService";
@@ -60,6 +61,12 @@ const sidebarMenu = [
     label: "Promosi",
     icon: <FaBullhorn />,
     path: "/admin/promosi",
+    roles: ["admin", "user"],
+  },
+  {
+    label: "Voice Note",
+    icon: <FaMicrophone />,
+    path: "/admin/voicenote",
     roles: ["admin", "user"],
   },
 ];
