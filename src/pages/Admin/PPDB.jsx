@@ -8,6 +8,7 @@ import Swal from "sweetalert2";
 import SantriService from "../../services/SantriService";
 import BerkasService from "../../services/BerkasService";
 import PendaftaranService from "../../services/PendaftaranService";
+import VoiceNoteService from "../../services/VoiceNoteService";
 import PengumumanService from "../../services/PengumumanService";
 
 export default function PPDB() {
@@ -82,30 +83,34 @@ export default function PPDB() {
   const [loading, setLoading] = useState(false);
   const [selectedBerkasId, setSelectedBerkasId] = useState(null);
   const [selectedBerkas, setSelectedBerkas] = useState(null);
+  const [selectedVoiceNote, setSelectedVoiceNote] = useState(null);
 
   const getDocumentsFromSelectedBerkas = () => {
     const b = selectedBerkas || {};
     const docs = [
-      { key: 'surat_pernyataan', label: 'Surat Pernyataan Taat Peraturan' },
-      { key: 'rapor', label: 'Fotokopi Rapor Kelas' },
-      { key: 'ijazah', label: 'Fotokopi Ijazah (Menyusul)' },
-      { key: 'ktp_orang_tua', label: 'Fotokopi KTP Orang Tua' },
-      { key: 'kartu_keluarga', label: 'Fotokopi Kartu Keluarga' },
-      { key: 'akta_kelahiran', label: 'Fotokopi Akta Kelahiran' },
-      { key: 'foto_santri', label: 'Pas Foto 4x6 Latar Biru (4 Lembar)' },
-      { key: 'surat_sehat', label: 'Surat Keterangan Bebas TBC & Hepatitis' },
+      { key: 'kartu_keluarga', label: 'Kartu Keluarga' },
+      { key: 'akta_kelahiran', label: 'Akta Kelahiran' },
+      { key: 'rapor', label: 'Rapor Kelas 5' },
+      { key: 'surat_kematian', label: 'Surat Kematian' },
+      { key: 'foto_santri', label: 'Pas Foto 4x6' },
+      { key: 'sertifikat_hafalan', label: 'Sertifikat Hafalan' },
+      { key: 'sertifikat_penghargaan', label: 'Sertifikat Penghargaan' },
     ];
-    return docs.map((d) => {
-      const rawPath = b[d.key];
-      const normalized = rawPath ? `/${String(rawPath).replace(/\\\\/g, '/').replace(/^\/?/, '')}` : '';
-      return {
-        ...d,
-        path: rawPath || '',
-        url: rawPath ? getImageUrl(normalized) : '',
-        filename: rawPath ? normalized.split('/').pop() : '',
-        exists: Boolean(rawPath)
-      };
-    });
+    
+    // Filter hanya dokumen yang benar-benar diunggah (field tidak null/kosong)
+    return docs
+      .filter((d) => b[d.key]) // Hanya ambil yang ada datanya
+      .map((d) => {
+        const rawPath = b[d.key];
+        const normalized = rawPath ? `/${String(rawPath).replace(/\\\\/g, '/').replace(/^\/?/, '')}` : '';
+        return {
+          ...d,
+          path: rawPath || '',
+          url: rawPath ? getImageUrl(normalized) : '',
+          filename: rawPath ? normalized.split('/').pop() : '',
+          exists: Boolean(rawPath)
+        };
+      });
   };
 
   const getExt = (filename = '') => (filename.split('.').pop() || '').toLowerCase();
@@ -157,6 +162,7 @@ export default function PPDB() {
     setSelectedSantri(null);
     setSelectedBerkasId(null);
     setSelectedBerkas(null);
+    setSelectedVoiceNote(null);
     try {
       const resp = await SantriService.getSantriById(santriId);
       // API may return { data: {...} } or the object directly depending on implementation
@@ -180,6 +186,18 @@ export default function PPDB() {
             angkatan: '-',
           });
         }
+      }
+
+      // Fetch voice note data
+      try {
+        const vnResponse = await VoiceNoteService.getAll({ id_santri: santriId });
+        const voiceNotes = vnResponse?.data?.voiceNotes || vnResponse?.data || [];
+        if (voiceNotes.length > 0) {
+          setSelectedVoiceNote(voiceNotes[0]); // Ambil voice note pertama
+        }
+      } catch (e) {
+        console.error("Error fetching voice note:", e);
+        setSelectedVoiceNote(null);
       }
     } catch (err) {
       console.error("Error fetching santri:", err);
@@ -555,71 +573,284 @@ export default function PPDB() {
                           <div className="py-16 text-center">Memuat...</div>
                         ) : (
                           <div>
-                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                              <div>
-                                <label className="text-sm text-slate-600">
-                                  Nama
-                                </label>
-                                <div className="p-3 mt-1 bg-slate-50 rounded">
-                                  {selectedBerkas?.nama_lengkap || selectedSantri?.nama || "-"}
+                            {/* Data Pribadi Calon Santri */}
+                            <div className="mb-6">
+                              <h4 className="text-lg font-bold text-slate-800 mb-3 border-b pb-2">
+                                📋 Data Pribadi Calon Santri
+                              </h4>
+                              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                <div>
+                                  <label className="text-sm font-semibold text-slate-600">Nama Lengkap</label>
+                                  <div className="p-3 mt-1 bg-slate-50 rounded">
+                                    {selectedBerkas?.nama_lengkap || selectedSantri?.nama || "-"}
+                                  </div>
                                 </div>
-                              </div>
-                              <div>
-                                <label className="text-sm text-slate-600">
-                                  Asal Sekolah Dasar/Madrasah Ibtidaiyah
-                                </label>
-                                <div className="p-3 mt-1 bg-slate-50 rounded">
-                                  {selectedBerkas?.asal_sekolah || selectedSantri?.asal_sekolah || "-"}
+                                <div>
+                                  <label className="text-sm font-semibold text-slate-600">Jenis Kelamin</label>
+                                  <div className="p-3 mt-1 bg-slate-50 rounded">
+                                    {selectedBerkas?.jenis_kelamin || "-"}
+                                  </div>
                                 </div>
-                              </div>
-                              <div>
-                                <label className="text-sm text-slate-600">
-                                  Alamat
-                                </label>
-                                <div className="p-3 mt-1 bg-slate-50 rounded">
-                                  {selectedBerkas?.alamat || selectedSantri?.alamat || "-"}
+                                <div>
+                                  <label className="text-sm font-semibold text-slate-600">Tempat Lahir</label>
+                                  <div className="p-3 mt-1 bg-slate-50 rounded">
+                                    {selectedBerkas?.tempat_lahir || "-"}
+                                  </div>
                                 </div>
-                              </div>
-                              <div>
-                                <label className="text-sm text-slate-600">
-                                  Angkatan
-                                </label>
-                                <div className="p-3 mt-1 bg-slate-50 rounded">
-                                  {selectedBerkas?.angkatan || "Angkatan 1"}
+                                <div>
+                                  <label className="text-sm font-semibold text-slate-600">Tanggal Lahir</label>
+                                  <div className="p-3 mt-1 bg-slate-50 rounded">
+                                    {selectedBerkas?.tanggal_lahir ? new Date(selectedBerkas.tanggal_lahir).toLocaleDateString('id-ID') : "-"}
+                                  </div>
                                 </div>
-                              </div>
-                              <div>
-                                <label className="text-sm text-slate-600">Tahapan</label>
-                                <div className="mt-1 px-4 py-2 rounded bg-slate-50 inline-block">
-                                  {getTahapanLabel(selectedBerkas?.tahapan)}
+                                <div>
+                                  <label className="text-sm font-semibold text-slate-600">Alamat</label>
+                                  <div className="p-3 mt-1 bg-slate-50 rounded">
+                                    {selectedBerkas?.alamat || selectedSantri?.alamat || "-"}
+                                  </div>
                                 </div>
-                                <div className="text-xs text-slate-500 mt-1"></div>
+                                <div>
+                                  <label className="text-sm font-semibold text-slate-600">No. Telp/WA</label>
+                                  <div className="p-3 mt-1 bg-slate-50 rounded">
+                                    {selectedBerkas?.no_telp || "-"}
+                                  </div>
+                                </div>
+                                <div>
+                                  <label className="text-sm font-semibold text-slate-600">Asal Sekolah/Madrasah</label>
+                                  <div className="p-3 mt-1 bg-slate-50 rounded">
+                                    {selectedBerkas?.asal_sekolah || selectedSantri?.asal_sekolah || "-"}
+                                  </div>
+                                </div>
+                                <div>
+                                  <label className="text-sm font-semibold text-slate-600">Hafalan Al-Qur'an</label>
+                                  <div className="p-3 mt-1 bg-slate-50 rounded">
+                                    {selectedBerkas?.hafalan_quran || "-"}
+                                  </div>
+                                </div>
+                                <div>
+                                  <label className="text-sm font-semibold text-slate-600">Angkatan</label>
+                                  <div className="p-3 mt-1 bg-slate-50 rounded">
+                                    {selectedBerkas?.angkatan || "Angkatan 1"}
+                                  </div>
+                                </div>
+                                <div>
+                                  <label className="text-sm font-semibold text-slate-600">Tahapan</label>
+                                  <div className="mt-1 px-4 py-2 rounded bg-slate-50 inline-block">
+                                    {getTahapanLabel(selectedBerkas?.tahapan)}
+                                  </div>
+                                </div>
                               </div>
                             </div>
 
-                            <div className="grid grid-cols-1 gap-4 mt-6 md:grid-cols-2">
-                              {getDocumentsFromSelectedBerkas().map((doc, idx) => (
-                                <div
-                                  key={idx}
-                                  className="flex items-center justify-between p-3 bg-slate-50 rounded"
-                                >
-                                  <div className="text-sm text-slate-700">
-                                    {doc.label}
+                            {/* Data Orang Tua */}
+                            <div className="mb-6">
+                              <h4 className="text-lg font-bold text-slate-800 mb-3 border-b pb-2">
+                                👨‍👩‍👧 Data Orang Tua
+                              </h4>
+                              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                <div>
+                                  <label className="text-sm font-semibold text-slate-600">Nama Ayah</label>
+                                  <div className="p-3 mt-1 bg-slate-50 rounded">
+                                    {selectedBerkas?.nama_ayah || "-"}
                                   </div>
-                                  <div className="flex items-center gap-3">
-                                    <button
-                                      className={`px-3 py-1 text-sm font-semibold rounded-full ${doc.exists ? 'text-emerald-700 bg-emerald-100' : 'text-slate-400 bg-slate-200 cursor-not-allowed'}`}
-                                      onClick={() => handleViewDocument(doc)}
-                                      disabled={!doc.exists}
-                                    >
-                                      Lihat
-                                    </button>
-                                    <div className="text-sm text-slate-500 truncate max-w-[160px]">
-                                      {doc.filename || 'Belum diunggah'}
+                                </div>
+                                <div>
+                                  <label className="text-sm font-semibold text-slate-600">Pekerjaan Ayah</label>
+                                  <div className="p-3 mt-1 bg-slate-50 rounded">
+                                    {selectedBerkas?.pekerjaan_ayah || "-"}
+                                  </div>
+                                </div>
+                                <div>
+                                  <label className="text-sm font-semibold text-slate-600">Penghasilan Ayah</label>
+                                  <div className="p-3 mt-1 bg-slate-50 rounded">
+                                    {selectedBerkas?.penghasilan_ayah || "-"}
+                                  </div>
+                                </div>
+                                <div>
+                                  <label className="text-sm font-semibold text-slate-600">Nama Ibu</label>
+                                  <div className="p-3 mt-1 bg-slate-50 rounded">
+                                    {selectedBerkas?.nama_ibu || "-"}
+                                  </div>
+                                </div>
+                                <div>
+                                  <label className="text-sm font-semibold text-slate-600">Pekerjaan Ibu</label>
+                                  <div className="p-3 mt-1 bg-slate-50 rounded">
+                                    {selectedBerkas?.pekerjaan_ibu || "-"}
+                                  </div>
+                                </div>
+                                <div>
+                                  <label className="text-sm font-semibold text-slate-600">Penghasilan Ibu</label>
+                                  <div className="p-3 mt-1 bg-slate-50 rounded">
+                                    {selectedBerkas?.penghasilan_ibu || "-"}
+                                  </div>
+                                </div>
+                                <div>
+                                  <label className="text-sm font-semibold text-slate-600">No. Telp Orang Tua</label>
+                                  <div className="p-3 mt-1 bg-slate-50 rounded">
+                                    {selectedBerkas?.no_telp_ortu || "-"}
+                                  </div>
+                                </div>
+                                <div>
+                                  <label className="text-sm font-semibold text-slate-600">Status Anak</label>
+                                  <div className="p-3 mt-1 bg-slate-50 rounded">
+                                    {selectedBerkas?.status_anak || "-"}
+                                  </div>
+                                </div>
+                                <div>
+                                  <label className="text-sm font-semibold text-slate-600">Jumlah Tanggungan</label>
+                                  <div className="p-3 mt-1 bg-slate-50 rounded">
+                                    {selectedBerkas?.jumlah_tanggungan || "-"}
+                                  </div>
+                                </div>
+                                <div>
+                                  <label className="text-sm font-semibold text-slate-600">Kesediaan Sekolah Ortu</label>
+                                  <div className="p-3 mt-1 bg-slate-50 rounded">
+                                    {selectedBerkas?.kesediaan_sekolah_ortu || "-"}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Data Ekonomi Keluarga */}
+                            <div className="mb-6">
+                              <h4 className="text-lg font-bold text-slate-800 mb-3 border-b pb-2">
+                                🏠 Data Ekonomi Keluarga
+                              </h4>
+                              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                <div>
+                                  <label className="text-sm font-semibold text-slate-600">Status Kepemilikan Rumah</label>
+                                  <div className="p-3 mt-1 bg-slate-50 rounded">
+                                    {selectedBerkas?.status_kepemilikan_rumah || "-"}
+                                  </div>
+                                </div>
+                                <div>
+                                  <label className="text-sm font-semibold text-slate-600">Luas Tanah & Bangunan</label>
+                                  <div className="p-3 mt-1 bg-slate-50 rounded">
+                                    {selectedBerkas?.luas_tanah_bangunan || "-"}
+                                  </div>
+                                </div>
+                                <div className="md:col-span-2">
+                                  <label className="text-sm font-semibold text-slate-600">Kepemilikan Kendaraan</label>
+                                  <div className="p-3 mt-1 bg-slate-50 rounded">
+                                    {selectedBerkas?.kepemilikan_kendaraan || "-"}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Nilai Voice Note */}
+                            {selectedVoiceNote && (
+                              <div className="mb-6">
+                                <h4 className="text-lg font-bold text-slate-800 mb-3 border-b pb-2">
+                                  🎤 Penilaian Voice Note (Bacaan Al-Qur'an)
+                                </h4>
+                                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                                  <div>
+                                    <label className="text-sm font-semibold text-slate-600">Surat</label>
+                                    <div className="p-3 mt-1 bg-slate-50 rounded">
+                                      {selectedVoiceNote.surat || "Yunus 71-78"}
+                                    </div>
+                                  </div>
+                                  <div>
+                                    <label className="text-sm font-semibold text-slate-600">Nilai</label>
+                                    <div className={`p-3 mt-1 rounded font-bold text-center ${selectedVoiceNote.nilai >= 80 ? 'bg-green-100 text-green-700' : selectedVoiceNote.nilai >= 60 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'}`}>
+                                      {selectedVoiceNote.nilai ? `${selectedVoiceNote.nilai}/100` : "Belum Dinilai"}
+                                    </div>
+                                  </div>
+                                  <div>
+                                    <label className="text-sm font-semibold text-slate-600">Status Penilaian</label>
+                                    <div className={`p-3 mt-1 rounded text-center font-semibold ${selectedVoiceNote.status_penilaian === 'Sudah Dinilai' ? 'bg-teal-100 text-teal-700' : 'bg-orange-100 text-orange-700'}`}>
+                                      {selectedVoiceNote.status_penilaian || "Belum Dinilai"}
+                                    </div>
+                                  </div>
+                                  {selectedVoiceNote.catatan_penilaian && (
+                                    <div className="md:col-span-3">
+                                      <label className="text-sm font-semibold text-slate-600">Catatan Penilaian</label>
+                                      <div className="p-3 mt-1 bg-slate-50 rounded">
+                                        {selectedVoiceNote.catatan_penilaian}
+                                      </div>
+                                    </div>
+                                  )}
+                                  {selectedVoiceNote.tanggal_penilaian && (
+                                    <div>
+                                      <label className="text-sm font-semibold text-slate-600">Tanggal Dinilai</label>
+                                      <div className="p-3 mt-1 bg-slate-50 rounded">
+                                        {new Date(selectedVoiceNote.tanggal_penilaian).toLocaleDateString('id-ID')}
+                                      </div>
+                                    </div>
+                                  )}
+                                  <div className="md:col-span-3">
+                                    <label className="text-sm font-semibold text-slate-600">Audio Rekaman</label>
+                                    <div className="p-3 mt-1 bg-slate-50 rounded">
+                                      {selectedVoiceNote.file_path ? (
+                                        <audio controls className="w-full">
+                                          <source src={`http://localhost:5000/${encodeURI(selectedVoiceNote.file_path)}`} />
+                                          Browser Anda tidak mendukung pemutar audio.
+                                        </audio>
+                                      ) : (
+                                        <span className="text-slate-400">Tidak ada rekaman</span>
+                                      )}
                                     </div>
                                   </div>
                                 </div>
-                              ))}
+                              </div>
+                            )}
+
+                            {/* Dokumen Berkas */}
+                            <div className="mb-6">
+                              <h4 className="text-lg font-bold text-slate-800 mb-3 border-b pb-2">
+                                📄 Dokumen Berkas
+                              </h4>
+
+                              <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
+                                {getDocumentsFromSelectedBerkas().length > 0 ? (
+                                  getDocumentsFromSelectedBerkas().map((doc, idx) => {
+                                    // Tentukan styling berdasarkan jenis dokumen (sama dengan Berkas.jsx)
+                                    let colorClass = '';
+                                    let svgPath = '';
+                                    
+                                    if (doc.key === 'kartu_keluarga') {
+                                      colorClass = 'text-purple-700 bg-purple-50 hover:bg-purple-100';
+                                      svgPath = 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z';
+                                    } else if (doc.key === 'akta_kelahiran') {
+                                      colorClass = 'text-yellow-700 bg-yellow-50 hover:bg-yellow-100';
+                                      svgPath = 'M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z';
+                                    } else if (doc.key === 'rapor') {
+                                      colorClass = 'text-indigo-700 bg-indigo-50 hover:bg-indigo-100';
+                                      svgPath = 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253';
+                                    } else if (doc.key === 'surat_kematian') {
+                                      colorClass = 'text-gray-700 bg-gray-50 hover:bg-gray-100';
+                                      svgPath = 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z';
+                                    } else if (doc.key === 'foto_santri') {
+                                      colorClass = 'text-blue-700 bg-blue-50 hover:bg-blue-100';
+                                      svgPath = 'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z';
+                                    } else if (doc.key === 'sertifikat_hafalan') {
+                                      colorClass = 'text-green-700 bg-green-50 hover:bg-green-100';
+                                      svgPath = 'M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z';
+                                    } else if (doc.key === 'sertifikat_penghargaan') {
+                                      colorClass = 'text-pink-700 bg-pink-50 hover:bg-pink-100';
+                                      svgPath = 'M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7';
+                                    }
+                                    
+                                    return (
+                                      <div
+                                        key={idx}
+                                        className={`flex items-center gap-2 px-3 py-2 text-sm font-medium transition rounded-lg cursor-pointer hover:shadow ${colorClass}`}
+                                        onClick={() => handleViewDocument(doc)}
+                                      >
+                                        <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={svgPath} />
+                                        </svg>
+                                        <span>{doc.label}</span>
+                                      </div>
+                                    );
+                                  })
+                                ) : (
+                                  <div className="col-span-4 text-center py-8 text-slate-400">
+                                    Tidak ada dokumen yang diunggah
+                                  </div>
+                                )}
+                              </div>
                             </div>
 
                             <div className="flex items-center justify-center gap-6 mt-8">

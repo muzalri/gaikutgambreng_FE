@@ -125,12 +125,81 @@ export default function Pendaftaran() {
       return;
     }
 
-    // Validasi tanggal tutup harus setelah tanggal buka
-    if (new Date(formData.tanggal_tutup) < new Date(formData.tanggal_buka)) {
+    // Buat datetime lengkap untuk validasi
+    const waktuBukaNew = new Date(`${formData.tanggal_buka}T${formData.jam_buka}:00`);
+    const waktuTutupNew = new Date(`${formData.tanggal_tutup}T${formData.jam_tutup}:00`);
+
+    // Validasi waktu tutup harus setelah waktu buka
+    if (waktuTutupNew <= waktuBukaNew) {
       Swal.fire({
         icon: "warning",
         title: "Perhatian",
-        text: "Tanggal tutup harus setelah atau sama dengan tanggal buka!",
+        text: "Waktu tutup harus setelah waktu buka!",
+      });
+      return;
+    }
+
+    // Validasi bentrok dengan jadwal pendaftaran lain (cek tanggal DAN jam)
+    console.log('🔍 Memeriksa bentrok untuk jadwal baru:', {
+      tanggal_buka: formData.tanggal_buka,
+      jam_buka: formData.jam_buka,
+      tanggal_tutup: formData.tanggal_tutup,
+      jam_tutup: formData.jam_tutup,
+      waktuBukaNew: waktuBukaNew.toISOString(),
+      waktuTutupNew: waktuTutupNew.toISOString()
+    });
+
+    const bentrokData = pendaftaranList.find((p) => {
+      // Skip jika angkatan sama (update nanti akan handle ini)
+      if (p.angkatan === formData.angkatan) {
+        return false;
+      }
+
+      // Parse waktu dari pendaftaran yang sudah ada
+      const jamBuka = p.jam_buka.substring(0, 5);
+      const jamTutup = p.jam_tutup.substring(0, 5);
+      const waktuBukaExisting = new Date(`${p.tanggal_buka}T${jamBuka}:00`);
+      const waktuTutupExisting = new Date(`${p.tanggal_tutup}T${jamTutup}:00`);
+
+      console.log(`📋 Cek dengan jadwal existing (${p.nama}):`, {
+        tanggal_buka: p.tanggal_buka,
+        jam_buka: jamBuka,
+        tanggal_tutup: p.tanggal_tutup,
+        jam_tutup: jamTutup,
+        waktuBukaExisting: waktuBukaExisting.toISOString(),
+        waktuTutupExisting: waktuTutupExisting.toISOString()
+      });
+
+      // Cek apakah ada overlap waktu
+      // Dua interval overlap jika: start1 < end2 AND start2 < end1
+      // Atau lebih mudah: NOT (end1 <= start2 OR end2 <= start1)
+      const condition1 = waktuTutupNew <= waktuBukaExisting; // Jadwal baru selesai sebelum existing dimulai
+      const condition2 = waktuTutupExisting <= waktuBukaNew; // Jadwal existing selesai sebelum baru dimulai
+      const isOverlap = !(condition1 || condition2);
+
+      console.log(`   Evaluasi:`, {
+        'tutupNew <= bukaExisting': condition1,
+        'tutupExisting <= bukaNew': condition2,
+        'isOverlap': isOverlap
+      });
+
+      if (isOverlap) {
+        console.log('⚠️ BENTROK TERDETEKSI!');
+      }
+
+      return isOverlap;
+    });
+
+    if (bentrokData) {
+      Swal.fire({
+        icon: "error",
+        title: "Jadwal Bentrok!",
+        html: `Jadwal pendaftaran bentrok dengan <strong>${bentrokData.nama}</strong> (${bentrokData.angkatan})<br><br>
+               <small>
+               Jadwal existing: ${bentrokData.tanggal_buka} ${bentrokData.jam_buka.substring(0,5)} - ${bentrokData.tanggal_tutup} ${bentrokData.jam_tutup.substring(0,5)}<br>
+               Jadwal baru: ${formData.tanggal_buka} ${formData.jam_buka} - ${formData.tanggal_tutup} ${formData.jam_tutup}
+               </small><br><br>
+               Silakan pilih tanggal dan jam lain.`,
       });
       return;
     }

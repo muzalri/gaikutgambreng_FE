@@ -220,6 +220,7 @@ export default function Berkas() {
     hafalan_quran: "",
     alamat: "",
     no_telp: "",
+    no_telp_ortu: "",
     angkatan: "",
     jenis_kelamin: "Laki-laki",
     nama_ayah: "",
@@ -642,6 +643,10 @@ export default function Berkas() {
                     <div>
                       <p className="text-xs text-gray-500">No. WhatsApp</p>
                       <p className="font-semibold text-gray-800">{submittedBerkas.no_telp || '-'}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">No. WhatsApp Orang Tua</p>
+                      <p className="font-semibold text-gray-800">{submittedBerkas.no_telp_ortu || '-'}</p>
                     </div>
                     <div className="md:col-span-2">
                       <p className="text-xs text-gray-500">Alamat</p>
@@ -1151,6 +1156,22 @@ export default function Berkas() {
                   type="tel"
                   name="no_telp"
                   value={formData.no_telp}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg"
+                  placeholder="Contoh: 085774786881"
+                  required
+                />
+                <p className="mt-1 text-xs text-gray-500">* Tidak boleh dengan (+62), (-) dan spasi, cukup satu nomor</p>
+              </div>
+
+              <div>
+                <label className="block mb-2 text-sm font-medium text-gray-700">
+                  Nomor WhatsApp Orang Tua <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="tel"
+                  name="no_telp_ortu"
+                  value={formData.no_telp_ortu}
                   onChange={handleInputChange}
                   className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg"
                   placeholder="Contoh: 085774786881"
