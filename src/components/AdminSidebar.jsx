@@ -9,6 +9,7 @@ import {
   FaCalendarAlt,
   FaBullhorn,
   FaMicrophone,
+  FaWhatsapp,
 } from "react-icons/fa";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import AdminService from "../services/AdminService";
@@ -67,6 +68,12 @@ const sidebarMenu = [
     label: "Voice Note",
     icon: <FaMicrophone />,
     path: "/admin/voicenote",
+    roles: ["admin", "user"],
+  },
+  {
+    label: "Group Chat",
+    icon: <FaWhatsapp />,
+    path: "/admin/groupchat",
     roles: ["admin", "user"],
   },
 ];

@@ -2,7 +2,9 @@ import React, { useRef, useState, useEffect } from "react";
 import PenggunaSidebar from "../../components/PenggunaSidebar";
 import BerkasService from "../../services/BerkasService";
 import VoiceNoteService from "../../services/VoiceNoteService";
+import GroupChatService from "../../services/GroupChatService";
 import Swal from "sweetalert2";
+import { FaWhatsapp } from "react-icons/fa";
 
 export default function Berkas() {
   const [santriData, setSantriData] = useState(null);
@@ -12,6 +14,7 @@ export default function Berkas() {
   const [submittedBerkas, setSubmittedBerkas] = useState(null); // Berkas yang sudah dikirim
   const [submittedVoiceNote, setSubmittedVoiceNote] = useState(null); // Voice note yang sudah diupload
   const [showSubmittedBerkas, setShowSubmittedBerkas] = useState(false); // Toggle view
+  const [groupChat, setGroupChat] = useState(null); // Group chat WA
 
   useEffect(() => {
     // Ambil data santri dari localStorage
@@ -94,9 +97,27 @@ export default function Berkas() {
         
         // Fetch voice note yang sudah diupload
         fetchSubmittedVoiceNote(santri.id, result.data[0].angkatan);
+        
+        // Fetch group chat untuk angkatan ini
+        fetchGroupChat(result.data[0].angkatan);
       }
     } catch (error) {
       console.error('Error fetching submitted berkas:', error);
+    }
+  };
+
+  const fetchGroupChat = async (angkatan) => {
+    try {
+      console.log('📱 Fetching group chat for angkatan:', angkatan);
+      const response = await GroupChatService.getGroupChatByAngkatan(angkatan);
+      
+      if (response.success && response.data) {
+        setGroupChat(response.data);
+        console.log('✅ Group chat loaded:', response.data);
+      }
+    } catch (error) {
+      console.log('ℹ️ Belum ada group chat untuk angkatan ini');
+      setGroupChat(null);
     }
   };
 
@@ -567,6 +588,34 @@ export default function Berkas() {
               Silakan lengkapi data berikut sesuai persyaratan pendaftaran
               Pesantren Al Ihsan Bekasi.
             </p>
+
+            {/* Group Chat WhatsApp Section */}
+            {submittedBerkas && groupChat && (
+              <div className="p-6 mb-6 border-l-4 border-green-500 rounded-lg shadow-md bg-gradient-to-r from-green-50 to-teal-50">
+                <div className="flex items-start gap-4">
+                  <div className="flex items-center justify-center flex-shrink-0 w-12 h-12 text-2xl text-white bg-green-500 rounded-full">
+                    <FaWhatsapp />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="mb-2 text-xl font-bold text-gray-800">
+                      Group WhatsApp Angkatan {submittedBerkas.angkatan}
+                    </h3>
+                    <p className="mb-4 text-gray-600">
+                      {groupChat.keterangan || 'Bergabunglah dengan group WhatsApp untuk mendapatkan informasi terbaru seputar pendaftaran dan kegiatan pesantren.'}
+                    </p>
+                    <a
+                      href={groupChat.link_wa}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-6 py-3 font-semibold text-white transition bg-green-500 rounded-lg shadow-md hover:bg-green-600"
+                    >
+                      <FaWhatsapp className="text-xl" />
+                      Gabung Group WhatsApp
+                    </a>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Tombol Toggle View Berkas yang Sudah Dikirim */}
             {submittedBerkas && (

@@ -6,12 +6,15 @@ import {
   FaThLarge,
   FaCalendarAlt,
   FaRegCalendarCheck,
+  FaWhatsapp,
 } from "react-icons/fa";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import PenggunaSidebar from "../../components/PenggunaSidebar";
 import Swal from "sweetalert2";
 import PengumumanService from "../../services/PengumumanService";
 import PromosiService from "../../services/PromosiService";
+import BerkasService from "../../services/BerkasService";
+import GroupChatService from "../../services/GroupChatService";
 
 export default function Beranda() {
   const [santriData, setSantriData] = useState(null);
@@ -20,13 +23,19 @@ export default function Beranda() {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [banner, setBanner] = useState(null);
   const [bannerLoading, setBannerLoading] = useState(true);
+  const [berkasData, setBerkasData] = useState(null);
+  const [groupChat, setGroupChat] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     // Ambil data santri dari localStorage
     const data = localStorage.getItem("santriData");
     if (data) {
-      setSantriData(JSON.parse(data));
+      const parsedData = JSON.parse(data);
+      setSantriData(parsedData);
+      
+      // Cek berkas santri ini
+      loadBerkasData(parsedData.id);
     }
     
     // Ambil banner dari promosi
@@ -52,6 +61,33 @@ export default function Beranda() {
       }
     })();
   }, []);
+
+  const loadBerkasData = async (idSantri) => {
+    try {
+      const response = await BerkasService.getByIdSantri(idSantri);
+      if (response.success && response.data) {
+        setBerkasData(response.data);
+        
+        // Jika berkas sudah ada dan ada angkatan, ambil group chat
+        if (response.data.angkatan) {
+          loadGroupChat(response.data.angkatan);
+        }
+      }
+    } catch (error) {
+      console.log('Belum ada berkas untuk santri ini');
+    }
+  };
+
+  const loadGroupChat = async (angkatan) => {
+    try {
+      const response = await GroupChatService.getGroupChatByAngkatan(angkatan);
+      if (response.success && response.data) {
+        setGroupChat(response.data);
+      }
+    } catch (error) {
+      console.log('Belum ada group chat untuk angkatan ini');
+    }
+  };
 
   const fetchBanner = async () => {
     try {
@@ -156,6 +192,34 @@ export default function Beranda() {
                 </div> */}
               </div>
             </div>
+            {/* Group Chat Section - Tampil jika ada berkas dan group chat */}
+            {berkasData && groupChat && (
+              <div className="mb-8 p-6 bg-gradient-to-r from-green-50 to-teal-50 rounded-2xl shadow border-l-4 border-green-500">
+                <div className="flex items-start gap-4">
+                  <div className="bg-green-500 text-white p-3 rounded-full">
+                    <FaWhatsapp className="text-2xl" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-xl font-bold text-gray-800 mb-2">
+                      Group WhatsApp Angkatan {berkasData.angkatan}
+                    </h3>
+                    <p className="text-gray-600 mb-4">
+                      {groupChat.keterangan || 'Bergabunglah dengan group WhatsApp untuk mendapatkan informasi terbaru seputar pendaftaran dan kegiatan pesantren.'}
+                    </p>
+                    <a
+                      href={groupChat.link_wa}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg transition shadow-md"
+                    >
+                      <FaWhatsapp className="text-xl" />
+                      Gabung Group WhatsApp
+                    </a>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Table Section */}
             <div className="p-6 bg-white shadow rounded-2xl">
               <h3 className="mb-1 text-lg font-bold">
