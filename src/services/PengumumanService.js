@@ -4,12 +4,12 @@ const TAHAPAN_MAP = {
   "Seleksi Berkas": 1,
   "Tes Psikolog": 2,
   "Tes Baca Al-Qur'an": 3,
-  "Wawancara Casantri": 4,
-  "Karantina Casantri": 5,
+  "Karantina Casantri": 4,
+  "Wawancara Casantri": 5,
   // Backward-compat for labels in modal if used
   "Seleksi Administrasi": 1,
-  "Wawancara": 4,
-  "Karantina": 5,
+  "Karantina": 4,
+  "Wawancara": 5,
 };
 
 const publish = async ({ angkatan, tahapan }) => {

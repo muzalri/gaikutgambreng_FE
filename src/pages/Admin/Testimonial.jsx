@@ -517,22 +517,15 @@ export default function Testimonial() {
                               <label className="block text-sm font-medium text-slate-700 mb-2">
                                 Kategori
                               </label>
-                              <select
+                              <input
+                                type="text"
                                 name="kategori"
                                 value={formData.kategori}
                                 onChange={handleInputChange}
                                 className="w-full px-4 py-3 rounded-lg bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-400"
+                                placeholder="Masukkan kategori (Wali Santri, Alumni, Santri, dll)"
                                 required
-                              >
-                                <option value="">Pilih Kategori</option>
-                                <option value="Wali Santri">Wali Santri</option>
-                                <option value="Alumni">Alumni</option>
-                                <option value="Santri">
-                                  Santri
-                                </option>
-                                <option value="Guru/Ustadz">Guru/Ustadz</option>
-                                <option value="Lainnya">Lainnya</option>
-                              </select>
+                              />
                             </div>
                           </div>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

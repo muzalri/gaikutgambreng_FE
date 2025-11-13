@@ -59,10 +59,27 @@ export default function AdminDashboard() {
           BerkasService.getAll({ status: 'Diterima', page: 1, limit: 1 }),
         ]);
 
-        const totalSantriLulus = resLulus?.pagination?.total ?? (resLulus?.data ? resLulus.data.length : 0);
-        const totalPendaftar = resPendaftar?.pagination?.total ?? (resPendaftar?.data ? resPendaftar.data.length : 0);
+        console.log('Stats responses:', {
+          resSantri,
+          resPendidik,
+          resArtikel,
+          resPendaftar,
+          resLulus
+        });
+
+        // Total santri lulus (yang statusnya Diterima)
+        const totalSantriLulus = resLulus?.pagination?.total ?? 0;
+        
+        // Total pendaftar (semua berkas yang pernah daftar)
+        const totalPendaftar = resPendaftar?.pagination?.total ?? 0;
+        
+        // Total pendidik
         const totalPendidik = resPendidik?.success && Array.isArray(resPendidik.data) ? resPendidik.data.length : 0;
+        
+        // Total artikel
         const totalArtikel = resArtikel?.success && Array.isArray(resArtikel.data) ? resArtikel.data.length : 0;
+
+        console.log('Final stats:', { totalSantriLulus, totalPendidik, totalArtikel, totalPendaftar });
 
         setStats({ totalSantriLulus, totalPendidik, totalArtikel, totalPendaftar });
       } catch (err) {
@@ -79,14 +96,29 @@ export default function AdminDashboard() {
         const currentYear = new Date().getFullYear();
         const years = Array.from({ length: 5 }, (_, i) => currentYear - 4 + i);
         
-        // Fetch data untuk setiap tahun
+        console.log('Fetching chart data for years:', years);
+        
+        // Fetch data untuk setiap tahun dengan berbagai format angkatan yang mungkin
         const yearlyData = await Promise.all(
           years.map(async (year) => {
             try {
-              const angkatan = `PPDB ${year}`;
-              const res = await BerkasService.getAll({ angkatan, page: 1, limit: 1 });
-              const count = res?.pagination?.total ?? 0;
-              return { year, count };
+              // Coba beberapa format angkatan yang mungkin
+              const formats = [`PPDB ${year}`, `${year}`, `Angkatan ${year}`];
+              let totalCount = 0;
+              
+              for (const format of formats) {
+                try {
+                  const res = await BerkasService.getAll({ angkatan: format, page: 1, limit: 1 });
+                  console.log(`Response for ${format}:`, res);
+                  const count = res?.pagination?.total ?? 0;
+                  totalCount += count;
+                } catch (err) {
+                  console.warn(`No data for format ${format}:`, err.message);
+                }
+              }
+              
+              console.log(`Total count for year ${year}:`, totalCount);
+              return { year, count: totalCount };
             } catch (err) {
               console.warn(`Error fetching data for year ${year}:`, err);
               return { year, count: 0 };
@@ -94,6 +126,7 @@ export default function AdminDashboard() {
           })
         );
 
+        console.log('Final yearly data:', yearlyData);
         setChartData(yearlyData);
       } catch (err) {
         console.error('Error fetching chart data:', err);
@@ -130,7 +163,7 @@ export default function AdminDashboard() {
                 <div className="flex flex-col items-center justify-center p-6 bg-white border shadow rounded-2xl border-slate-100">
                   <FaUserFriends className="mb-2 text-4xl text-teal-700" />
                   <div className="text-base font-semibold text-slate-700">
-                    Total Santri
+                    Santri Diterima
                   </div>
                   <div className="mt-1 text-2xl font-extrabold text-teal-900">
                     {loadingCounts ? 'Memuat...' : `${stats.totalSantriLulus} Santri`}
@@ -139,7 +172,7 @@ export default function AdminDashboard() {
                 <div className="flex flex-col items-center justify-center p-6 bg-white border shadow rounded-2xl border-slate-100">
                   <FaChalkboardTeacher className="mb-2 text-4xl text-teal-700" />
                   <div className="text-base font-semibold text-slate-700">
-                    Pendidik
+                    Total Pendidik
                   </div>
                   <div className="mt-1 text-2xl font-extrabold text-teal-900">
                     {loadingCounts ? 'Memuat...' : `${stats.totalPendidik} Pendidik`}
@@ -157,7 +190,7 @@ export default function AdminDashboard() {
                 <div className="flex flex-col items-center justify-center p-6 bg-white border shadow rounded-2xl border-slate-100">
                   <FaChartLine className="mb-2 text-4xl text-teal-700" />
                   <div className="text-base font-semibold text-slate-700">
-                    Pendaftar
+                    Total Pendaftar
                   </div>
                   <div className="mt-1 text-2xl font-extrabold text-teal-900">
                     {loadingCounts ? 'Memuat...' : `${stats.totalPendaftar} Pendaftar`}

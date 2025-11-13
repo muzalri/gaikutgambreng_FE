@@ -108,11 +108,11 @@ export default function Beranda() {
   const namaLogin = santriData?.nama || "Santri";
   const getTahapanLabel = (num) => {
     const map = {
-      2: "Seleksi Berkas",
-      3: "Tes Psikolog",
-      4: "Tes Baca Al-Qur'an",
+      1: "Seleksi Berkas",
+      2: "Tes Psikolog",
+      3: "Tes Baca Al-Qur'an",
+      4: "Karantina Casantri",
       5: "Wawancara Casantri",
-      6: "Diterima",
     };
     return map[parseInt(num || 1, 10)] || `Tahap ${num}`;
   };

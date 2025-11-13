@@ -24,8 +24,8 @@ export default function PPDB() {
     1: "Seleksi Berkas",
     2: "Tes Psikolog",
     3: "Tes Baca Al-Qur'an",
-    4: "Wawancara Casantri",
-    5: "Karantina Casantri",
+    4: "Karantina Casantri",
+    5: "Wawancara Casantri",
   };
 
   const getTahapanLabel = (value) => {
@@ -454,8 +454,8 @@ export default function PPDB() {
                       <option value="1">Seleksi Berkas</option>
                       <option value="2">Tes Psikolog</option>
                       <option value="3">Tes Baca Al-Qur'an</option>
-                      <option value="4">Wawancara Casantri</option>
-                      <option value="5">Karantina Casantri</option>
+                      <option value="4">Karantina Casantri</option>
+                      <option value="5">Wawancara Casantri</option>
                     </select>
                     <span className="absolute text-teal-700 transform -translate-y-1/2 pointer-events-none right-4 top-1/2">
                       <svg
