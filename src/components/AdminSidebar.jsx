@@ -76,6 +76,12 @@ const sidebarMenu = [
     path: "/admin/groupchat",
     roles: ["admin", "user"],
   },
+  {
+    label: "FAQ",
+    icon: <FaFileAlt />,
+    path: "/admin/faq",
+    roles: ["admin", "user"],
+  },
 ];
 
 export default function AdminSidebar() {

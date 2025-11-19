@@ -10,6 +10,7 @@ export default function Pendaftaran() {
   const navigate = useNavigate();
   const [pendaftaranList, setPendaftaranList] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchKeyword, setSearchKeyword] = useState("");
   const [formData, setFormData] = useState({
     tanggal_buka: "",
     jam_buka: "",
@@ -292,7 +293,9 @@ export default function Pendaftaran() {
                   <div className="relative">
                     <input
                       type="text"
-                      placeholder="Cari..."
+                      placeholder="Cari angkatan, nama..."
+                      value={searchKeyword}
+                      onChange={(e) => setSearchKeyword(e.target.value)}
                       className="px-6 py-2 pr-10 font-semibold text-teal-700 bg-white border border-teal-700 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
                     />
                     <span className="absolute text-teal-700 transform -translate-y-1/2 right-4 top-1/2">
@@ -467,7 +470,34 @@ export default function Pendaftaran() {
                         </tr>
                       </thead>
                       <tbody>
-                        {pendaftaranList.map((pendaftaran, i) => (
+                        {(() => {
+                          // Filter berdasarkan search keyword
+                          let filtered = pendaftaranList;
+                          
+                          if (searchKeyword.trim()) {
+                            const keyword = searchKeyword.toLowerCase();
+                            filtered = filtered.filter(p => 
+                              (p.angkatan && String(p.angkatan).toLowerCase().includes(keyword)) ||
+                              (p.nama && p.nama.toLowerCase().includes(keyword)) ||
+                              (p.tanggal_buka && p.tanggal_buka.includes(keyword)) ||
+                              (p.tanggal_tutup && p.tanggal_tutup.includes(keyword))
+                            );
+                          }
+                          
+                          if (filtered.length === 0) {
+                            return (
+                              <tr>
+                                <td
+                                  colSpan="8"
+                                  className="py-8 text-center text-slate-500"
+                                >
+                                  {searchKeyword.trim() ? 'Tidak ada jadwal pendaftaran yang sesuai dengan pencarian' : 'Tidak ada data jadwal pendaftaran'}
+                                </td>
+                              </tr>
+                            );
+                          }
+                          
+                          return filtered.map((pendaftaran, i) => (
                           <tr
                             key={pendaftaran.id}
                             className={i % 2 === 0 ? "bg-white" : "bg-slate-50"}
@@ -511,10 +541,11 @@ export default function Pendaftaran() {
                                 >
                                   Hapus
                                 </button>
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
+                            </div>
+                          </td>
+                        </tr>
+                          ));
+                        })()}
                       </tbody>
                     </table>
                   </div>

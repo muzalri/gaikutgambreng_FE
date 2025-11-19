@@ -699,17 +699,41 @@ export default function Santri() {
                             Loading...
                           </td>
                         </tr>
-                      ) : (selectedYear ? santriList.filter(s => String(s.tahun_masuk || '') === String(selectedYear)) : santriList).length === 0 ? (
-                        <tr>
-                          <td
-                            colSpan="4"
-                            className="py-8 text-center text-slate-500"
-                          >
-                            Tidak ada data santri
-                          </td>
-                        </tr>
-                      ) : (
-                        (selectedYear ? santriList.filter(s => String(s.tahun_masuk || '') === String(selectedYear)) : santriList).map((santri, i) => (
+                      ) : (() => {
+                        // Filter berdasarkan tahun dan search keyword
+                        let filtered = santriList;
+                        
+                        // Filter by year
+                        if (selectedYear) {
+                          filtered = filtered.filter(s => String(s.tahun_masuk || '') === String(selectedYear));
+                        }
+                        
+                        // Filter by search keyword
+                        if (searchKeyword.trim()) {
+                          const keyword = searchKeyword.toLowerCase();
+                          filtered = filtered.filter(s => 
+                            (s.nama_lengkap && s.nama_lengkap.toLowerCase().includes(keyword)) ||
+                            (s.nama && s.nama.toLowerCase().includes(keyword)) ||
+                            (s.email && s.email.toLowerCase().includes(keyword)) ||
+                            (s.angkatan && String(s.angkatan).toLowerCase().includes(keyword)) ||
+                            (s.asal_sekolah && s.asal_sekolah.toLowerCase().includes(keyword))
+                          );
+                        }
+                        
+                        if (filtered.length === 0) {
+                          return (
+                            <tr>
+                              <td
+                                colSpan="4"
+                                className="py-8 text-center text-slate-500"
+                              >
+                                {searchKeyword.trim() ? 'Tidak ada santri yang sesuai dengan pencarian' : 'Tidak ada data santri'}
+                              </td>
+                            </tr>
+                          );
+                        }
+                        
+                        return filtered.map((santri, i) => (
                           <tr
                             key={santri.id}
                             className={i % 2 === 0 ? "bg-white" : "bg-slate-50"}
@@ -728,8 +752,8 @@ export default function Santri() {
                               </button>
                             </td>
                           </tr>
-                        ))
-                      )}
+                        ));
+                      })()}
                     </tbody>
                   </table>
                 </div>

@@ -419,7 +419,34 @@ export default function Pendidik() {
                         </tr>
                       </thead>
                       <tbody>
-                        {pendidikList.map((pendidik, i) => (
+                        {(() => {
+                          // Filter berdasarkan search keyword
+                          let filtered = pendidikList;
+                          
+                          if (searchQuery.trim()) {
+                            const keyword = searchQuery.toLowerCase();
+                            filtered = filtered.filter(p => 
+                              (p.nama && p.nama.toLowerCase().includes(keyword)) ||
+                              (p.email && p.email.toLowerCase().includes(keyword)) ||
+                              (p.no_telp && String(p.no_telp).toLowerCase().includes(keyword)) ||
+                              (p.isi && p.isi.toLowerCase().includes(keyword))
+                            );
+                          }
+                          
+                          if (filtered.length === 0) {
+                            return (
+                              <tr>
+                                <td
+                                  colSpan="6"
+                                  className="py-8 text-center text-slate-500"
+                                >
+                                  {searchQuery.trim() ? 'Tidak ada pendidik yang sesuai dengan pencarian' : 'Tidak ada data pendidik'}
+                                </td>
+                              </tr>
+                            );
+                          }
+                          
+                          return filtered.map((pendidik, i) => (
                           <tr
                             key={pendidik.id}
                             className={i % 2 === 0 ? "bg-white" : "bg-slate-50"}
@@ -452,7 +479,8 @@ export default function Pendidik() {
                               </button>
                             </td>
                           </tr>
-                        ))}
+                          ));
+                        })()}
                       </tbody>
                     </table>
                   </div>

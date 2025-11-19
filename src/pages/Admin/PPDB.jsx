@@ -19,6 +19,7 @@ export default function PPDB() {
   const [selectedAngkatan, setSelectedAngkatan] = useState("");
   const [selectedTahapan, setSelectedTahapan] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
+  const [searchKeyword, setSearchKeyword] = useState("");
 
   const TAHAPAN_LABELS = {
     1: "Seleksi Berkas",
@@ -473,7 +474,9 @@ export default function PPDB() {
                   <div className="relative">
                     <input
                       type="text"
-                      placeholder="Cari..."
+                      placeholder="Cari nama, angkatan, status..."
+                      value={searchKeyword}
+                      onChange={(e) => setSearchKeyword(e.target.value)}
                       className="px-6 py-2 pr-10 font-semibold text-teal-700 bg-white border border-teal-700 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
                     />
                     <span className="absolute text-teal-700 transform -translate-y-1/2 right-4 top-1/2">
@@ -507,28 +510,62 @@ export default function PPDB() {
                       </tr>
                     </thead>
                     <tbody>
-                      {santriList
-                        .filter((row) => {
-                          if (!selectedAngkatan) return true;
+                      {(() => {
+                        let filtered = santriList;
+                        
+                        // Filter by angkatan
+                        if (selectedAngkatan) {
                           const val = String(selectedAngkatan);
-                          const ra = String(row.angkatan || "").toLowerCase();
-                          return (
-                            ra === val.toLowerCase() ||
-                            ra.includes(val.toLowerCase()) ||
-                            ra.includes(`angkatan ${val}`.toLowerCase())
-                          );
-                        })
-                        .filter((row) => {
-                          if (!selectedTahapan) return true;
-                          const tahap = parseInt(row?.tahapan || 1, 10);
-                          return tahap === parseInt(selectedTahapan, 10);
-                        })
-                        .filter((row) => {
-                          if (!selectedStatus) return true;
+                          filtered = filtered.filter((row) => {
+                            const ra = String(row.angkatan || "").toLowerCase();
+                            return (
+                              ra === val.toLowerCase() ||
+                              ra.includes(val.toLowerCase()) ||
+                              ra.includes(`angkatan ${val}`.toLowerCase())
+                            );
+                          });
+                        }
+                        
+                        // Filter by tahapan
+                        if (selectedTahapan) {
+                          filtered = filtered.filter((row) => {
+                            const tahap = parseInt(row?.tahapan || 1, 10);
+                            return tahap === parseInt(selectedTahapan, 10);
+                          });
+                        }
+                        
+                        // Filter by status
+                        if (selectedStatus) {
                           const target = selectedStatus === 'Proses' ? 'Pending' : selectedStatus;
-                          return String(row?.status || '').toLowerCase() === String(target).toLowerCase();
-                        })
-                        .map((data, i) => (
+                          filtered = filtered.filter((row) => {
+                            return String(row?.status || '').toLowerCase() === String(target).toLowerCase();
+                          });
+                        }
+                        
+                        // Filter by search keyword
+                        if (searchKeyword.trim()) {
+                          const keyword = searchKeyword.toLowerCase();
+                          filtered = filtered.filter(row => 
+                            (row.nama && row.nama.toLowerCase().includes(keyword)) ||
+                            (row.angkatan && String(row.angkatan).toLowerCase().includes(keyword)) ||
+                            (row.status && row.status.toLowerCase().includes(keyword))
+                          );
+                        }
+                        
+                        if (filtered.length === 0) {
+                          return (
+                            <tr>
+                              <td
+                                colSpan="6"
+                                className="py-8 text-center text-slate-500"
+                              >
+                                {searchKeyword.trim() ? 'Tidak ada data yang sesuai dengan pencarian' : 'Tidak ada data pendaftaran'}
+                              </td>
+                            </tr>
+                          );
+                        }
+                        
+                        return filtered.map((data, i) => (
                         <tr
                           key={data.id}
                           className={i % 2 === 0 ? "bg-white" : "bg-slate-50"}
@@ -547,7 +584,8 @@ export default function PPDB() {
                             </button>
                           </td>
                         </tr>
-                      ))}
+                        ));
+                      })()}
                     </tbody>
                   </table>
                   {/* Viewer modal */}

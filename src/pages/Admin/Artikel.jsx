@@ -555,7 +555,34 @@ export default function Artikel() {
                           </tr>
                         </thead>
                         <tbody>
-                          {artikelList.map((artikel, i) => (
+                          {(() => {
+                            // Filter berdasarkan search keyword
+                            let filtered = artikelList;
+                            
+                            if (searchKeyword.trim()) {
+                              const keyword = searchKeyword.toLowerCase();
+                              filtered = filtered.filter(a => 
+                                (a.judul && a.judul.toLowerCase().includes(keyword)) ||
+                                (a.kategori && a.kategori.toLowerCase().includes(keyword)) ||
+                                (a.isi && a.isi.toLowerCase().includes(keyword)) ||
+                                (a.penulis?.nama && a.penulis.nama.toLowerCase().includes(keyword))
+                              );
+                            }
+                            
+                            if (filtered.length === 0) {
+                              return (
+                                <tr>
+                                  <td
+                                    colSpan="6"
+                                    className="py-8 text-center text-slate-500"
+                                  >
+                                    {searchKeyword.trim() ? 'Tidak ada artikel yang sesuai dengan pencarian' : 'Tidak ada data artikel'}
+                                  </td>
+                                </tr>
+                              );
+                            }
+                            
+                            return filtered.map((artikel, i) => (
                             <tr
                               key={artikel.id}
                               className={
@@ -586,7 +613,8 @@ export default function Artikel() {
                                 </button>
                               </td>
                             </tr>
-                          ))}
+                            ));
+                          })()}
                         </tbody>
                       </table>
                     </div>

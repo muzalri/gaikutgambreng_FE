@@ -7,6 +7,7 @@ import Pendaftaran from "./pages/Admin/Pendaftaran";
 import Promosi from "./pages/Admin/Promosi";
 import VoiceNote from "./pages/Admin/VoiceNote";
 import GroupChat from "./pages/Admin/GroupChat";
+import FAQ from "./pages/Admin/FAQ";
 import React from "react";
 import { BrowserRouter, Routes, Route, Link, Navigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
@@ -119,6 +120,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <GroupChat />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/faq"
+            element={
+              <ProtectedRoute>
+                <FAQ />
               </ProtectedRoute>
             }
           />
