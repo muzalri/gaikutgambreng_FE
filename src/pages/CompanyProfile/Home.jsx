@@ -82,7 +82,9 @@ export default function Home() {
             return {
               id: item.id,
               name: item.nama,
-              cohort: item.angkatan ? `Angkatan ${item.angkatan}` : item.kategori || "",
+              cohort: item.angkatan
+                ? `Angkatan ${item.angkatan}`
+                : item.kategori || "",
               photo: getImageUrl(imagePath),
               text: item.testimonial,
             };
@@ -498,18 +500,88 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Galeri */}
+      <section
+        className="py-20 bg-slate-50"
+        data-aos="fade-up"
+        data-aos-delay="200"
+      >
+        <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+          <h2 className="text-2xl font-extrabold text-center mb-12">
+            Galeri <span className="text-amber-500">Pesantren</span>
+          </h2>
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-4 auto-rows-[200px]">
+            {/* Image 1 - Large */}
+            <div className="col-span-2 row-span-2 overflow-hidden rounded-2xl shadow-lg">
+              <img
+                src="/assets/gallery/pesantren-1.jpg"
+                alt="Gedung Pesantren"
+                className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
+                onError={(e) => {
+                  e.target.src = "/assets/FotoPesantren.png";
+                }}
+              />
+            </div>
+            {/* Image 2 */}
+            <div className="overflow-hidden rounded-2xl shadow-lg">
+              <img
+                src="/assets/gallery/pesantren-2.jpg"
+                alt="Fasilitas Pesantren"
+                className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
+                onError={(e) => {
+                  e.target.src = "/assets/FotoSejarah.png";
+                }}
+              />
+            </div>
+            {/* Image 3 */}
+            <div className="overflow-hidden rounded-2xl shadow-lg">
+              <img
+                src="/assets/gallery/pesantren-3.jpg"
+                alt="Masjid Pesantren"
+                className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
+                onError={(e) => {
+                  e.target.src = "/assets/FotoPesantren.png";
+                }}
+              />
+            </div>
+            {/* Image 4 */}
+            <div className="overflow-hidden rounded-2xl shadow-lg">
+              <img
+                src="/assets/gallery/pesantren-4.jpg"
+                alt="Kegiatan Santri"
+                className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
+                onError={(e) => {
+                  e.target.src = "/assets/FotoBarisSantri.png";
+                }}
+              />
+            </div>
+            {/* Image 5 */}
+            <div className="overflow-hidden rounded-2xl shadow-lg">
+              <img
+                src="/assets/gallery/pesantren-5.jpg"
+                alt="Pembelajaran"
+                className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
+                onError={(e) => {
+                  e.target.src = "/assets/FotoPesantren.png";
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Testimoni */}
       <section
         className="relative py-16"
         data-aos="fade-up"
-        data-aos-delay="150"
+        data-aos-delay="250"
       >
         {/* Background image with blur */}
         <div
           className="absolute inset-0 -z-10 bg-cover bg-center"
-          style={{ 
+          style={{
             backgroundImage: "url(/assets/FotoPesantren.png)",
-            filter: "blur(3px)"
+            filter: "blur(3px)",
           }}
         />
         <div className="absolute inset-0 -z-10 bg-white/70" />
@@ -529,63 +601,72 @@ export default function Home() {
                 Belum ada testimoni
               </div>
             ) : (
-            <>
-            {/* Side previews - blurred background cards */}
-            <div className="hidden lg:block absolute left-8 top-1/2 -translate-y-1/2 w-[200px] h-[280px] rounded-2xl overflow-hidden shadow-lg z-0" style={{ filter: "blur(2px)", opacity: 0.6 }}>
-              <img
-                src={testimonials[(current - 1 + total) % total].photo}
-                alt="Previous"
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div className="hidden lg:block absolute right-8 top-1/2 -translate-y-1/2 w-[200px] h-[280px] rounded-2xl overflow-hidden shadow-lg z-0" style={{ filter: "blur(2px)", opacity: 0.6 }}>
-              <img
-                src={testimonials[(current + 1) % total].photo}
-                alt="Next"
-                className="w-full h-full object-cover"
-              />
-            </div>
-
-            {/* Main testimonial card */}
-            <div className="relative z-10 w-full max-w-4xl mx-auto px-4">
-              <div className="bg-white rounded-2xl shadow-xl overflow-hidden grid md:grid-cols-[320px_1fr] gap-6 p-6">
-                {/* Photo on the left */}
-                <div className="flex items-center justify-center">
+              <>
+                {/* Side previews - blurred background cards */}
+                <div
+                  className="hidden lg:block absolute left-8 top-1/2 -translate-y-1/2 w-[200px] h-[280px] rounded-2xl overflow-hidden shadow-lg z-0"
+                  style={{ filter: "blur(2px)", opacity: 0.6 }}
+                >
                   <img
-                    src={testimonials[current].photo}
-                    alt={testimonials[current].name}
-                    className="w-full max-w-[280px] h-auto rounded-xl object-cover shadow-md"
+                    src={testimonials[(current - 1 + total) % total].photo}
+                    alt="Previous"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div
+                  className="hidden lg:block absolute right-8 top-1/2 -translate-y-1/2 w-[200px] h-[280px] rounded-2xl overflow-hidden shadow-lg z-0"
+                  style={{ filter: "blur(2px)", opacity: 0.6 }}
+                >
+                  <img
+                    src={testimonials[(current + 1) % total].photo}
+                    alt="Next"
+                    className="w-full h-full object-cover"
                   />
                 </div>
 
-                {/* Text content on the right */}
-                <div className="flex flex-col justify-center py-4">
-                  <h3 className="text-xl font-bold text-slate-900 mb-1">
-                    {testimonials[current].name} - <span className="text-amber-500">{testimonials[current].cohort}</span>
-                  </h3>
-                  <p className="text-slate-700 leading-relaxed text-justify mt-4">
-                    {testimonials[current].text}
-                  </p>
-                </div>
-              </div>
-            </div>
+                {/* Main testimonial card */}
+                <div className="relative z-10 w-full max-w-4xl mx-auto px-4">
+                  <div className="bg-white rounded-2xl shadow-xl overflow-hidden grid md:grid-cols-[320px_1fr] gap-6 p-6">
+                    {/* Photo on the left */}
+                    <div className="flex items-center justify-center">
+                      <img
+                        src={testimonials[current].photo}
+                        alt={testimonials[current].name}
+                        className="w-full max-w-[280px] h-auto rounded-xl object-cover shadow-md"
+                      />
+                    </div>
 
-            {/* Navigation arrows */}
-            <button
-              onClick={prev}
-              aria-label="Sebelumnya"
-              className="absolute left-2 lg:left-4 z-20 inline-flex items-center justify-center w-12 h-12 text-3xl text-white -translate-y-1/2 rounded-full shadow-lg top-1/2 bg-amber-500 hover:bg-amber-600 transition-colors"
-            >
-              ‹
-            </button>
-            <button
-              onClick={next}
-              aria-label="Selanjutnya"
-              className="absolute right-2 lg:right-4 z-20 inline-flex items-center justify-center w-12 h-12 text-3xl text-white -translate-y-1/2 rounded-full shadow-lg top-1/2 bg-amber-500 hover:bg-amber-600 transition-colors"
-            >
-              ›
-            </button>
-            </>
+                    {/* Text content on the right */}
+                    <div className="flex flex-col justify-center py-4">
+                      <h3 className="text-xl font-bold text-slate-900 mb-1">
+                        {testimonials[current].name} -{" "}
+                        <span className="text-amber-500">
+                          {testimonials[current].cohort}
+                        </span>
+                      </h3>
+                      <p className="text-slate-700 leading-relaxed text-justify mt-4">
+                        {testimonials[current].text}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Navigation arrows */}
+                <button
+                  onClick={prev}
+                  aria-label="Sebelumnya"
+                  className="absolute left-2 lg:left-4 z-20 inline-flex items-center justify-center w-12 h-12 text-3xl text-white -translate-y-1/2 rounded-full shadow-lg top-1/2 bg-amber-500 hover:bg-amber-600 transition-colors"
+                >
+                  ‹
+                </button>
+                <button
+                  onClick={next}
+                  aria-label="Selanjutnya"
+                  className="absolute right-2 lg:right-4 z-20 inline-flex items-center justify-center w-12 h-12 text-3xl text-white -translate-y-1/2 rounded-full shadow-lg top-1/2 bg-amber-500 hover:bg-amber-600 transition-colors"
+                >
+                  ›
+                </button>
+              </>
             )}
           </div>
         </div>

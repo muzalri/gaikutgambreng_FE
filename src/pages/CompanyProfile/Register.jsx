@@ -7,7 +7,7 @@ import Swal from "sweetalert2";
 export default function Register() {
   const [open, setOpen] = useState([false, false, false]);
   const toggle = (idx) => setOpen((o) => o.map((v, i) => (i === idx ? !v : v)));
-  
+
   // State untuk brosur
   const [brosur, setBrosur] = useState(null);
   const [brosurLoading, setBrosurLoading] = useState(true);
@@ -33,7 +33,7 @@ export default function Register() {
           setBrosur(response.data);
         }
       } catch (error) {
-        console.log('Brosur belum tersedia');
+        console.log("Brosur belum tersedia");
         setBrosur(null);
       } finally {
         setBrosurLoading(false);
@@ -46,11 +46,16 @@ export default function Register() {
         const response = await PromosiService.getBanner();
         if (response.success && response.data) {
           setBanner(response.data);
-          console.log('✅ Banner loaded:', response.data);
-          console.log('📸 Banner URL:', `http://localhost:5000/uploads/promosi/${encodeURIComponent(response.data.gambar)}`);
+          console.log("✅ Banner loaded:", response.data);
+          console.log(
+            "📸 Banner URL:",
+            `http://localhost:5000/uploads/promosi/${encodeURIComponent(
+              response.data.gambar
+            )}`
+          );
         }
       } catch (error) {
-        console.log('Banner belum tersedia, menggunakan default');
+        console.log("Banner belum tersedia, menggunakan default");
         setBanner(null);
       } finally {
         setBannerLoading(false);
@@ -65,7 +70,7 @@ export default function Register() {
         // Initialize faqOpen state with false for each FAQ
         setFaqOpen(new Array(data.length).fill(false));
       } catch (error) {
-        console.log('FAQ belum tersedia');
+        console.log("FAQ belum tersedia");
         setFaqs([]);
         setFaqOpen([]);
       } finally {
@@ -82,47 +87,47 @@ export default function Register() {
   const handleDownloadBrosur = async () => {
     if (!brosur) {
       Swal.fire({
-        icon: 'info',
-        title: 'Brosur Belum Tersedia',
-        text: 'Brosur sedang dalam proses pembuatan. Silakan coba lagi nanti.',
+        icon: "info",
+        title: "Brosur Belum Tersedia",
+        text: "Brosur sedang dalam proses pembuatan. Silakan coba lagi nanti.",
       });
       return;
     }
 
     try {
       const brosurUrl = `http://localhost:5000/uploads/promosi/${brosur.gambar}`;
-      
+
       // Fetch the file as blob
       const response = await fetch(brosurUrl);
       const blob = await response.blob();
-      
+
       // Create download link
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       const objectUrl = URL.createObjectURL(blob);
       link.href = objectUrl;
       link.download = `Brosur_Pesantren_AlIhsan_${new Date().getFullYear()}.jpg`;
-      
+
       // Trigger download
       document.body.appendChild(link);
       link.click();
-      
+
       // Cleanup
       document.body.removeChild(link);
       URL.revokeObjectURL(objectUrl);
 
       Swal.fire({
-        icon: 'success',
-        title: 'Berhasil!',
-        text: 'Brosur berhasil diunduh',
+        icon: "success",
+        title: "Berhasil!",
+        text: "Brosur berhasil diunduh",
         timer: 1500,
         showConfirmButton: false,
       });
     } catch (error) {
-      console.error('Error downloading brosur:', error);
+      console.error("Error downloading brosur:", error);
       Swal.fire({
-        icon: 'error',
-        title: 'Gagal',
-        text: 'Gagal mengunduh brosur. Silakan coba lagi.',
+        icon: "error",
+        title: "Gagal",
+        text: "Gagal mengunduh brosur. Silakan coba lagi.",
       });
     }
   };
@@ -161,12 +166,14 @@ export default function Register() {
         {/* Background image menggunakan img tag untuk handle encoding lebih baik */}
         {banner ? (
           <img
-            src={`http://localhost:5000/uploads/promosi/${encodeURIComponent(banner.gambar)}`}
+            src={`http://localhost:5000/uploads/promosi/${encodeURIComponent(
+              banner.gambar
+            )}`}
             alt="Banner Pesantren Al Ihsan"
             className="absolute inset-0 w-full h-full object-cover"
             onError={(e) => {
-              console.error('❌ Error loading banner image');
-              e.target.src = '/assets/FotoPesantren.png';
+              console.error("❌ Error loading banner image");
+              e.target.src = "/assets/FotoPesantren.png";
             }}
           />
         ) : (
@@ -175,7 +182,7 @@ export default function Register() {
             style={{ backgroundImage: "url(/assets/FotoPesantren.png)" }}
           />
         )}
-        
+
         {/* <div className="absolute inset-0 bg-black/40" />
         <div className="absolute top-0 bottom-0 left-0 right-0 flex flex-col justify-center px-6 sm:px-16">
           <h1 className="max-w-2xl mb-3 text-3xl font-extrabold text-white sm:text-4xl drop-shadow-lg">
@@ -188,13 +195,15 @@ export default function Register() {
             pendidikan yang berkualitas, berakhlak mulia, dan berbasis keilmuan.
           </p>
         </div> */}
-        
+
         {/* Loading indicator saat fetch banner */}
         {bannerLoading && (
           <div className="absolute top-4 right-4 bg-white/20 backdrop-blur-sm px-3 py-2 rounded-full z-10">
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-              <span className="text-xs text-white font-medium">Memuat banner...</span>
+              <span className="text-xs text-white font-medium">
+                Memuat banner...
+              </span>
             </div>
           </div>
         )}
@@ -234,7 +243,7 @@ export default function Register() {
             Brosur ini disusun agar calon santri dan wali santri lebih mudah
             memahami visi, misi, serta layanan yang tersedia di pesantren.
           </p>
-          <button 
+          <button
             onClick={handleDownloadBrosur}
             disabled={!brosur || brosurLoading}
             className="px-6 py-2 text-base font-semibold text-white transition bg-teal-700 rounded-full shadow hover:bg-teal-800 disabled:bg-slate-400 disabled:cursor-not-allowed"
@@ -245,9 +254,9 @@ export default function Register() {
                 Memuat...
               </span>
             ) : brosur ? (
-              '📥 Unduh Brosur'
+              "📥 Unduh Brosur"
             ) : (
-              'Brosur Belum Tersedia'
+              "Brosur Belum Tersedia"
             )}
           </button>
         </div>
@@ -255,12 +264,12 @@ export default function Register() {
 
       {/* Timeline section */}
       <section className="w-full max-w-6xl px-4 mx-auto mt-16">
-        <h3 className="mb-12 text-3xl font-bold text-center text-slate-900">
-          Timeline <span className="text-amber-500">Pendaftaran</span>
+        <h3 className="mb-8 sm:mb-12 text-2xl sm:text-3xl font-bold text-center text-slate-900">
+          Tahapan <span className="text-amber-500">Pendaftaran</span>
         </h3>
 
-        {/* Timeline Container dengan background terang */}
-        <div className="relative bg-gradient-to-r from-slate-50 to-orange-50 rounded-2xl p-12 shadow-lg">
+        {/* Timeline Container dengan background terang - Desktop Version */}
+        <div className="hidden md:block relative bg-gradient-to-r from-slate-50 to-orange-50 rounded-2xl p-12 shadow-lg">
           {/* Garis horizontal oranye */}
           <div className="absolute left-12 right-12 top-1/2 h-1 bg-amber-500 rounded-full transform -translate-y-1/2" />
 
@@ -273,24 +282,19 @@ export default function Register() {
                 position: "above",
               },
               {
-                title: "Tes",
-                bold: "Psikologi",
-                position: "below",
-              },
-              {
                 title: "Tes Baca",
                 bold: "Al-Quran",
-                position: "above",
-              },
-              {
-                title: "Wawancara",
-                bold: "Casantri",
                 position: "below",
               },
               {
                 title: "Karantina",
                 bold: "Casantri",
                 position: "above",
+              },
+              {
+                title: "Wawancara",
+                bold: "Casantri",
+                position: "below",
               },
             ].map((step, i) => (
               <div key={i} className="relative flex flex-col items-center z-10">
@@ -322,6 +326,51 @@ export default function Register() {
                 )}
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* Timeline Container - Mobile Version (Vertical) */}
+        <div className="md:hidden bg-gradient-to-b from-slate-50 to-orange-50 rounded-2xl p-6 shadow-lg">
+          <div className="relative">
+            {/* Garis vertikal oranye */}
+            <div className="absolute left-4 top-0 bottom-0 w-1 bg-amber-500 rounded-full" />
+
+            {/* Timeline steps vertical */}
+            <div className="space-y-8">
+              {[
+                {
+                  title: "Seleksi",
+                  bold: "Administrasi",
+                },
+                {
+                  title: "Tes Baca",
+                  bold: "Al-Quran",
+                },
+                {
+                  title: "Karantina",
+                  bold: "Casantri",
+                },
+                {
+                  title: "Wawancara",
+                  bold: "Casantri",
+                },
+              ].map((step, i) => (
+                <div key={i} className="relative flex items-center gap-4 z-10">
+                  {/* Titik oranye bulat */}
+                  <div className="w-4 h-4 bg-amber-500 rounded-full shadow-md flex-shrink-0" />
+
+                  {/* Label */}
+                  <div className="text-left">
+                    <span className="text-sm sm:text-base text-slate-800">
+                      {step.title}{" "}
+                      <span className="font-bold text-slate-900">
+                        {step.bold}
+                      </span>
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
