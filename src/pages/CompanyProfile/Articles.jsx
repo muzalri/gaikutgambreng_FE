@@ -124,12 +124,12 @@ export default function Articles() {
           </div>
 
           {/* Search and Filter - Responsive */}
-          <div className="flex flex-col gap-3 px-2 mb-6 sm:flex-row sm:items-center sm:justify-end sm:px-6">
-            <div className="relative w-full sm:w-auto">
+          <div className="flex flex-col gap-3 px-2 mb-6 sm:flex-row sm:items-center sm:justify-end sm:gap-4 sm:px-6">
+            <div className="relative w-full sm:w-auto sm:min-w-[200px]">
               <select
                 value={selectedCategory}
                 onChange={handleCategoryChange}
-                className="w-full px-4 py-2 pr-10 text-sm font-semibold text-teal-700 bg-white border border-teal-700 rounded-full shadow-sm appearance-none sm:px-6 focus:outline-none focus:ring-2 focus:ring-teal-400"
+                className="w-full px-4 py-2.5 pr-10 text-sm font-semibold text-teal-700 bg-white border border-teal-700 rounded-full shadow-sm appearance-none sm:px-6 focus:outline-none focus:ring-2 focus:ring-teal-400"
               >
                 {categories.map((category) => (
                   <option key={category} value={category}>
@@ -150,13 +150,13 @@ export default function Articles() {
                 </svg>
               </span>
             </div>
-            <form onSubmit={handleSearch} className="relative w-full sm:w-auto">
+            <form onSubmit={handleSearch} className="relative w-full sm:w-auto sm:min-w-[250px]">
               <input
                 type="text"
                 placeholder="Cari artikel..."
                 value={searchKeyword}
                 onChange={(e) => setSearchKeyword(e.target.value)}
-                className="w-full px-4 py-2 pr-10 text-sm font-semibold text-teal-700 bg-white border border-teal-700 rounded-full shadow-sm sm:px-6 focus:outline-none focus:ring-2 focus:ring-teal-400"
+                className="w-full px-4 py-2.5 pr-10 text-sm font-semibold text-teal-700 bg-white border border-teal-700 rounded-full shadow-sm sm:px-6 focus:outline-none focus:ring-2 focus:ring-teal-400"
               />
               <button
                 type="submit"
