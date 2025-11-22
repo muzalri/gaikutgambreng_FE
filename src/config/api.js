@@ -1,10 +1,10 @@
 import axios from 'axios';
 
 // Base URL untuk API
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://backend.pesantrenalihsanbekasi.or.id/api';
 
 // Base URL untuk server (untuk static files)
-export const SERVER_BASE_URL = process.env.REACT_APP_SERVER_URL || 'http://localhost:5000';
+export const SERVER_BASE_URL = process.env.REACT_APP_SERVER_URL || 'https://backend.pesantrenalihsanbekasi.or.id/';
 
 // Helper function untuk get full image URL
 export const getImageUrl = (path) => {

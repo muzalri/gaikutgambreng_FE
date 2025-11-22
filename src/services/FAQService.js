@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/faq";
+const API_URL = "https://backend.pesantrenalihsanbekasi.or.id/api/faq";
 
 const FAQService = {
   // Get all FAQs

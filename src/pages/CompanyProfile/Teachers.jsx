@@ -70,10 +70,10 @@ export default function Teachers() {
                   // Normalize leading slash and encode spaces/special chars
                   const path = photoUrl.startsWith("/") ? photoUrl : `/${photoUrl}`;
                   try {
-                    photoUrl = new URL(path, 'http://localhost:5000').toString();
+                    photoUrl = new URL(path, 'https://backend.pesantrenalihsanbekasi.or.id').toString();
                   } catch (e) {
                     // Fallback if URL constructor fails
-                    photoUrl = `http://localhost:5000${encodeURI(path)}`;
+                    photoUrl = `https://backend.pesantrenalihsanbekasi.or.id${encodeURI(path)}`;
                   }
                 }
               }

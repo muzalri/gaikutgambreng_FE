@@ -94,7 +94,7 @@ export default function Beranda() {
       setBannerLoading(true);
       const response = await PromosiService.getBanner();
       console.log('✅ Banner loaded:', response.data);
-      console.log('📸 Banner URL:', `http://localhost:5000/uploads/promosi/${encodeURIComponent(response.data.gambar)}`);
+      console.log('📸 Banner URL:', `https://backend.pesantrenalihsanbekasi.or.id/uploads/promosi/${encodeURIComponent(response.data.gambar)}`);
       setBanner(response.data);
     } catch (error) {
       console.log('ℹ️ No banner found, using default');
@@ -164,7 +164,7 @@ export default function Beranda() {
               <div className="relative w-full h-[320px] rounded-2xl overflow-hidden shadow bg-white">
                 {banner ? (
                   <img
-                    src={`http://localhost:5000/uploads/promosi/${encodeURIComponent(banner.gambar)}`}
+                    src={`https://backend.pesantrenalihsanbekasi.or.id/uploads/promosi/${encodeURIComponent(banner.gambar)}`}
                     alt="Hero Banner"
                     className="object-cover w-full h-full"
                     onError={(e) => {

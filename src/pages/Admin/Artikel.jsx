@@ -337,7 +337,7 @@ export default function Artikel() {
     });
     // Set preview dengan URL lengkap dari server jika ada foto
     if (article.foto) {
-      setPreview(`http://localhost:5000${article.foto}`);
+      setPreview(`https://backend.pesantrenalihsanbekasi.or.id${article.foto}`);
     } else {
       setPreview(null);
     }
@@ -670,7 +670,7 @@ export default function Artikel() {
                   />
                 ) : formData.foto ? (
                   <img
-                    src={`http://localhost:5000${formData.foto}`}
+                    src={`https://backend.pesantrenalihsanbekasi.or.id${formData.foto}`}
                     alt="Foto artikel"
                     className="object-contain h-full rounded-lg"
                     onError={(e) => {

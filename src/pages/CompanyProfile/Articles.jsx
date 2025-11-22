@@ -203,7 +203,7 @@ export default function Articles() {
                   <div className="h-40 bg-slate-200 relative overflow-hidden">
                     {artikel.foto ? (
                       <img
-                        src={`http://localhost:5000${artikel.foto}`}
+                        src={`https://backend.pesantrenalihsanbekasi.or.id/${artikel.foto}`}
                         alt={artikel.judul}
                         className="object-cover w-full h-full"
                         onError={(e) => {
@@ -275,7 +275,7 @@ export default function Articles() {
             {selectedArtikel.foto && (
               <div className="w-full h-64 bg-slate-200">
                 <img
-                  src={`http://localhost:5000${selectedArtikel.foto}`}
+                  src={`https://backend.pesantrenalihsanbekasi.or.id${selectedArtikel.foto}`}
                   alt={selectedArtikel.judul}
                   className="object-cover w-full h-full"
                   onError={(e) => {

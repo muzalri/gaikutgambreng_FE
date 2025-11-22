@@ -423,7 +423,7 @@ export default function Santri() {
             const berkas = sorted[0] || {};
 
             // Generate document URLs
-            const baseUrl = 'http://localhost:5000';
+            const baseUrl = 'https://backend.pesantrenalihsanbekasi.or.id';
             const docs = [
               { key: 'kartu_keluarga', label: 'Kartu Keluarga' },
               { key: 'akta_kelahiran', label: 'Akta Kelahiran' },

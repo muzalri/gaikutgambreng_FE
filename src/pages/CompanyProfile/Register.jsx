@@ -47,7 +47,7 @@ export default function Register() {
         if (response.success && response.data) {
           setBanner(response.data);
           console.log('✅ Banner loaded:', response.data);
-          console.log('📸 Banner URL:', `http://localhost:5000/uploads/promosi/${encodeURIComponent(response.data.gambar)}`);
+          console.log('📸 Banner URL:', `https://backend.pesantrenalihsanbekasi.or.id/uploads/promosi/${encodeURIComponent(response.data.gambar)}`);
         }
       } catch (error) {
         console.log('Banner belum tersedia, menggunakan default');
@@ -90,7 +90,7 @@ export default function Register() {
     }
 
     try {
-      const brosurUrl = `http://localhost:5000/uploads/promosi/${brosur.gambar}`;
+      const brosurUrl = `https://backend.pesantrenalihsanbekasi.or.id/uploads/promosi/${brosur.gambar}`;
       
       // Fetch the file as blob
       const response = await fetch(brosurUrl);
@@ -161,7 +161,7 @@ export default function Register() {
         {/* Background image menggunakan img tag untuk handle encoding lebih baik */}
         {banner ? (
           <img
-            src={`http://localhost:5000/uploads/promosi/${encodeURIComponent(banner.gambar)}`}
+            src={`https://backend.pesantrenalihsanbekasi.or.id/uploads/promosi/${encodeURIComponent(banner.gambar)}`}
             alt="Banner Pesantren Al Ihsan"
             className="absolute inset-0 w-full h-full object-cover"
             onError={(e) => {
@@ -207,7 +207,7 @@ export default function Register() {
           </div>
         ) : brosur ? (
           <img
-            src={`http://localhost:5000/uploads/promosi/${brosur.gambar}`}
+            src={`https://backend.pesantrenalihsanbekasi.or.id/uploads/promosi/${brosur.gambar}`}
             alt="Brosur Pesantren Al Ihsan"
             className="w-[220px] h-[180px] object-cover rounded-lg shadow-lg border-2 border-amber-300 cursor-pointer hover:scale-105 transition-transform"
             onClick={handleDownloadBrosur}

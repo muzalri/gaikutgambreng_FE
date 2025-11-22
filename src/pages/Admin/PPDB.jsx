@@ -822,7 +822,7 @@ export default function PPDB() {
                                     <div className="p-3 mt-1 bg-slate-50 rounded">
                                       {selectedVoiceNote.file_path ? (
                                         <audio controls className="w-full">
-                                          <source src={`http://localhost:5000/${encodeURI(selectedVoiceNote.file_path)}`} />
+                                          <source src={`https://backend.pesantrenalihsanbekasi.or.id/${encodeURI(selectedVoiceNote.file_path)}`} />
                                           Browser Anda tidak mendukung pemutar audio.
                                         </audio>
                                       ) : (

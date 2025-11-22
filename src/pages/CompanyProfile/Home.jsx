@@ -247,7 +247,7 @@ export default function Home() {
                   let imageUrl = imagePath
                     ? imagePath.startsWith("http")
                       ? imagePath
-                      : `http://localhost:5000${imagePath}`
+                      : `https://backend.pesantrenalihsanbekasi.or.id${imagePath}`
                     : "/assets/achievements/sample.jpg";
 
                   // Encode the URL to handle spaces and special characters
@@ -389,7 +389,7 @@ export default function Home() {
                   let imageUrl = imagePath
                     ? imagePath.startsWith("http")
                       ? imagePath
-                      : `http://localhost:5000${imagePath}`
+                      : `https://backend.pesantrenalihsanbekasi.or.id${imagePath}`
                     : "/assets/activities/sample.jpg";
 
                   // Encode the URL to handle spaces and special characters
@@ -679,7 +679,7 @@ export default function Home() {
             {selectedArtikel.foto && (
               <div className="w-full h-64 bg-slate-200">
                 <img
-                  src={`http://localhost:5000${selectedArtikel.foto}`}
+                  src={`https://backend.pesantrenalihsanbekasi.or.id${selectedArtikel.foto}`}
                   alt={selectedArtikel.judul}
                   className="object-cover w-full h-full"
                   onError={(e) => {

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/promosi";
+const API_URL = "https://backend.pesantrenalihsanbekasi.or.id/api/promosi";
 
 const PromosiService = {
   // Get banner (hanya 1)

@@ -34,7 +34,7 @@ export default function Berkas() {
       const finalUrl = parsedData?.foto 
         ? (parsedData.foto.startsWith('http') 
             ? parsedData.foto 
-            : `http://localhost:5000/${parsedData.foto}`)
+            : `https://backend.pesantrenalihsanbekasi.or.id/${parsedData.foto}`)
         : "/assets/teachers/Drs.-K.H.-Mudrik-Qori-MA-Mudir 1.png";
       
       console.log('📸 Final URL untuk foto:', finalUrl);
@@ -557,7 +557,7 @@ export default function Berkas() {
               santriData?.foto 
                 ? (santriData.foto.startsWith('http') 
                     ? santriData.foto 
-                    : `http://localhost:5000/${santriData.foto}`)
+                    : `https://backend.pesantrenalihsanbekasi.or.id/${santriData.foto}`)
                 : "/assets/teachers/Drs.-K.H.-Mudrik-Qori-MA-Mudir 1.png"
             }
             alt="Profile"
@@ -800,7 +800,7 @@ export default function Berkas() {
                   
                   <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
                     {submittedBerkas.kartu_keluarga && (
-                      <a href={`http://localhost:5000/${submittedBerkas.kartu_keluarga}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-purple-700 transition rounded-lg bg-purple-50 hover:bg-purple-100 hover:shadow">
+                      <a href={`https://backend.pesantrenalihsanbekasi.or.id/${submittedBerkas.kartu_keluarga}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-purple-700 transition rounded-lg bg-purple-50 hover:bg-purple-100 hover:shadow">
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
@@ -808,7 +808,7 @@ export default function Berkas() {
                       </a>
                     )}
                     {submittedBerkas.akta_kelahiran && (
-                      <a href={`http://localhost:5000/${submittedBerkas.akta_kelahiran}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-yellow-700 transition rounded-lg bg-yellow-50 hover:bg-yellow-100 hover:shadow">
+                      <a href={`https://backend.pesantrenalihsanbekasi.or.id/${submittedBerkas.akta_kelahiran}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-yellow-700 transition rounded-lg bg-yellow-50 hover:bg-yellow-100 hover:shadow">
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                         </svg>
@@ -816,7 +816,7 @@ export default function Berkas() {
                       </a>
                     )}
                     {submittedBerkas.rapor && (
-                      <a href={`http://localhost:5000/${submittedBerkas.rapor}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-indigo-700 transition rounded-lg bg-indigo-50 hover:bg-indigo-100 hover:shadow">
+                      <a href={`https://backend.pesantrenalihsanbekasi.or.id/${submittedBerkas.rapor}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-indigo-700 transition rounded-lg bg-indigo-50 hover:bg-indigo-100 hover:shadow">
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                         </svg>
@@ -824,7 +824,7 @@ export default function Berkas() {
                       </a>
                     )}
                     {submittedBerkas.surat_kematian && (
-                      <a href={`http://localhost:5000/${submittedBerkas.surat_kematian}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 transition rounded-lg bg-gray-50 hover:bg-gray-100 hover:shadow">
+                      <a href={`https://backend.pesantrenalihsanbekasi.or.id/${submittedBerkas.surat_kematian}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 transition rounded-lg bg-gray-50 hover:bg-gray-100 hover:shadow">
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
@@ -832,7 +832,7 @@ export default function Berkas() {
                       </a>
                     )}
                     {submittedBerkas.foto_santri && (
-                      <a href={`http://localhost:5000/${submittedBerkas.foto_santri}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-blue-700 transition rounded-lg bg-blue-50 hover:bg-blue-100 hover:shadow">
+                      <a href={`https://backend.pesantrenalihsanbekasi.or.id/${submittedBerkas.foto_santri}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-blue-700 transition rounded-lg bg-blue-50 hover:bg-blue-100 hover:shadow">
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
@@ -840,7 +840,7 @@ export default function Berkas() {
                       </a>
                     )}
                     {submittedBerkas.sertifikat_hafalan && (
-                      <a href={`http://localhost:5000/${submittedBerkas.sertifikat_hafalan}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-green-700 transition rounded-lg bg-green-50 hover:bg-green-100 hover:shadow">
+                      <a href={`https://backend.pesantrenalihsanbekasi.or.id/${submittedBerkas.sertifikat_hafalan}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-green-700 transition rounded-lg bg-green-50 hover:bg-green-100 hover:shadow">
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
                         </svg>
@@ -848,7 +848,7 @@ export default function Berkas() {
                       </a>
                     )}
                     {submittedBerkas.sertifikat_penghargaan && (
-                      <a href={`http://localhost:5000/${submittedBerkas.sertifikat_penghargaan}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-pink-700 transition rounded-lg bg-pink-50 hover:bg-pink-100 hover:shadow">
+                      <a href={`https://backend.pesantrenalihsanbekasi.or.id/${submittedBerkas.sertifikat_penghargaan}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-pink-700 transition rounded-lg bg-pink-50 hover:bg-pink-100 hover:shadow">
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
                         </svg>
@@ -896,7 +896,7 @@ export default function Berkas() {
                             normalizedPath = normalizedPath.substring(uploadsIndex);
                           }
                           
-                          const audioUrl = `http://localhost:5000/${encodeURI(normalizedPath)}`;
+                          const audioUrl = `https://backend.pesantrenalihsanbekasi.or.id/${encodeURI(normalizedPath)}`;
                           
                           console.log('🎵 Original path:', submittedVoiceNote.file_path);
                           console.log('🎵 Normalized path:', normalizedPath);

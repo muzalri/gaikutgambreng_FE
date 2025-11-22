@@ -34,7 +34,7 @@ export default function AdminHeader() {
         <span className="font-semibold">Halo, {adminName}</span>
         {adminPhotoProfile ? (
           <img
-            src={`http://localhost:5000/${adminPhotoProfile}`}
+            src={`https://backend.pesantrenalihsanbekasi.or.id/${adminPhotoProfile}`}
             alt="Admin"
             className="object-cover w-8 h-8 border-2 border-white rounded-full"
           />

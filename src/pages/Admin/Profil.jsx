@@ -248,7 +248,7 @@ export default function Profil() {
                             <div className="relative">
                               {photoPreview || adminData?.photo_profile ? (
                                 <img
-                                  src={photoPreview || `http://localhost:5000/${adminData.photo_profile}`}
+                                  src={photoPreview || `https://backend.pesantrenalihsanbekasi.or.id/${adminData.photo_profile}`}
                                   alt="Profile"
                                   className="object-cover w-24 h-24 border-4 border-teal-500 rounded-full"
                                 />
@@ -266,7 +266,7 @@ export default function Profil() {
                           <div>
                             {adminData?.photo_profile ? (
                               <img
-                                src={`http://localhost:5000/${adminData.photo_profile}`}
+                                src={`https://backend.pesantrenalihsanbekasi.or.id/${adminData.photo_profile}`}
                                 alt="Profile"
                                 className="object-cover w-24 h-24 border-4 border-teal-500 rounded-full"
                               />

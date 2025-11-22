@@ -374,7 +374,7 @@ export default function VoiceNote() {
                             {vn.file_path && (
                               <audio controls className="w-64">
                                 <source
-                                  src={`http://localhost:5000/${encodeURI(
+                                  src={`https://backend.pesantrenalihsanbekasi.or.id/${encodeURI(
                                     vn.file_path.replace(/\\/g, "/")
                                   )}`}
                                   type="audio/mpeg"
@@ -576,7 +576,7 @@ export default function VoiceNote() {
                         </label>
                         <audio controls className="w-full">
                           <source
-                            src={`http://localhost:5000/${encodeURI(
+                            src={`https://backend.pesantrenalihsanbekasi.or.id/${encodeURI(
                               selectedVN.file_path.replace(/\\/g, "/")
                             )}`}
                             type="audio/mpeg"

@@ -48,7 +48,7 @@ export default function Testimonial() {
           nama: item.nama,
           asal: item.asal || '',
           testimonial: item.testimonial,
-          foto: item.foto ? `http://localhost:5000/uploads/testimonial/${encodeURIComponent(item.foto)}` : 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
+          foto: item.foto ? `https://backend.pesantrenalihsanbekasi.or.id/uploads/testimonial/${encodeURIComponent(item.foto)}` : 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
           status: 'Aktif',
           kategori: item.kategori,
           angkatan: item.angkatan || ''
