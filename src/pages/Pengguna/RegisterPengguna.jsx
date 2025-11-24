@@ -171,28 +171,28 @@ export default function RegisterPengguna() {
   };
 
   return (
-    <div className="flex items-center justify-center w-full min-h-screen bg-white">
-      <div className="flex w-full h-screen">
-        {/* Left Side - Image & Title (no rounded) */}
-        <div
-          className="flex flex-col items-center justify-center w-1/2 h-full bg-center bg-cover"
-          style={{ backgroundImage: "url('/assets/FotoPesantren.png')" }}
-        >
-          <div className="flex flex-col items-center justify-center w-full h-full bg-black bg-opacity-40">
-            <h1 className="mb-2 text-5xl font-bold text-center text-white drop-shadow-lg">
-              Pesantren <span className="text-yellow-400">Al-Ihsan</span> Bekasi
-            </h1>
-          </div>
+    <div className="flex w-full min-h-screen">
+      {/* Left Side - Image (Desktop Only) */}
+      <div
+        className="hidden lg:flex flex-col items-center justify-center w-1/2 bg-center bg-cover"
+        style={{ backgroundImage: "url('/assets/FotoPesantren.png')" }}
+      >
+        <div className="flex items-center justify-center w-full h-full bg-black bg-opacity-40 px-8">
+          <h1 className="text-4xl xl:text-5xl font-bold text-center text-white drop-shadow-lg">
+            Pesantren <span className="text-yellow-400">Al-Ihsan</span> Bekasi
+          </h1>
         </div>
-        {/* Right Side - Form (no sidebar) */}
-        <div className="flex flex-col items-center justify-center w-1/2 h-full bg-white">
-          <div className="w-full max-w-md px-8">
-            <h2 className="mb-2 text-3xl font-bold text-center">
+      </div>
+        {/* Right Side - Form */}
+        <div className="flex items-center justify-center w-full lg:w-1/2 bg-white px-4 sm:px-6 lg:px-8 py-12">
+          <div className="w-full max-w-md">
+            <h2 className="mb-2 text-3xl font-bold text-center text-gray-800">
               SELAMAT DATANG
             </h2>
-            <p className="mb-6 text-center text-gray-600">
+            <p className="mb-8 text-center text-gray-600">
               Silahkan Masukkan Data Akun Anda!
             </p>
+
             <form className="flex flex-col gap-4" onSubmit={handleRegister}>
               <div className="flex items-center px-5 py-3 bg-gray-100 rounded-full">
                 <span className="mr-3 text-gray-400 material-icons">
@@ -279,24 +279,27 @@ export default function RegisterPengguna() {
                   </span>
                 </span>
               </div>
+
               <button
                 type="submit"
                 disabled={loading}
-                className={`w-full py-3 mt-2 font-semibold text-white bg-teal-700 rounded-full shadow-lg transition ${
-                  loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-teal-800'
+                className={`w-full py-3 mt-2 font-semibold text-white bg-gradient-to-r from-[#155e63] to-[#1ca7a7] rounded-full shadow-[0_4px_24px_0_rgba(21,94,99,0.15)] transition ${
+                  loading ? 'opacity-50 cursor-not-allowed' : 'hover:from-[#134e53] hover:to-[#178a8a]'
                 }`}
               >
                 {loading ? 'Membuat Akun...' : 'Buat Akun'}
               </button>
-              <div className="flex items-center my-2">
+
+              <div className="flex items-center my-4">
                 <div className="flex-1 h-px bg-gray-200" />
-                <span className="mx-2 text-gray-400 text-sm">atau</span>
+                <span className="mx-4 text-gray-400">atau</span>
                 <div className="flex-1 h-px bg-gray-200" />
               </div>
+
               <button
                 type="button"
                 onClick={handleGoogleRegister}
-                className="w-full flex items-center justify-center gap-3 py-3 mt-2 font-semibold text-white bg-gradient-to-r from-[#155e63] to-[#1ca7a7] rounded-full shadow-[0_4px_24px_0_rgba(21,94,99,0.15)] hover:from-[#134e53] hover:to-[#178a8a] transition"
+                className="w-full flex items-center justify-center gap-3 py-3 font-semibold text-white bg-gradient-to-r from-[#155e63] to-[#1ca7a7] rounded-full shadow-[0_4px_24px_0_rgba(21,94,99,0.15)] hover:from-[#134e53] hover:to-[#178a8a] transition"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path
@@ -320,6 +323,7 @@ export default function RegisterPengguna() {
                 <span>Daftar dengan Google</span>
               </button>
             </form>
+
             <div className="mt-6 text-center text-gray-700">
               Sudah punya akun?{" "}
               <a
@@ -332,6 +336,6 @@ export default function RegisterPengguna() {
           </div>
         </div>
       </div>
-    </div>
+    
   );
 }
