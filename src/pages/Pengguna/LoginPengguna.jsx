@@ -158,85 +158,88 @@ export default function LoginPengguna() {
   };
 
   return (
-    <div className="flex items-center justify-center w-full min-h-screen bg-white">
-      <div className="flex w-full h-screen">
-        {/* Left Side - Image & Title (no rounded) */}
-        <div
-          className="flex flex-col items-center justify-center w-1/2 h-full bg-center bg-cover"
-          style={{ backgroundImage: "url('/assets/FotoPesantren.png')" }}
-        >
-          <div className="flex flex-col items-center justify-center w-full h-full bg-black bg-opacity-40">
-            <h1 className="mb-2 text-5xl font-bold text-center text-white drop-shadow-lg">
-              Pesantren <span className="text-yellow-400">Al-Ihsan</span> Bekasi
-            </h1>
-          </div>
+    <div className="flex w-full min-h-screen">
+      {/* Left Side - Image (Desktop Only) */}
+      <div
+        className="hidden lg:flex flex-col items-center justify-center w-1/2 bg-center bg-cover"
+        style={{ backgroundImage: "url('/assets/FotoPesantren.png')" }}
+      >
+        <div className="flex items-center justify-center w-full h-full bg-black bg-opacity-40 px-8">
+          <h1 className="text-4xl xl:text-5xl font-bold text-center text-white drop-shadow-lg">
+            Pesantren <span className="text-yellow-400">Al-Ihsan</span> Bekasi
+          </h1>
         </div>
-        {/* Right Side - Form */}
-        <div className="flex flex-col items-center justify-center w-1/2 h-full bg-white">
-          <div className="w-full max-w-md px-8">
-            <h2 className="mb-2 text-3xl font-bold text-center">
-              Login Pengguna
-            </h2>
-            <p className="mb-6 text-center text-gray-600">
-              Silahkan Masukkan Data Akun Anda!
-            </p>
-            <form className="flex flex-col gap-4" onSubmit={handleLogin}>
-              <div className="flex items-center px-5 py-3 bg-gray-100 rounded-full">
-                <span className="mr-3 text-gray-400 material-icons">
-                  email
-                </span>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  placeholder="Masukkan Email..."
-                  className="w-full font-medium text-gray-700 bg-transparent outline-none"
-                  required
-                />
-              </div>
-              <div className="flex items-center px-5 py-3 bg-gray-100 rounded-full">
-                <span className="mr-3 text-gray-400 material-icons">lock</span>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  name="kata_sandi"
-                  value={formData.kata_sandi}
-                  onChange={handleInputChange}
-                  placeholder="Masukkan Kata Sandi..."
-                  className="w-full font-medium text-gray-700 bg-transparent outline-none"
-                  required
-                />
-                <span
-                  className="ml-3 text-gray-400 cursor-pointer select-none"
-                  onClick={() => setShowPassword(!showPassword)}
-                  tabIndex={0}
-                  role="button"
-                  aria-label="Toggle password visibility"
-                >
-                  <span className="material-icons">
-                    {showPassword ? "visibility_off" : "visibility"}
-                  </span>
-                </span>
-              </div>
-              <button
-                type="submit"
-                disabled={loading}
-                className={`w-full py-3 mt-2 font-semibold text-white  bg-gradient-to-r from-[#155e63] to-[#1ca7a7] rounded-full shadow-[0_4px_24px_0_rgba(21,94,99,0.15)] transition ${
-                  loading ? 'opacity-50 cursor-not-allowed' : 'hover:from-[#134e53] hover:to-[#178a8a]'
-                }`}
+      </div>
+
+      {/* Right Side - Form */}
+      <div className="flex items-center justify-center w-full lg:w-1/2 bg-white px-4 sm:px-6 lg:px-8 py-12">
+        <div className="w-full max-w-md">
+          <h2 className="mb-2 text-3xl font-bold text-center text-gray-800">
+            Login Pengguna
+          </h2>
+          <p className="mb-8 text-center text-gray-600">
+            Silahkan Masukkan Data Akun Anda!
+          </p>
+          <form className="flex flex-col gap-4" onSubmit={handleLogin}>
+            <div className="flex items-center px-5 py-3 bg-gray-100 rounded-full">
+              <span className="mr-3 text-gray-400 material-icons">
+                email
+              </span>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                placeholder="Masukkan Email..."
+                className="w-full font-medium text-gray-700 bg-transparent outline-none"
+                required
+              />
+            </div>
+            <div className="flex items-center px-5 py-3 bg-gray-100 rounded-full">
+              <span className="mr-3 text-gray-400 material-icons">lock</span>
+              <input
+                type={showPassword ? "text" : "password"}
+                name="kata_sandi"
+                value={formData.kata_sandi}
+                onChange={handleInputChange}
+                placeholder="Masukkan Kata Sandi..."
+                className="w-full font-medium text-gray-700 bg-transparent outline-none"
+                required
+              />
+              <span
+                className="ml-3 text-gray-400 cursor-pointer select-none"
+                onClick={() => setShowPassword(!showPassword)}
+                tabIndex={0}
+                role="button"
+                aria-label="Toggle password visibility"
               >
-                {loading ? 'Masuk...' : 'Masuk'}
-              </button>
-              <div className="flex items-center my-2">
-                <div className="flex-1 h-px bg-gray-200" />
-                <span className="mx-2 text-gray-400 text-sm">atau</span>
-                <div className="flex-1 h-px bg-gray-200" />
-              </div>
-              <button
-                type="button"
-                onClick={handleGoogleLogin}
-                className="w-full flex items-center justify-center gap-3 py-3 mt-2 font-semibold text-white bg-gradient-to-r from-[#155e63] to-[#1ca7a7] rounded-full shadow-[0_4px_24px_0_rgba(21,94,99,0.15)] hover:from-[#134e53] hover:to-[#178a8a] transition"
-              >
+                <span className="material-icons">
+                  {showPassword ? "visibility_off" : "visibility"}
+                </span>
+              </span>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className={`w-full py-3 mt-2 font-semibold text-white bg-gradient-to-r from-[#155e63] to-[#1ca7a7] rounded-full shadow-[0_4px_24px_0_rgba(21,94,99,0.15)] transition ${
+                loading ? 'opacity-50 cursor-not-allowed' : 'hover:from-[#134e53] hover:to-[#178a8a]'
+              }`}
+            >
+              {loading ? 'Masuk...' : 'Masuk'}
+            </button>
+
+            <div className="flex items-center my-4">
+              <div className="flex-1 h-px bg-gray-200" />
+              <span className="mx-4 text-gray-400">atau</span>
+              <div className="flex-1 h-px bg-gray-200" />
+            </div>
+
+            <button
+              type="button"
+              onClick={handleGoogleLogin}
+              className="w-full flex items-center justify-center gap-3 py-3 font-semibold text-white bg-gradient-to-r from-[#155e63] to-[#1ca7a7] rounded-full shadow-[0_4px_24px_0_rgba(21,94,99,0.15)] hover:from-[#134e53] hover:to-[#178a8a] transition"
+            >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path
                     fill="white"
@@ -254,20 +257,20 @@ export default function LoginPengguna() {
                     fill="white"
                     d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                   />
-                </svg>
-                <div className="w-px h-4 bg-white/30"></div>
-                <span>Masuk dengan Google</span>
-              </button>
-            </form>
-            <div className="mt-6 text-center text-gray-700">
-              Belum punya akun?{" "}
-              <a
-                href="/registerpengguna"
-                className="font-semibold text-teal-700 hover:underline"
-              >
-                Daftar Sekarang!
-              </a>
-            </div>
+              </svg>
+              <div className="w-px h-4 bg-white/30"></div>
+              <span>Masuk dengan Google</span>
+            </button>
+          </form>
+
+          <div className="mt-6 text-center text-gray-700">
+            Belum punya akun?{" "}
+            <a
+              href="/registerpengguna"
+              className="font-semibold text-teal-700 hover:underline"
+            >
+              Daftar Sekarang!
+            </a>
           </div>
         </div>
       </div>
