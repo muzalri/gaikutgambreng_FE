@@ -346,7 +346,7 @@ export default function Promosi() {
                     <div className="space-y-4">
                       <div className="overflow-hidden border-2 rounded-lg border-slate-200">
                         <img
-                          src={`https://backend.pesantrenalihsanbekasi.or.id/${banner.gambar}`}
+                          src={`https://backend.pesantrenalihsanbekasi.or.id/uploads/promosi/${banner.gambar}`}
                           alt="Banner Promosi"
                           className="object-cover w-full h-64"
                         />
