@@ -86,23 +86,39 @@ export default function Berkas() {
   const fetchSubmittedBerkas = async () => {
     try {
       const data = localStorage.getItem('santriData');
-      if (!data) return;
+      console.log('🔍 [fetchSubmittedBerkas] localStorage data:', data);
+      if (!data) {
+        console.log('❌ [fetchSubmittedBerkas] No santriData in localStorage');
+        return;
+      }
       
       const santri = JSON.parse(data);
-      const result = await BerkasService.getAll({ id_santri: santri.id });
+      console.log('🔍 [fetchSubmittedBerkas] Fetching berkas for santri ID:', santri.id);
+      console.log('🔍 [fetchSubmittedBerkas] santri.id type:', typeof santri.id);
+      console.log('🔍 [fetchSubmittedBerkas] Request params:', { id_santri: santri.id, limit: 100 });
+      
+      const result = await BerkasService.getAll({ id_santri: santri.id, limit: 100 });
+      console.log('🔍 [fetchSubmittedBerkas] API Response:', result);
+      console.log('🔍 [fetchSubmittedBerkas] Result.data:', result.data);
+      console.log('🔍 [fetchSubmittedBerkas] Result.data.length:', result.data?.length);
+      console.log('🔍 [fetchSubmittedBerkas] Pagination:', result.pagination);
       
       if (result.data && result.data.length > 0) {
         setSubmittedBerkas(result.data[0]); // Ambil berkas pertama
-        console.log('📄 Berkas yang sudah dikirim:', result.data[0]);
+        console.log('✅ [fetchSubmittedBerkas] Berkas yang sudah dikirim:', result.data[0]);
+        console.log('✅ [fetchSubmittedBerkas] State submittedBerkas akan di-set dengan:', result.data[0]);
         
         // Fetch voice note yang sudah diupload
         fetchSubmittedVoiceNote(santri.id, result.data[0].angkatan);
         
         // Fetch group chat untuk angkatan ini
         fetchGroupChat(result.data[0].angkatan);
+      } else {
+        console.log('⚠️ [fetchSubmittedBerkas] Tidak ada berkas ditemukan atau result.data kosong');
+        console.log('⚠️ [fetchSubmittedBerkas] result.data:', result.data);
       }
     } catch (error) {
-      console.error('Error fetching submitted berkas:', error);
+      console.error('❌ [fetchSubmittedBerkas] Error:', error);
     }
   };
 

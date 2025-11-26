@@ -36,7 +36,7 @@
   Header always set Referrer-Policy "strict-origin-when-cross-origin"
   
   # Content Security Policy
-  Header always set Content-Security-Policy "default-src 'self' https://backend.pesantrenalihsanbekasi.or.id https://accounts.google.com https://www.googleapis.com https://lh3.googleusercontent.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://backend.pesantrenalihsanbekasi.or.id https://accounts.google.com https://www.googleapis.com https://*.googleusercontent.com"
+  Header always set Content-Security-Policy "default-src 'self' https://backend.pesantrenalihsanbekasi.or.id https://accounts.google.com https://www.googleapis.com https://lh3.googleusercontent.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://backend.pesantrenalihsanbekasi.or.id https://accounts.google.com https://www.googleapis.com https://*.googleusercontent.com; media-src 'self' blob: data: https://backend.pesantrenalihsanbekasi.or.id"
 </IfModule>
 
 # Enable Gzip Compression

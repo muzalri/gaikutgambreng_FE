@@ -53,7 +53,8 @@ export default function PPDB() {
   const loadBerkas = async () => {
     try {
       setLoadingList(true);
-      const resp = await BerkasService.getAll({ limit: 100 });
+      // Add cache busting with timestamp
+      const resp = await BerkasService.getAll({ limit: 100, _t: Date.now() });
       const list = resp?.data || resp; // {success, data} or array
       if (Array.isArray(list) && list.length > 0) {
         const normalized = list.map((b, idx) => ({
@@ -244,8 +245,11 @@ export default function PPDB() {
               if (!isConfirmed) return;
               await BerkasService.updateStatus(selectedBerkasId, 'Diterima');
               await loadBerkas();
+              await new Promise(resolve => setTimeout(resolve, 300)); // Wait for DB to update
+              const detail = await BerkasService.getById(selectedBerkasId);
+              setSelectedBerkas(detail?.data || detail);
               await Swal.fire({ title: 'Berhasil', text: 'Status diubah menjadi Diterima', icon: 'success' });
-              closeModal();
+              // JANGAN tutup modal, biarkan user lihat perubahan
               return;
             }
             await Swal.fire({ title: 'Info', text: 'Tahapan sudah di level tertinggi.', icon: 'info' });
@@ -265,6 +269,7 @@ export default function PPDB() {
           await BerkasService.updateTahapan(selectedBerkasId, next);
           // Refresh list and selected berkas
           await loadBerkas();
+          await new Promise(resolve => setTimeout(resolve, 300)); // Wait for DB to update
           const detail = await BerkasService.getById(selectedBerkasId);
           setSelectedBerkas(detail?.data || detail);
           await Swal.fire({
@@ -272,8 +277,10 @@ export default function PPDB() {
             text: `Tahapan berhasil dimajukan ke ${nextLabel}`,
             icon: "success",
           });
+          // JANGAN tutup modal, biarkan user lihat perubahan dan bisa lanjut ke tahap berikutnya
+          return;
         }
-        closeModal();
+        // closeModal(); - DIHAPUS, modal tetap terbuka
         return;
       } else if (action === "Ditolak") {
         if (selectedBerkasId) {
@@ -288,13 +295,18 @@ export default function PPDB() {
           if (!isConfirmed) return;
           await BerkasService.updateStatus(selectedBerkasId, "Ditolak");
           await loadBerkas();
+          await new Promise(resolve => setTimeout(resolve, 300)); // Wait for DB to update
+          const detail = await BerkasService.getById(selectedBerkasId);
+          setSelectedBerkas(detail?.data || detail);
           await Swal.fire({
             title: "Berhasil",
             text: "Status berkas diubah menjadi Ditolak",
             icon: "success",
           });
+          // Modal tetap terbuka setelah ditolak
+          return;
         }
-        closeModal();
+        // closeModal(); - DIHAPUS
         return;
       }
     } catch (err) {

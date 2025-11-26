@@ -17,10 +17,19 @@ class BerkasService {
   // Get all berkas
   async getAll(params = {}) {
     try {
+      console.log('🌐 [BerkasService.getAll] API_URL:', API_URL);
+      console.log('🌐 [BerkasService.getAll] Params:', params);
+      console.log('🌐 [BerkasService.getAll] Full URL:', `${API_URL}/berkas?` + new URLSearchParams(params).toString());
+      
       const response = await axios.get(`${API_URL}/berkas`, { params });
+      
+      console.log('🌐 [BerkasService.getAll] Response status:', response.status);
+      console.log('🌐 [BerkasService.getAll] Response data:', response.data);
+      
       return response.data;
     } catch (error) {
-      console.error('Error fetching berkas:', error);
+      console.error('❌ [BerkasService.getAll] Error:', error);
+      console.error('❌ [BerkasService.getAll] Error response:', error.response?.data);
       throw error;
     }
   }
@@ -39,7 +48,9 @@ class BerkasService {
   // Get berkas by ID
   async getById(id) {
     try {
-      const response = await axios.get(`${API_URL}/berkas/${id}`);
+      // Add timestamp to prevent caching
+      const response = await axios.get(`${API_URL}/berkas/${id}?_t=${Date.now()}`);
+      console.log('🔄 [BerkasService.getById] Fresh data fetched for ID:', id, response.data);
       return response.data;
     } catch (error) {
       console.error('Error fetching berkas by ID:', error);

@@ -20,9 +20,17 @@ const api = axios.create({
   withCredentials: true,
 });
 
-// Request interceptor untuk menambahkan token jika ada
+// Request interceptor untuk menambahkan token dan cache busting
 api.interceptors.request.use(
   (config) => {
+    // Add cache busting timestamp untuk GET requests
+    if (config.method === 'get') {
+      config.params = {
+        ...config.params,
+        _t: Date.now()
+      };
+    }
+    
     console.log('🚀 Frontend Request:', {
       method: config.method.toUpperCase(),
       url: config.baseURL + config.url,
