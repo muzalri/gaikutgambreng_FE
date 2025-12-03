@@ -90,7 +90,7 @@ const AdminLogin = () => {
             <FaLock className="mr-2 text-gray-400" />
             <input
               type={showPassword ? "text" : "password"}
-              placeholder="Masukan Username Anda..."
+              placeholder="Masukan Password Anda..."
               className="w-full py-3 bg-transparent outline-none"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
